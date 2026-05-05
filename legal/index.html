@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edel | Legal - Terms & Privacy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/config/tailwind.js"></script>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/utilities.css" />
+    <link rel="stylesheet" href="../css/pages/static-page.css" />
+  </head>
+  <body class="static-page">
+    <header class="static-page__header">
+      <div class="static-page__header-inner">
+        <a href="/" class="static-page__brand">
+          <span class="static-page__brand-badge"><i data-lucide="sparkles" class="w-5 h-5"></i></span>
+          <span>Edel</span>
+        </a>
+        <nav class="static-page__nav">
+          <a href="/about/">About</a>
+          <a href="/contact/">Contact</a>
+          <a href="/provider-agreement/">Provider Agreement</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="static-page__hero">
+      <span class="static-page__eyebrow"><i data-lucide="shield" class="w-4 h-4"></i> Legal & Compliance</span>
+      <h1>Terms & Privacy.</h1>
+      <p>Please read our platform terms and privacy policy carefully to understand your rights, responsibilities, and how we protect your data.</p>
+    </section>
+
+    <main class="static-page__content">
+      <div class="static-page__grid">
+        <div class="static-page__stack">
+          <!-- Terms Section -->
+          <article class="static-page__card" id="terms">
+            <h2 class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand-navy">
+                <i data-lucide="scroll-text" class="w-6 h-6"></i>
+              </div>
+              Terms of Service
+            </h2>
+            <p class="static-page__muted mb-8 font-bold tracking-widest uppercase text-xs">Last Updated: April 30, 2026</p>
+            
+            <h3>1. Account Usage</h3>
+            <p>By creating an account on Edel, you agree to provide accurate information and maintain the security of your credentials. You are responsible for all activity that occurs under your account.</p>
+            
+            <h3>2. Service Transactions</h3>
+            <p>Edel is a marketplace platform. While we facilitate connections and verification, all service contracts and payments are currently handled directly between customers and providers. Edel is not a party to these service agreements.</p>
+            
+            <h3>3. Platform Limitations</h3>
+            <p>We strive for 100% uptime but do not guarantee it. We reserve the right to suspend accounts that violate our community standards or misuse the QR handshake system.</p>
+            
+            <h3>4. Dispute Handling</h3>
+            <p>While payments are off-platform, Edel maintains a reporting system. High rates of reports or disputes may lead to tier demotion or account termination.</p>
+          </article>
+
+          <!-- Privacy Section -->
+          <article class="static-page__card" id="privacy">
+            <h2 class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand-navy">
+                <i data-lucide="lock" class="w-6 h-6"></i>
+              </div>
+              Privacy Policy
+            </h2>
+            <p class="static-page__muted mb-8 font-bold tracking-widest uppercase text-xs">Last Updated: April 30, 2026</p>
+            
+            <h3>1. Information We Collect</h3>
+            <p>We collect basic account information (name, email, phone) and service-related data (listings, reviews). For providers, we require a profile photo to build trust.</p>
+            
+            <h3>2. Location Data</h3>
+            <p>As a proximity-based service, Edel requires access to your GPS location to function. This data is used to surface nearby services and to verify on-site arrival via our QR handshake flow.</p>
+            
+            <h3>3. Data Retention</h3>
+            <p>We retain transaction logs and reports to maintain platform security and handle disputes. You may request account deletion at any time through your profile settings.</p>
+            
+            <h3>4. Third-Party Services</h3>
+            <p>We use <strong class="text-brand-navy">Paystack</strong> for platform access fees and <strong class="text-brand-navy">Leaflet/OpenStreetMap</strong> for location services. These partners may collect data according to their own privacy policies.</p>
+          </article>
+        </div>
+
+        <aside class="static-page__stack">
+          <section class="static-page__card">
+            <h2>Quick Navigation</h2>
+            <nav class="flex flex-col gap-3">
+              <a href="#terms" class="text-brand-navy hover:text-brand-accent font-bold text-sm flex items-center gap-2">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i> Terms of Service
+              </a>
+              <a href="#privacy" class="text-brand-navy hover:text-brand-accent font-bold text-sm flex items-center gap-2">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i> Privacy Policy
+              </a>
+              <hr class="my-4 border-slate-200" />
+              <a href="/provider-agreement/" class="text-brand-navy hover:text-brand-accent font-bold text-sm flex items-center gap-2">
+                <i data-lucide="external-link" class="w-4 h-4"></i> Provider Agreement
+              </a>
+            </nav>
+          </section>
+
+          <section class="static-page__card bg-brand-navy text-white">
+            <h2 class="text-white">Legal Questions?</h2>
+            <p class="mb-8 text-slate-300">Need clarification on our terms? Our legal team is here to help.</p>
+            <a href="/contact/" class="static-page__cta static-page__cta--secondary w-full">Contact Legal Support</a>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="static-page__footer">
+      <div class="static-page__footer-logo">
+        <div class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-brand-navy">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        Edel
+      </div>
+      <p class="static-page__muted">&copy; 2026 Edel Platform. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/modules/core.js"></script>
+    <script src="../js/pages/static-page.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

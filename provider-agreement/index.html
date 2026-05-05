@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edel | Provider Agreement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/config/tailwind.js"></script>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/utilities.css" />
+    <link rel="stylesheet" href="../css/pages/static-page.css" />
+  </head>
+  <body class="static-page">
+    <header class="static-page__header">
+      <div class="static-page__header-inner">
+        <a href="/" class="static-page__brand">
+          <span class="static-page__brand-badge"><i data-lucide="sparkles" class="w-5 h-5"></i></span>
+          <span>Edel</span>
+        </a>
+        <nav class="static-page__nav">
+          <a href="/for-providers/">For Providers</a>
+          <a href="/pricing/">Pricing</a>
+          <a href="/legal/">Legal</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="static-page__hero">
+      <span class="static-page__eyebrow"><i data-lucide="briefcase" class="w-4 h-4"></i> Provider Legal</span>
+      <h1>Provider Agreement.</h1>
+      <p>This agreement outlines the professional standards and obligations for service providers on the Edel platform.</p>
+    </section>
+
+    <main class="static-page__content">
+      <div class="static-page__grid">
+        <div class="static-page__stack">
+          <article class="static-page__card">
+            <h2>1. Service Standards</h2>
+            <p>As a provider, you agree to maintain high standards of professionalism and quality. You must accurately describe your services, set fair prices, and keep your availability status up to date.</p>
+            <h3>Service Limit</h3>
+            <p>Each provider account is limited to a maximum of <strong class="text-brand-navy">5 unique service listings</strong>. This ensures quality and focus within your profile.</p>
+          </article>
+
+          <article class="static-page__card">
+            <h2>2. Verification & QR Handshake</h2>
+            <p>You agree to comply with our <strong class="text-brand-navy">QR Handshake verification flow</strong>. This means you MUST scan the customer's unique QR code upon physical arrival at the job site. Failure to follow this flow may lead to jobs not being recorded, loss of tier status, or account suspension.</p>
+            <h3>Geolocation</h3>
+            <p>You must have GPS enabled during active orders. We verify your location against the customer's to ensure the service is performed where requested.</p>
+          </article>
+
+          <article class="static-page__card">
+            <h2>3. Fees & Billing</h2>
+            <p>The first 3 successfully completed orders on Edel are free of platform fees. To continue receiving requests after the 3rd order, you must pay a <strong class="text-brand-navy">one-time, non-refundable Access Fee of ₦3,500</strong> via Paystack.</p>
+            <p>This fee grants you permanent access to the platform without monthly subscriptions or commissions on your service earnings.</p>
+          </article>
+
+          <article class="static-page__card">
+            <h2>4. Conduct & Termination</h2>
+            <p>Misuse of the platform, including fraudulent reviews, off-platform solicitations to bypass safety protocols, or consistent negative reports, will result in immediate termination of access without refund of the Access Fee.</p>
+          </article>
+        </div>
+
+        <aside class="static-page__stack">
+          <section class="static-page__card">
+            <h2>Tier Progression</h2>
+            <ul class="text-sm space-y-2">
+              <li><strong class="text-brand-navy">Rookie:</strong> 0-10 Completed Orders</li>
+              <li><strong class="text-brand-navy">Veteran:</strong> 11-50 Completed Orders</li>
+              <li><strong class="text-brand-navy">Elite:</strong> 51-200 Completed Orders</li>
+              <li><strong class="text-brand-navy">Platinum:</strong> 200+ Completed Orders</li>
+            </ul>
+          </section>
+
+          <section class="static-page__card bg-brand-navy text-white">
+            <h2 class="text-white">Ready to grow?</h2>
+            <p class="mb-8 text-slate-300">Agree to these terms and start building your business on Edel.</p>
+            <a href="/auth/" class="static-page__cta static-page__cta--secondary w-full">I Agree - Sign Up</a>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="static-page__footer">
+      <div class="static-page__footer-logo">
+        <div class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-brand-navy">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        Edel
+      </div>
+      <p class="static-page__muted">&copy; 2026 Edel Platform. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/modules/core.js"></script>
+    <script src="../js/pages/static-page.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

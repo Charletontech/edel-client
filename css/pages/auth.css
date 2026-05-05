@@ -1,0 +1,120 @@
+/* Custom Animations */
+      .fade-enter {
+        opacity: 0;
+        transform: translateY(10px);
+        transition:
+          opacity 0.4s ease-out,
+          transform 0.4s ease-out;
+      }
+      .fade-enter-active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .auth-gradient {
+        background: radial-gradient(
+          120% 120% at 50% 50%,
+          #1b3358 0%,
+          #06142e 60%,
+          #030816 100%
+        );
+      }
+
+      .bg-blur-blob {
+        position: absolute;
+        filter: blur(100px);
+        z-index: 0;
+        opacity: 0.4;
+        border-radius: 50%;
+      }
+
+      /* Hide scrollbar for form area if it gets too long */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Global animation variables */
+      :root {
+        --anim-ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+        --anim-fast: 200ms;
+        --anim-medium: 400ms;
+        --accent-glow: rgba(250, 204, 21, 0.12);
+      }
+
+      /* Smooth transitions for interactive elements */
+      .transition-all {
+        transition: all var(--anim-medium) var(--anim-ease) !important;
+      }
+
+      /* Ripple effect for buttons (don't override absolute-positioned buttons) */
+      button.ripple:not(.absolute) {
+        position: relative;
+        overflow: hidden;
+      }
+      .ripple-effect {
+        position: absolute;
+        border-radius: 50%;
+        transform: scale(0);
+        background: rgba(26, 35, 87, 0.12);
+        pointer-events: none;
+        animation: ripple 600ms var(--anim-ease);
+      }
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* Floating / bobbing animation for decorative elements */
+      .float-anim {
+        animation: float 6s ease-in-out infinite;
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      /* Blob slow motion */
+      .blob-1 {
+        animation: float 14s ease-in-out infinite;
+      }
+      .blob-2 {
+        animation: float 18s ease-in-out infinite reverse;
+      }
+
+      /* Input focus lift (scoped) */
+      .input-focus-lift:focus-within {
+        box-shadow: 0 18px 40px rgba(6, 20, 46, 0.06);
+        transform: translateY(-2px);
+      }
+
+      /* Tilt container baseline - will be controlled via JS */
+      .tilt-container {
+        transform-style: preserve-3d;
+        transition: transform 300ms var(--anim-ease);
+        will-change: transform;
+      }
+
+      /* Respect reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .float-anim,
+        .blob-1,
+        .blob-2,
+        .ripple-effect,
+        .tilt-container {
+          animation: none !important;
+          transition: none !important;
+        }
+      }

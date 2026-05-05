@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Edel | Profile & Settings</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script src="../js/config/tailwind.js"></script>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/utilities.css" />
+    <link rel="stylesheet" href="../css/pages/profile.css" />
+
+    <!-- CoolAlert.js -->
+    <script src="https://cdn.jsdelivr.net/npm/coolalertjs@latest/dist/coolalert.min.js"></script>
+  </head>
+  <body
+    class="bg-brand-light text-slate-800 antialiased overflow-hidden flex h-screen"
+  >
+    <!-- Desktop Sidebar -->
+    <aside
+      class="hidden lg:flex flex-col w-72 bg-brand-navy text-white h-full shadow-2xl z-40 shrink-0 relative"
+    >
+      <div class="p-6">
+        <a
+          href="/"
+          class="text-2xl font-bold tracking-tight flex items-center gap-3"
+        >
+          <div
+            class="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center text-brand-navy shadow-glow"
+          >
+            <i data-lucide="sparkles" class="w-6 h-6"></i>
+          </div>
+          Edel
+        </a>
+      </div>
+
+      <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <a
+          href="/discovery/"
+          class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
+        >
+          <i data-lucide="compass" class="w-5 h-5"></i> Discovery
+        </a>
+        <a
+          href="/activities/"
+          class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
+        >
+          <i data-lucide="map" class="w-5 h-5"></i> Activity Map
+        </a>
+        <a
+          href="/billing/"
+          class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
+        >
+          <i data-lucide="credit-card" class="w-5 h-5"></i> Transactions
+        </a>
+        <a
+          href="/profile/"
+          class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all flex justify-between"
+        >
+          <div class="flex items-center gap-4">
+            <i data-lucide="message-square" class="w-5 h-5"></i> Messages
+          </div>
+          <span
+            class="bg-brand-accent text-brand-navy text-xs font-bold px-2 py-0.5 rounded-full"
+            >3</span
+          >
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-4 px-4 py-3 bg-white/10 text-brand-accent rounded-2xl font-bold transition-all border border-white/10 mt-8"
+        >
+          <i data-lucide="user" class="w-5 h-5"></i> Profile & Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main
+      class="flex-1 flex flex-col h-full relative bg-slate-50 overflow-hidden"
+    >
+      <!-- Header (Sticky) -->
+      <header
+        class="glass-header z-30 px-6 lg:px-10 pt-8 pb-4 border-b border-slate-200/50 sticky top-0 flex justify-between items-center"
+      >
+        <div>
+          <h1 class="text-2xl font-bold text-brand-navy tracking-tight">
+            Profile
+          </h1>
+          <p class="text-sm text-slate-500 font-medium">
+            Manage your account and settings.
+          </p>
+        </div>
+
+        <!-- Developer Toggle (For Demonstration) -->
+        <div
+          class="hidden md:flex bg-white/90 backdrop-blur p-1 rounded-xl shadow-sm border border-slate-200 items-center"
+        >
+          <button
+            onclick="setView('customer')"
+            id="btn-view-customer"
+            class="px-6 py-2 rounded-lg bg-brand-navy text-brand-accent font-bold text-sm transition-all shadow-sm"
+          >
+            Customer View
+          </button>
+          <button
+            onclick="setView('provider')"
+            id="btn-view-provider"
+            class="px-6 py-2 rounded-lg text-slate-500 font-bold text-sm hover:text-brand-navy transition-all"
+          >
+            Provider View
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Content -->
+      <div
+        class="flex-1 overflow-y-auto p-4 lg:p-10 pb-32 lg:pb-10 no-scrollbar"
+      >
+        <div class="max-w-3xl mx-auto space-y-6">
+          <!-- Mobile Developer Toggle -->
+          <div
+            class="md:hidden flex bg-white p-1 rounded-xl shadow-sm border border-slate-200 items-center mb-6"
+          >
+            <button
+              onclick="setView('customer')"
+              id="btn-view-customer-mob"
+              class="flex-1 py-2 rounded-lg bg-brand-navy text-brand-accent font-bold text-sm transition-all shadow-sm"
+            >
+              Customer
+            </button>
+            <button
+              onclick="setView('provider')"
+              id="btn-view-provider-mob"
+              class="flex-1 py-2 rounded-lg text-slate-500 font-bold text-sm hover:text-brand-navy transition-all"
+            >
+              Provider
+            </button>
+          </div>
+
+          <!-- Profile Header Card (Dynamic) -->
+          <div
+            class="bg-white rounded-[2rem] p-6 lg:p-8 shadow-soft border border-slate-100 flex flex-col md:flex-row items-center md:items-start gap-6 relative overflow-hidden"
+          >
+            <!-- Background Decoration -->
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-brand-accent/10 rounded-bl-full -z-10"
+            ></div>
+
+            <div class="relative shrink-0">
+              <img
+                id="profile-avatar"
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+                class="w-24 h-24 rounded-3xl object-cover border-4 border-white shadow-lg"
+              />
+              <!-- Badge Container -->
+              <div
+                id="profile-badge-container"
+                class="hidden absolute -bottom-2 -right-2 w-8 h-8 verified-badge rounded-xl flex items-center justify-center border-2 border-white shadow-sm"
+                title="Verified Rookie"
+              >
+                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+              </div>
+            </div>
+
+            <div class="flex-1 text-center md:text-left">
+              <div
+                class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2"
+              >
+                <h2
+                  id="profile-name"
+                  class="text-2xl font-bold text-brand-navy"
+                >
+                  Sarah Jenkins
+                </h2>
+                <span
+                  id="profile-role-tag"
+                  class="bg-slate-100 text-slate-500 text-xs font-bold px-3 py-1 rounded-full self-center md:self-auto uppercase tracking-wide"
+                  >Customer</span
+                >
+              </div>
+              <p
+                class="text-slate-500 text-sm mb-4 flex items-center justify-center md:justify-start gap-2"
+              >
+                <i data-lucide="map-pin" class="w-4 h-4 text-brand-accent"></i>
+                Lagos, Nigeria
+              </p>
+
+              <!-- Metrics row -->
+              <div
+                class="flex items-center justify-center md:justify-start gap-6 border-t border-slate-100 pt-4 mt-2"
+              >
+                <div>
+                  <p
+                    class="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1"
+                  >
+                    Platform Rating
+                  </p>
+                  <p
+                    id="profile-rating"
+                    class="font-extrabold text-brand-navy text-lg flex items-center gap-1"
+                  >
+                    100%
+                    <i
+                      data-lucide="trending-up"
+                      class="w-4 h-4 text-green-500"
+                    ></i>
+                  </p>
+                </div>
+                <div
+                  id="metric-completed-jobs"
+                  class="hidden border-l border-slate-100 pl-6"
+                >
+                  <p
+                    class="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1"
+                  >
+                    Jobs Completed
+                  </p>
+                  <p
+                    id="jobs-completed-count"
+                    class="font-extrabold text-brand-navy text-lg"
+                  >
+                    0
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="absolute top-6 right-6 w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors shadow-sm border border-slate-200"
+            >
+              <i data-lucide="edit-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- ========================================== -->
+          <!-- PROVIDER SPECIFIC SETTINGS                   -->
+          <!-- ========================================== -->
+          <div id="provider-sections" class="hidden space-y-6">
+            <!-- Availability Dropdown -->
+            <div
+              class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  id="status-icon-container"
+                  class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 transition-colors duration-300"
+                >
+                  <i data-lucide="activity" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-brand-navy text-lg">
+                    Active Status
+                  </h3>
+                  <p id="status-description" class="text-sm text-slate-500">
+                    Currently receiving service requests.
+                  </p>
+                </div>
+              </div>
+
+              <div class="relative w-full sm:w-auto">
+                <select
+                  id="provider-status"
+                  onchange="updateProviderStatus(this)"
+                  class="status-select status-available w-full sm:w-40 pl-4 pr-10 py-3 rounded-xl font-bold text-sm border-2 transition-all duration-300 focus:outline-none cursor-pointer"
+                >
+                  <option value="available" class="text-slate-800">
+                    Available
+                  </option>
+                  <option value="busy" class="text-slate-800">Busy</option>
+                  <option value="unavailable" class="text-slate-800">
+                    Unavailable
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Manage Services -->
+            <div
+              class="bg-white rounded-3xl shadow-sm border border-slate-100"
+            >
+              <div
+                class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-3xl"
+              >
+                <div>
+                  <h3 class="font-bold text-brand-navy text-lg">My Services</h3>
+                  <p class="text-sm text-slate-500">
+                    You can list up to 5 active services.
+                  </p>
+                </div>
+                <!-- + Add Service Button -->
+                <button
+                  onclick="openModal('modal-add-service')"
+                  class="bg-brand-navy text-brand-accent px-4 py-2 rounded-lg font-bold text-sm shadow-sm hover:bg-brand-blue transition-colors flex items-center gap-2 active:scale-95"
+                >
+                  <i data-lucide="plus" class="w-4 h-4"></i> Add
+                </button>
+              </div>
+              <div id="services-list" class="p-4 space-y-3">
+                <!-- Services will be injected here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================== -->
+          <!-- SHARED SETTINGS (Personal Info, Security)    -->
+          <!-- ========================================== -->
+          <div
+            class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden"
+          >
+            <div
+              onclick="openModal('modal-personal-info')"
+              class="p-6 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-10 h-10 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center"
+                >
+                  <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-brand-navy text-sm">
+                    Personal Information
+                  </h4>
+                  <p class="text-xs text-slate-500">
+                    Update email, phone, and password
+                  </p>
+                </div>
+              </div>
+              <i
+                data-lucide="chevron-right"
+                class="w-5 h-5 text-slate-300 group-hover:text-brand-accent transition-colors"
+              ></i>
+            </div>
+
+            <div
+              onclick="openModal('modal-notifications')"
+              class="p-6 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center"
+                >
+                  <i data-lucide="bell" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-brand-navy text-sm">
+                    Notifications
+                  </h4>
+                  <p class="text-xs text-slate-500">
+                    Manage alerts and job requests
+                  </p>
+                </div>
+              </div>
+              <i
+                data-lucide="chevron-right"
+                class="w-5 h-5 text-slate-300 group-hover:text-brand-accent transition-colors"
+              ></i>
+            </div>
+
+            <div
+              onclick="openModal('modal-security')"
+              class="p-6 hover:bg-slate-50 transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"
+                >
+                  <i data-lucide="shield" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-brand-navy text-sm">
+                    Privacy & Security
+                  </h4>
+                  <p class="text-xs text-slate-500">
+                    Data, location tracking, and connected accounts
+                  </p>
+                </div>
+              </div>
+              <i
+                data-lucide="chevron-right"
+                class="w-5 h-5 text-slate-300 group-hover:text-brand-accent transition-colors"
+              ></i>
+            </div>
+          </div>
+
+          <!-- Logout Button -->
+          <button
+            id="logout-button"
+            class="w-full bg-red-50 text-red-600 font-bold py-4 rounded-2xl shadow-sm border border-red-100 hover:bg-red-100 transition-colors flex justify-center items-center gap-2"
+          >
+            <i data-lucide="log-out" class="w-5 h-5"></i> Log Out
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav
+      class="lg:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-between items-center px-6 py-3 pb-safe z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]"
+    >
+      <a
+        href="/discovery/"
+        class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-navy transition-colors"
+      >
+        <i data-lucide="compass" class="w-6 h-6"></i>
+        <span class="text-[10px] font-medium">Discover</span>
+      </a>
+      <a
+        href="/activities/"
+        class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-navy transition-colors"
+      >
+        <i data-lucide="map" class="w-6 h-6"></i>
+        <span class="text-[10px] font-medium">Activity</span>
+      </a>
+      <div class="relative -top-6">
+        <button
+          class="w-14 h-14 bg-brand-accent rounded-full flex items-center justify-center text-brand-navy shadow-glow border-4 border-white transition-transform active:scale-95"
+        >
+          <i data-lucide="plus" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <a
+        href="/billing/"
+        class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-navy transition-colors relative"
+      >
+        <i data-lucide="message-square" class="w-6 h-6"></i>
+        <span class="text-[10px] font-medium">Inbox</span>
+      </a>
+      <a
+        href="/profile/"
+        class="flex flex-col items-center gap-1 text-brand-navy"
+      >
+        <i data-lucide="user" class="w-6 h-6"></i>
+        <span class="text-[10px] font-bold">Profile</span>
+      </a>
+    </nav>
+
+    <!-- ======================================================= -->
+    <!-- MODALS SECTION                                          -->
+    <!-- ======================================================= -->
+
+    <!-- Shared Modal Overlay -->
+    <div
+      id="modal-overlay"
+      class="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 lg:p-0"
+    >
+      <!-- 1. Add Service Modal -->
+      <div
+        id="modal-add-service"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <h3 class="font-bold text-brand-navy text-xl">Add New Service</h3>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar space-y-6">
+          <div class="relative group z-0">
+            <i
+              data-lucide="grid"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <select
+              id="new-category"
+              required
+              class="float-input w-full pl-11 pr-10 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm appearance-none cursor-pointer"
+            >
+              <option value="" disabled selected hidden></option>
+              <option value="cleaning">Cleaning</option>
+              <option value="repairs">Repairs</option>
+              <option value="beauty">Beauty</option>
+              <option value="tutoring">Tutoring</option>
+            </select>
+            <label
+              for="new-category"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Service Category</label
+            >
+            <i
+              data-lucide="chevron-down"
+              class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none z-10"
+            ></i>
+          </div>
+
+          <div class="relative group z-0">
+            <i
+              data-lucide="tag"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="text"
+              id="new-title"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="new-title"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Service Title</label
+            >
+          </div>
+
+          <div class="relative group z-0">
+            <span
+              class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+              >₦</span
+            >
+            <input
+              type="number"
+              id="new-price"
+              required
+              placeholder=" "
+              class="float-input w-full pl-9 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="new-price"
+              class="float-label absolute left-9 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Base Pricing (₦)</label
+            >
+          </div>
+
+          <div class="relative group z-0">
+            <textarea
+              id="new-desc"
+              rows="3"
+              required
+              placeholder=" "
+              class="float-input w-full p-4 pt-5 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm no-scrollbar resize-none"
+            ></textarea>
+            <label
+              for="new-desc"
+              class="float-label absolute left-4 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left transition-all duration-300"
+              >Short Description</label
+            >
+          </div>
+        </div>
+
+        <div class="p-6 pt-0 mt-auto">
+          <button
+            id="btn-save-service"
+            onclick="saveNewService()"
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            Add Service <i data-lucide="check" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Upgrade Provider Modal -->
+      <div
+        id="modal-upgrade-provider"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <h3 class="font-bold text-brand-navy text-xl">Become a Provider</h3>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar space-y-6">
+          <p class="text-sm text-slate-500 mb-4">Complete your profile setup to start receiving service requests and earning on Edel.</p>
+          <div class="relative group z-0">
+            <i
+              data-lucide="grid"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <select
+              id="upgrade-category"
+              required
+              class="float-input w-full pl-11 pr-10 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm appearance-none cursor-pointer"
+            >
+              <option value="" disabled selected hidden></option>
+              <option value="cleaning">Cleaning</option>
+              <option value="repairs">Repairs</option>
+              <option value="beauty">Beauty</option>
+              <option value="tutoring">Tutoring</option>
+            </select>
+            <label
+              for="upgrade-category"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Service Category</label
+            >
+            <i
+              data-lucide="chevron-down"
+              class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none z-10"
+            ></i>
+          </div>
+
+          <div class="relative group z-0">
+            <i
+              data-lucide="tag"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="text"
+              id="upgrade-title"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="upgrade-title"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Main Service Title</label
+            >
+          </div>
+
+          <div class="relative group z-0">
+            <span
+              class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+              >₦</span
+            >
+            <input
+              type="number"
+              id="upgrade-price"
+              required
+              placeholder=" "
+              class="float-input w-full pl-9 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="upgrade-price"
+              class="float-label absolute left-9 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Starting Price (₦)</label
+            >
+          </div>
+
+          <div class="relative group z-0">
+            <textarea
+              id="upgrade-desc"
+              rows="3"
+              required
+              placeholder=" "
+              class="float-input w-full p-4 pt-5 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm no-scrollbar resize-none"
+            ></textarea>
+            <label
+              for="upgrade-desc"
+              class="float-label absolute left-4 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left transition-all duration-300"
+              >Brief Description</label
+            >
+          </div>
+        </div>
+
+        <div class="p-6 pt-0 mt-auto">
+          <button
+            onclick="submitProviderUpgrade()"
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            Create Provider Account <i data-lucide="check" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Account Upgrade Prompt Modal -->
+      <div
+        id="modal-upgrade-prompt"
+        class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div class="p-8 flex flex-col items-center text-center">
+          <div
+            class="w-20 h-20 bg-brand-light rounded-[2.5rem] flex items-center justify-center mb-6 shadow-sm border border-brand-accent/20"
+          >
+            <i
+              id="upgrade-prompt-icon"
+              data-lucide="shield-plus"
+              class="w-10 h-10 text-brand-navy"
+            ></i>
+          </div>
+          <h3
+            id="upgrade-prompt-title"
+            class="text-2xl font-extrabold text-brand-navy mb-3 px-4"
+          >
+            Switch to Provider
+          </h3>
+          <p
+            id="upgrade-prompt-message"
+            class="text-slate-500 text-sm leading-relaxed px-6"
+          >
+            You are currently a Customer. To access the Provider dashboard and
+            list services, you need to create a Provider profile.
+          </p>
+        </div>
+
+        <div class="p-8 pt-0 space-y-3">
+          <button
+            id="btn-confirm-upgrade"
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            Create Profile <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+          <button
+            onclick="closeModals()"
+            class="w-full bg-slate-50 text-slate-400 hover:text-slate-600 font-bold py-4 rounded-xl transition-all active:scale-95"
+          >
+            Maybe Later
+          </button>
+        </div>
+      </div>
+
+      <!-- Service Details Modal -->
+      <div
+        id="modal-service-details"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <h3 class="font-bold text-brand-navy text-xl">Service Details</h3>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-8 overflow-y-auto no-scrollbar space-y-6">
+          <div class="flex flex-col items-center text-center">
+            <div
+              id="detail-icon-container"
+              class="w-20 h-20 bg-brand-light rounded-[2.5rem] flex items-center justify-center mb-4 shadow-sm border border-brand-accent/20"
+            >
+              <i
+                id="detail-icon"
+                data-lucide="package"
+                class="w-10 h-10 text-brand-navy"
+              ></i>
+            </div>
+            <span
+              id="detail-category"
+              class="bg-brand-accent text-brand-navy text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest mb-2"
+              >Category</span
+            >
+            <h2
+              id="detail-title"
+              class="text-2xl font-extrabold text-brand-navy leading-tight"
+            >
+              Service Title
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p
+                class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1"
+              >
+                Base Price
+              </p>
+              <p id="detail-price" class="text-xl font-black text-brand-navy">
+                ₦0.00
+              </p>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p
+                class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1"
+              >
+                Status
+              </p>
+              <p
+                class="text-sm font-bold text-green-600 flex items-center gap-1"
+              >
+                <span
+                  class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                ></span>
+                Active
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h4
+              class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-3"
+            >
+              Description
+            </h4>
+            <div
+              class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm min-h-[100px]"
+            >
+              <p
+                id="detail-desc"
+                class="text-slate-600 text-sm leading-relaxed whitespace-pre-line"
+              >
+                Service description...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 pt-0 mt-auto flex gap-3">
+          <button
+            id="btn-edit-from-detail"
+            class="flex-1 bg-slate-100 text-brand-navy hover:bg-slate-200 font-bold py-4 rounded-xl transition-all active:scale-95"
+          >
+            Edit Service
+          </button>
+          <button
+            onclick="closeModals()"
+            class="flex-1 bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Personal Information Modal -->
+      <div
+        id="modal-personal-info"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <h3 class="font-bold text-brand-navy text-xl">
+            Personal Information
+          </h3>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar space-y-6">
+          <div class="relative group z-0">
+            <i
+              data-lucide="user"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="text"
+              id="info-name"
+              value="Sarah Jenkins"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="info-name"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Full Name</label
+            >
+          </div>
+
+          <div class="relative group z-0">
+            <i
+              data-lucide="mail"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="email"
+              id="info-email"
+              value="sarah@example.com"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="info-email"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Email Address</label
+            >
+          </div>
+
+          <div class="relative group z-0">
+            <i
+              data-lucide="phone"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="tel"
+              id="info-phone"
+              value="+2348000000000"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="info-phone"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Phone Number</label
+            >
+          </div>
+        </div>
+
+        <div class="p-6 pt-0 mt-auto">
+          <button
+            onclick="updateProfile()"
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Notifications Modal -->
+      <div
+        id="modal-notifications"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <h3 class="font-bold text-brand-navy text-xl">Notifications</h3>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar space-y-4">
+          <!-- Toggle 1 -->
+          <div
+            class="flex items-center justify-between p-4 border border-slate-200 rounded-2xl"
+          >
+            <div>
+              <h4 class="font-bold text-brand-navy text-sm">
+                Push Notifications
+              </h4>
+              <p class="text-xs text-slate-500">
+                Receive alerts on your device
+              </p>
+            </div>
+            <div class="relative inline-block w-12 align-middle select-none">
+              <input
+                type="checkbox"
+                name="toggle-push"
+                id="toggle-push"
+                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+                checked
+              />
+              <label
+                for="toggle-push"
+                class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+              ></label>
+            </div>
+          </div>
+
+          <!-- Toggle 2 -->
+          <div
+            class="flex items-center justify-between p-4 border border-slate-200 rounded-2xl"
+          >
+            <div>
+              <h4 class="font-bold text-brand-navy text-sm">Email Alerts</h4>
+              <p class="text-xs text-slate-500">
+                Weekly summaries and receipts
+              </p>
+            </div>
+            <div class="relative inline-block w-12 align-middle select-none">
+              <input
+                type="checkbox"
+                name="toggle-email"
+                id="toggle-email"
+                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+                checked
+              />
+              <label
+                for="toggle-email"
+                class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+              ></label>
+            </div>
+          </div>
+
+          <!-- Toggle 3 -->
+          <div
+            class="flex items-center justify-between p-4 border border-slate-200 rounded-2xl"
+          >
+            <div>
+              <h4 class="font-bold text-brand-navy text-sm">SMS Updates</h4>
+              <p class="text-xs text-slate-500">Urgent job status changes</p>
+            </div>
+            <div class="relative inline-block w-12 align-middle select-none">
+              <input
+                type="checkbox"
+                name="toggle-sms"
+                id="toggle-sms"
+                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+              />
+              <label
+                for="toggle-sms"
+                class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+              ></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 pt-0 mt-auto">
+          <button
+            onclick="updatePreferences()"
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            Update Preferences
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Privacy & Security Modal -->
+      <div
+        id="modal-security"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <h3 class="font-bold text-brand-navy text-xl">Privacy & Security</h3>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar space-y-6">
+          <button
+            onclick="openModal('modal-change-password')"
+            class="w-full flex items-center justify-between p-4 border border-slate-200 rounded-2xl hover:border-brand-navy hover:bg-slate-50 transition-colors group"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 group-hover:text-brand-navy transition-colors"
+              >
+                <i data-lucide="key" class="w-4 h-4"></i>
+              </div>
+              <span class="font-bold text-brand-navy text-sm"
+                >Change Password</span
+              >
+            </div>
+            <i
+              data-lucide="chevron-right"
+              class="w-4 h-4 text-slate-300 group-hover:text-brand-navy transition-colors"
+            ></i>
+          </button>
+
+          <div
+            class="flex items-center justify-between p-4 border border-slate-200 rounded-2xl opacity-50 select-none"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-400"
+              >
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 mb-0.5">
+                  <h4 class="font-bold text-slate-500 text-sm">
+                    Two-Factor Auth (2FA)
+                  </h4>
+                  <span
+                    class="bg-slate-200 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+                    >v2</span
+                  >
+                </div>
+                <p class="text-xs text-slate-400">Extra layer of security</p>
+              </div>
+            </div>
+            <div class="relative inline-block w-12 align-middle">
+              <input
+                type="checkbox"
+                disabled
+                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-not-allowed"
+              />
+              <label
+                class="block overflow-hidden h-6 rounded-full bg-gray-200 cursor-not-allowed"
+              ></label>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="pt-4 border-t border-slate-200">
+            <h4
+              class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-3"
+            >
+              Danger Zone
+            </h4>
+            <button
+              onclick="deleteAccount()"
+              class="w-full flex items-center justify-between p-4 border border-red-200 bg-red-50 rounded-2xl hover:bg-red-100 transition-colors group"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600 group-hover:bg-red-200 transition-colors"
+                >
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </div>
+                <div class="text-left">
+                  <h4 class="font-bold text-red-600 text-sm">Delete Account</h4>
+                  <p class="text-xs text-red-500/70">
+                    Permanently remove your data
+                  </p>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Change Password Modal -->
+      <div
+        id="modal-change-password"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <div class="flex items-center gap-3">
+            <button
+              onclick="openModal('modal-security')"
+              class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+            >
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            </button>
+            <h3 class="font-bold text-brand-navy text-xl">Change Password</h3>
+          </div>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar space-y-6">
+          <div class="relative group z-0">
+            <i
+              data-lucide="lock"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="password"
+              id="current-password"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-12 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="current-password"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Current Password</label
+            >
+            <button
+              type="button"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-navy transition-colors z-10"
+            >
+              <i data-lucide="eye" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <div class="relative group z-0">
+            <i
+              data-lucide="key-round"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="password"
+              id="new-password"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-12 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="new-password"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >New Password</label
+            >
+            <button
+              type="button"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-navy transition-colors z-10"
+            >
+              <i data-lucide="eye" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <div class="relative group z-0">
+            <i
+              data-lucide="shield-check"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="password"
+              id="confirm-password"
+              required
+              placeholder=" "
+              class="float-input w-full pl-11 pr-12 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="confirm-password"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Confirm New Password</label
+            >
+            <button
+              type="button"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-navy transition-colors z-10"
+            >
+              <i data-lucide="eye" class="w-5 h-5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6 pt-0 mt-auto">
+          <button
+            onclick="updatePassword()"
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            Update Password
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/modules/core.js"></script>
+    <script src="../js/config/env.js"></script>
+    <script src="../js/modules/api.js"></script>
+    <script src="../js/modules/ui-utils.js"></script>
+    <script src="../js/modules/auth.js"></script>
+    <script src="../js/pages/profile.js"></script>
+  </body>
+</html>

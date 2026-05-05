@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edel | How It Works</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/config/tailwind.js"></script>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/utilities.css" />
+    <link rel="stylesheet" href="../css/pages/static-page.css" />
+  </head>
+  <body class="static-page">
+    <header class="static-page__header">
+      <div class="static-page__header-inner">
+        <a href="/" class="static-page__brand">
+          <span class="static-page__brand-badge"><i data-lucide="sparkles" class="w-5 h-5"></i></span>
+          <span>Edel</span>
+        </a>
+        <nav class="static-page__nav">
+          <a href="/about/">About</a>
+          <a href="/for-providers/">For Providers</a>
+          <a href="/pricing/">Pricing</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="static-page__hero">
+      <span class="static-page__eyebrow"><i data-lucide="route" class="w-4 h-4"></i> The Journey</span>
+      <h1>How Edel Works.</h1>
+      <p>From finding the right professional to completing a job securely, discover the step-by-step flow that makes Edel unique.</p>
+    </section>
+
+    <main class="static-page__content">
+      <div class="static-page__section-title">For Customers</div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div class="static-page__card group">
+          <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+            <i data-lucide="search" class="w-8 h-8"></i>
+          </div>
+          <h3>1. Discover</h3>
+          <p>Browse trending services nearby. We show you the closest pros first, along with their ratings and tier badges.</p>
+        </div>
+        <div class="static-page__card group">
+          <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+            <i data-lucide="shopping-cart" class="w-8 h-8"></i>
+          </div>
+          <h3>2. Order</h3>
+          <p>Found what you need? Tap 'Order' to send a real-time request. You'll be notified as soon as the provider accepts.</p>
+        </div>
+        <div class="static-page__card group">
+          <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+            <i data-lucide="qr-code" class="w-8 h-8"></i>
+          </div>
+          <h3>3. Handshake</h3>
+          <p>When the pro arrives, generate your unique QR code. Once they scan it, the service officially begins.</p>
+        </div>
+      </div>
+
+      <div class="static-page__section-title">For Providers</div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div class="static-page__card group">
+          <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+            <i data-lucide="bell" class="w-8 h-8"></i>
+          </div>
+          <h3>1. Accept</h3>
+          <p>Receive instant notifications for requests in your area. Review the customer details and accept the job.</p>
+        </div>
+        <div class="static-page__card group">
+          <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+            <i data-lucide="map-pin" class="w-8 h-8"></i>
+          </div>
+          <h3>2. Travel</h3>
+          <p>Head to the customer's location. Your status automatically switches to 'Busy' while the order is active.</p>
+        </div>
+        <div class="static-page__card group">
+          <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+            <i data-lucide="scan" class="w-8 h-8"></i>
+          </div>
+          <h3>3. Verify</h3>
+          <p>Scan the customer's QR code on arrival. Our system verifies your proximity before marking the service as started.</p>
+        </div>
+      </div>
+
+      <div class="static-page__grid">
+        <article class="static-page__card">
+          <h2>The Service Verification System</h2>
+          <p>We've replaced manual check-ins with a high-security verification flow. This ensures that every job logged on Edel is authentic and performed on-site.</p>
+          <h3>How it stays secure:</h3>
+          <ul>
+            <li><strong class="text-brand-navy">Single-Use Tokens:</strong> Every QR code is unique and expires in 3 minutes.</li>
+            <li><strong class="text-brand-navy">GPS Precision:</strong> We compare both parties' locations with a 50-meter accuracy requirement.</li>
+            <li><strong class="text-brand-navy">Socket.io Events:</strong> Status updates happen in real-time, instantly notifying both apps.</li>
+          </ul>
+        </article>
+        <aside class="static-page__stack">
+          <section class="static-page__card bg-brand-navy text-white">
+            <h2 class="text-white">Ready to Start?</h2>
+            <p class="mb-8 text-slate-300">Experience the future of local services today.</p>
+            <a href="/auth/" class="static-page__cta static-page__cta--secondary w-full">Join Edel Now</a>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="static-page__footer">
+      <div class="static-page__footer-logo">
+        <div class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-brand-navy">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        Edel
+      </div>
+      <p class="static-page__muted">&copy; 2026 Edel Platform. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/modules/core.js"></script>
+    <script src="../js/pages/static-page.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

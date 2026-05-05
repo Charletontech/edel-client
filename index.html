@@ -1,0 +1,1260 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edel | Local Services, Fintech Standard</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config for precise brand colors -->
+    <script src="js/config/tailwind.js"></script>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/pages/index.css" />
+  </head>
+  <body class="bg-brand-light text-slate-800 antialiased overflow-x-hidden">
+    <!-- Navigation -->
+    <nav
+      class="fixed w-full z-50 transition-all duration-300 border-b border-white/5 backdrop-blur-md"
+      id="navbar"
+    >
+      <div
+        class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex justify-between items-center"
+      >
+        <a
+          href="/"
+          class="text-2xl font-bold text-white tracking-tighter flex items-center gap-2 group"
+        >
+          <div
+            class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-brand-navy group-hover:shadow-glow transition-all"
+          >
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          Edel
+        </a>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-8">
+          <a
+            href="#features"
+            class="text-slate-400 hover:text-brand-glow transition-colors font-medium text-xs font-mono-data"
+            >[ Features ]</a
+          >
+          <a
+            href="#how-it-works"
+            class="text-slate-400 hover:text-brand-glow transition-colors font-medium text-xs font-mono-data"
+            >[ Solutions ]</a
+          >
+          <a
+            href="#security"
+            class="text-slate-400 hover:text-brand-glow transition-colors font-medium text-xs font-mono-data"
+            >[ Trust & Safety ]</a
+          >
+          <div
+            class="flex items-center gap-4 ml-6 border-l border-white/10 pl-6"
+          >
+            <a
+              href="/auth/"
+              class="text-white hover:text-brand-accent font-medium transition-colors text-sm"
+            >
+              Log In
+            </a>
+            <a
+              href="/auth/"
+              class="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-5 py-2.5 rounded-full font-semibold transition-all text-sm glass-border-glow"
+            >
+              Become a Provider
+            </a>
+            <a
+              href="/auth/"
+              class="bg-brand-accent hover:bg-brand-accentHover text-brand-navy px-6 py-2.5 rounded-full font-bold transition-all hover:-translate-y-0.5 hover:shadow-glow text-sm"
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="md:hidden text-white" id="mobile-menu-btn">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Menu Dropdown -->
+      <div
+        class="md:hidden hidden bg-[#030816]/95 backdrop-blur-xl absolute top-full left-0 w-full border-t border-white/10 shadow-2xl"
+        id="mobile-menu"
+      >
+        <div class="px-6 py-6 flex flex-col gap-4">
+          <a
+            href="#features"
+            class="text-slate-300 hover:text-white block py-2 font-medium"
+            >Features</a
+          >
+          <a
+            href="#how-it-works"
+            class="text-slate-300 hover:text-white block py-2 font-medium"
+            >Solutions</a
+          >
+          <a
+            href="#security"
+            class="text-slate-300 hover:text-white block py-2 font-medium"
+            >Trust & Safety</a
+          >
+          <hr class="border-white/10 my-2" />
+          <a href="/auth/" class="text-left text-white py-2 font-medium">Log In</a>
+          <a
+            href="/auth/"
+            class="bg-white/10 border border-white/20 text-white px-6 py-3 rounded-xl font-bold mt-2"
+          >
+            Become a Provider
+          </a>
+          <a
+            href="/auth/"
+            class="bg-brand-accent text-brand-navy px-6 py-3 rounded-xl font-bold mt-2 shadow-glow"
+          >
+            Get Started
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header
+      class="relative pt-32 pb-24 lg:pt-48 lg:pb-32 hero-gradient overflow-hidden flex items-center min-h-[100vh] hero-mobile-layout"
+    >
+      <!-- Atmospheric Layers -->
+      <div class="data-grid"></div>
+      <div class="scanline"></div>
+      
+      <div
+        class="bg-blur-blob bg-blue-600 w-[600px] h-[600px] top-[-15%] left-[-10%] opacity-20"
+      ></div>
+      <div
+        class="bg-blur-blob bg-brand-glow w-[500px] h-[500px] bottom-[-10%] right-[-10%] opacity-15"
+      ></div>
+
+      <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <!-- Hero Text -->
+          <div class="max-w-2xl reveal hero-text-container">
+            <!-- Segmented Control (Toggle) from hero.png -->
+            <div class="flex lg:hidden mb-10">
+               <div class="glass-panel p-1.5 rounded-2xl flex items-center gap-1">
+                  <button class="bg-white/10 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-inner-glow">Provider</button>
+                  <button class="text-slate-400 px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    Customer
+                  </button>
+               </div>
+            </div>
+
+            <div
+              class="inline-flex items-center gap-3 px-4 py-2 rounded-full glass-panel text-brand-glow text-xs font-mono-data mb-8 border border-brand-glow/20"
+            >
+              <span class="relative flex h-2 w-2">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-glow opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-2 w-2 bg-brand-glow"
+                ></span>
+              </span>
+              SYS.STATUS: GLOBAL_READY_2.0
+            </div>
+            <h1
+              class="text-5xl lg:text-8xl font-extrabold text-white leading-[0.95] mb-8 tracking-tighter"
+            >
+              Local talent.<br />
+              Digital<br />
+              <span class="gradient-text">Precision.</span>
+            </h1>
+            <p
+              class="text-lg lg:text-xl text-slate-400 mb-12 leading-relaxed max-w-lg font-medium"
+            >
+              Edel redefines the local economy through a high-fidelity 
+              service layer. Instant matching, verified logic, and 
+              sovereign security—architected for the future.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 items-center">
+              <a
+                href="/auth/"
+                class="w-full sm:w-auto bg-brand-accent hover:bg-brand-accentHover text-brand-navy px-10 py-5 rounded-full font-bold text-lg transition-all hover:shadow-glow magnetic-button flex items-center justify-center gap-2"
+              >
+                Launch Protocol
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+              </a>
+              <a
+                href="/auth/"
+                class="w-full sm:w-auto glass-panel text-white px-10 py-5 rounded-full font-semibold text-lg transition-all flex items-center justify-center gap-2 glass-border-glow hover:bg-white/5"
+              >
+                Become Provider
+              </a>
+            </div>
+
+            <div
+              class="flex items-center gap-8 mt-16 border-t border-white/5 pt-10"
+            >
+              <div class="flex -space-x-3">
+                <img
+                  class="w-10 h-10 rounded-full border-2 border-[#030816] object-cover ring-1 ring-white/10"
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"
+                  alt="User"
+                />
+                <img
+                  class="w-10 h-10 rounded-full border-2 border-[#030816] object-cover ring-1 ring-white/10"
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80"
+                  alt="User"
+                />
+                <img
+                  class="w-10 h-10 rounded-full border-2 border-[#030816] object-cover ring-1 ring-white/10"
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"
+                  alt="User"
+                />
+              </div>
+              <div class="font-mono-data">
+                <p class="text-white font-bold text-sm tracking-wider">100K+ NODES</p>
+                <p class="text-slate-500 text-[10px]">VERIFIED_SERVICE_PROVIDERS</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Image / Visual Component -->
+          <div class="relative reveal delay-200 hidden lg:block">
+            <div class="relative z-10 p-4">
+              <div class="absolute inset-0 bg-brand-glow/10 blur-[100px] rounded-full"></div>
+              
+              <!-- Futuristic Device Frame -->
+              <div class="relative glass-panel rounded-[3rem] p-3 border border-white/10 shadow-floating">
+                <img
+                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                  alt="Professional"
+                  class="w-full h-[600px] object-cover rounded-[2.5rem] opacity-80"
+                />
+                
+                <!-- Floating Data Widgets -->
+                <div class="absolute -left-12 top-1/4 glass-panel p-5 rounded-2xl border border-white/10 shadow-2xl animate-float w-64">
+                   <div class="flex items-center gap-3 mb-4">
+                      <div class="w-2 h-2 rounded-full bg-brand-glow animate-pulse"></div>
+                      <span class="text-[10px] font-mono-data text-slate-400">ACTIVE_RECON</span>
+                   </div>
+                   <div class="space-y-3">
+                      <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                         <div class="h-full bg-brand-glow w-3/4 animate-shimmer"></div>
+                      </div>
+                      <p class="text-white text-xs font-bold">Scanning Local Talent...</p>
+                   </div>
+                </div>
+
+                <div class="absolute -right-8 bottom-1/4 glass-panel p-6 rounded-2xl border border-brand-accent/30 shadow-glow w-72 backdrop-blur-3xl">
+                   <div class="flex justify-between items-start mb-4">
+                      <i data-lucide="shield-check" class="text-brand-accent w-6 h-6"></i>
+                      <span class="text-[10px] font-mono-data text-brand-accent">ENCRYPTED_TX</span>
+                   </div>
+                   <p class="text-white font-bold mb-1">Payment Secured</p>
+                   <p class="text-slate-400 text-xs mb-4">Escrow hold active via Paystack Node</p>
+                   <div class="bg-brand-accent/10 rounded-lg p-2 text-center border border-brand-accent/20">
+                      <span class="text-brand-accent font-bold text-sm">$240.00 RELEASED</span>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Full-Width Feature Highlights -->
+    <section class="py-12 bg-brand-light">
+      <div class="max-w-7xl mx-auto px-6 lg:px-12 space-y-8">
+        <!-- Highlight Card 1 -->
+        <div
+          class="relative h-[400px] lg:h-[500px] w-full rounded-[2.5rem] overflow-hidden reveal group"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=1600&q=80"
+            alt="Local store"
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-brand-navy/90 via-brand-navy/50 to-transparent"
+          ></div>
+          <div
+            class="relative h-full flex flex-col justify-center p-10 lg:p-16 max-w-2xl"
+          >
+            <div
+              class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center mb-6"
+            >
+              <i data-lucide="map-pin" class="text-brand-navy w-6 h-6"></i>
+            </div>
+            <h2
+              class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight"
+            >
+              Find services near you, instantly.
+            </h2>
+            <p class="text-xl text-slate-300 mb-8 font-medium">
+              Our advanced location matching connects you with top-rated
+              professionals in your exact neighborhood within seconds.
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlight Card 2 -->
+        <div
+          class="relative h-[400px] lg:h-[500px] w-full rounded-[2.5rem] overflow-hidden reveal group delay-100"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80"
+            alt="Team meeting"
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-l from-brand-navy/90 via-brand-navy/50 to-transparent"
+          ></div>
+          <div
+            class="relative h-full flex flex-col justify-center items-end text-right p-10 lg:p-16 w-full"
+          >
+            <div class="max-w-2xl flex flex-col items-end">
+              <div
+                class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center mb-6"
+              >
+                <i data-lucide="briefcase" class="text-brand-navy w-6 h-6"></i>
+              </div>
+              <h2
+                class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight"
+              >
+                Get hired by people around you.
+              </h2>
+              <p class="text-xl text-slate-300 mb-8 font-medium">
+                Turn your skills into a business. Receive real-time requests,
+                manage your schedule, and get paid securely.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product App Showcase (Fintech Transition) -->
+    <section class="py-32 bg-brand-navy relative overflow-hidden" id="features">
+      <div
+        class="absolute top-0 right-0 w-[600px] h-full bg-blue-900/10 rounded-l-full blur-3xl"
+      ></div>
+
+      <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-20 reveal">
+          <h2
+            class="text-sm font-bold text-brand-accent tracking-widest uppercase mb-3"
+          >
+            The Edel Interface
+          </h2>
+          <h3 class="text-4xl lg:text-5xl font-bold text-white mb-6">
+            Designed like your banking app. Built for real life.
+          </h3>
+          <p class="text-xl text-slate-400">
+            Experience a service marketplace that feels incredibly seamless,
+            secure, and premium.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-12 items-center">
+          <!-- Left: Interactive Nav / Text -->
+          <div class="lg:col-span-5 reveal">
+            <div class="space-y-4">
+              <!-- Toggle Buttons -->
+              <button
+                onclick="switchTab('discovery')"
+                id="btn-discovery"
+                class="w-full text-left p-6 rounded-2xl transition-all duration-300 border-2 border-brand-accent bg-white/5 backdrop-blur-md"
+              >
+                <h4
+                  class="text-xl font-bold text-white mb-2 flex items-center gap-3"
+                >
+                  <i data-lucide="search" class="w-6 h-6 text-brand-accent"></i>
+                  Intelligent Discovery
+                </h4>
+                <p class="text-slate-400">
+                  Card-based listings with upfront pricing, verified ratings,
+                  and exact distance tracking.
+                </p>
+              </button>
+
+              <button
+                onclick="switchTab('activity')"
+                id="btn-activity"
+                class="w-full text-left p-6 rounded-2xl transition-all duration-300 border-2 border-transparent hover:bg-white/5 opacity-60 hover:opacity-100"
+              >
+                <h4
+                  class="text-xl font-bold text-white mb-2 flex items-center gap-3"
+                >
+                  <i data-lucide="map" class="w-6 h-6 text-slate-300"></i>
+                  Active Tracking & QR
+                </h4>
+                <p class="text-slate-400">
+                  Follow your provider on a live map and scan their secure QR
+                  code to begin the service.
+                </p>
+              </button>
+
+              <button
+                onclick="switchTab('transactions')"
+                id="btn-transactions"
+                class="w-full text-left p-6 rounded-2xl transition-all duration-300 border-2 border-transparent hover:bg-white/5 opacity-60 hover:opacity-100"
+              >
+                <h4
+                  class="text-xl font-bold text-white mb-2 flex items-center gap-3"
+                >
+                  <i
+                    data-lucide="credit-card"
+                    class="w-6 h-6 text-slate-300"
+                  ></i>
+                  Ledger History
+                </h4>
+                <p class="text-slate-400">
+                  A clean, banking-style transaction ledger for total financial
+                  clarity and receipt tracking.
+                </p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Phone Mockup -->
+          <div
+            class="lg:col-span-7 flex justify-center lg:justify-end reveal delay-200"
+          >
+            <div
+              class="relative w-[340px] h-[680px] bg-black rounded-[50px] border-[12px] border-slate-800 shadow-2xl overflow-hidden shadow-brand-accent/10"
+            >
+              <!-- Notch -->
+              <div
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-7 bg-slate-800 rounded-b-3xl z-30"
+              ></div>
+
+              <!-- Screen Container -->
+              <div
+                class="relative w-full h-full bg-slate-50 overflow-hidden"
+                id="app-screen-container"
+              >
+                <!-- TAB 1: DISCOVERY (Active) -->
+                <div
+                  id="screen-discovery"
+                  class="absolute inset-0 flex flex-col app-screen transition-opacity duration-300"
+                >
+                  <!-- Header -->
+                  <div
+                    class="bg-brand-navy pt-14 pb-6 px-5 rounded-b-3xl shadow-sm z-20"
+                  >
+                    <div class="flex justify-between items-center mb-6">
+                      <div class="flex items-center gap-3">
+                        <img
+                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+                          class="w-10 h-10 rounded-full border-2 border-white/20"
+                        />
+                        <div class="text-white">
+                          <p class="text-xs text-slate-400">Current Location</p>
+                          <p class="text-sm font-bold flex items-center gap-1">
+                            Downtown, NY
+                            <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                          </p>
+                        </div>
+                      </div>
+                      <div
+                        class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white"
+                      >
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                      </div>
+                    </div>
+                    <!-- Search -->
+                    <div
+                      class="bg-white rounded-xl p-3 flex items-center gap-3 shadow-inner text-slate-500"
+                    >
+                      <i data-lucide="search" class="w-5 h-5"></i>
+                      <input
+                        type="text"
+                        placeholder="What do you need help with?"
+                        class="bg-transparent outline-none w-full text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Content -->
+                  <div
+                    class="flex-1 overflow-y-auto no-scrollbar p-5 pb-24 bg-slate-50"
+                  >
+                    <h3 class="font-bold text-brand-navy mb-4 text-lg">
+                      Top Rated Near You
+                    </h3>
+
+                    <div class="space-y-4">
+                      <!-- Service Card 1 -->
+                      <div
+                        class="bg-white p-4 rounded-2xl shadow-soft border border-slate-100 flex flex-col gap-3"
+                      >
+                        <div class="flex justify-between items-start">
+                          <div class="flex gap-3">
+                            <img
+                              src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=100&q=80"
+                              class="w-12 h-12 rounded-xl object-cover"
+                            />
+                            <div>
+                              <h4 class="font-bold text-brand-navy text-sm">
+                                Deep Home Cleaning
+                              </h4>
+                              <p class="text-xs text-slate-500">
+                                Maria S. • Pro Tier
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            class="bg-brand-light px-2 py-1 rounded-md text-xs font-bold text-brand-navy flex items-center gap-1"
+                          >
+                            <i
+                              data-lucide="star"
+                              class="w-3 h-3 fill-brand-accent text-brand-accent"
+                            ></i>
+                            4.9
+                          </div>
+                        </div>
+                        <div
+                          class="flex justify-between items-center pt-2 border-t border-slate-50"
+                        >
+                          <p
+                            class="text-xs text-slate-500 flex items-center gap-1"
+                          >
+                            <i data-lucide="map-pin" class="w-3 h-3"></i> 0.8 mi
+                            away
+                          </p>
+                          <p class="font-bold text-brand-navy">
+                            $45
+                            <span class="text-xs font-normal text-slate-500"
+                              >/hr</span
+                            >
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Service Card 2 -->
+                      <div
+                        class="bg-white p-4 rounded-2xl shadow-soft border border-slate-100 flex flex-col gap-3"
+                      >
+                        <div class="flex justify-between items-start">
+                          <div class="flex gap-3">
+                            <img
+                              src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=100&q=80"
+                              class="w-12 h-12 rounded-xl object-cover"
+                            />
+                            <div>
+                              <h4 class="font-bold text-brand-navy text-sm">
+                                Emergency Plumbing
+                              </h4>
+                              <p class="text-xs text-slate-500">
+                                Dave's Fixes • Standard
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            class="bg-brand-light px-2 py-1 rounded-md text-xs font-bold text-brand-navy flex items-center gap-1"
+                          >
+                            <i
+                              data-lucide="star"
+                              class="w-3 h-3 fill-brand-accent text-brand-accent"
+                            ></i>
+                            4.8
+                          </div>
+                        </div>
+                        <div
+                          class="flex justify-between items-center pt-2 border-t border-slate-50"
+                        >
+                          <p
+                            class="text-xs text-slate-500 flex items-center gap-1"
+                          >
+                            <i data-lucide="map-pin" class="w-3 h-3"></i> 1.2 mi
+                            away
+                          </p>
+                          <p class="font-bold text-brand-navy">
+                            $80
+                            <span class="text-xs font-normal text-slate-500"
+                              >/hr</span
+                            >
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 2: ACTIVITY (Hidden initially) -->
+                <div
+                  id="screen-activity"
+                  class="absolute inset-0 flex flex-col app-screen opacity-0 pointer-events-none transition-opacity duration-300"
+                >
+                  <!-- Map Area -->
+                  <div class="flex-1 bg-slate-300 relative">
+                    <img
+                      src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=600&q=80"
+                      class="w-full h-full object-cover opacity-80 mix-blend-multiply"
+                    />
+                    <div class="absolute inset-0 bg-blue-900/10"></div>
+                    <!-- Map Markers -->
+                    <div
+                      class="absolute top-1/3 left-1/2 -translate-x-1/2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full shadow-lg"
+                    ></div>
+                    <div
+                      class="absolute top-1/2 left-1/3 w-12 h-12 bg-white rounded-full border-4 border-white shadow-xl overflow-hidden -translate-y-6"
+                    >
+                      <img
+                        src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=100&q=80"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <!-- Top Bar -->
+                    <div
+                      class="absolute top-12 left-5 right-5 flex justify-between items-center"
+                    >
+                      <div
+                        class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-brand-navy"
+                      >
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                      </div>
+                      <div
+                        class="bg-brand-navy text-white px-4 py-2 rounded-full text-xs font-bold shadow-md"
+                      >
+                        Active Request
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Bottom Sheet -->
+                  <div
+                    class="bg-white rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] relative z-20"
+                  >
+                    <div
+                      class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"
+                    ></div>
+                    <h3 class="text-xl font-bold text-brand-navy mb-1">
+                      Arriving in 4 mins
+                    </h3>
+                    <p class="text-slate-500 text-sm mb-6">
+                      Maria S. is approaching your location.
+                    </p>
+
+                    <div
+                      class="bg-brand-light rounded-xl p-4 flex items-center justify-between mb-6 border border-slate-100"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm"
+                        >
+                          <i
+                            data-lucide="qr-code"
+                            class="text-brand-navy w-5 h-5"
+                          ></i>
+                        </div>
+                        <div>
+                          <p class="text-sm font-bold text-brand-navy">
+                            Verify Provider
+                          </p>
+                          <p class="text-xs text-slate-500">
+                            Scan to start timer
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      class="w-full bg-brand-accent text-brand-navy font-bold py-4 rounded-xl shadow-glow"
+                    >
+                      Scan QR Code
+                    </button>
+                  </div>
+                </div>
+
+                <!-- TAB 3: TRANSACTIONS (Hidden initially) -->
+                <div
+                  id="screen-transactions"
+                  class="absolute inset-0 flex flex-col bg-slate-50 app-screen opacity-0 pointer-events-none transition-opacity duration-300"
+                >
+                  <!-- Header -->
+                  <div
+                    class="bg-brand-navy pt-14 pb-8 px-5 rounded-b-3xl shadow-sm"
+                  >
+                    <h2 class="text-white text-xl font-bold text-center mb-6">
+                      Wallet & History
+                    </h2>
+                    <div class="text-center">
+                      <p class="text-slate-400 text-sm mb-1">
+                        Available Balance
+                      </p>
+                      <h3 class="text-white text-4xl font-extrabold">
+                        $450.00
+                      </h3>
+                    </div>
+                  </div>
+
+                  <!-- Content -->
+                  <div class="flex-1 overflow-y-auto no-scrollbar p-5">
+                    <div class="flex justify-between items-center mb-6">
+                      <h4 class="font-bold text-brand-navy">Recent Activity</h4>
+                      <i
+                        data-lucide="filter"
+                        class="w-4 h-4 text-slate-400"
+                      ></i>
+                    </div>
+
+                    <div class="space-y-4">
+                      <!-- Tx 1 -->
+                      <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between"
+                      >
+                        <div class="flex items-center gap-3">
+                          <div
+                            class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center"
+                          >
+                            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                          </div>
+                          <div>
+                            <p class="font-bold text-sm text-brand-navy">
+                              Deep Home Cleaning
+                            </p>
+                            <p class="text-xs text-slate-400">Today, 2:30 PM</p>
+                          </div>
+                        </div>
+                        <p class="font-bold text-brand-navy">-$90.00</p>
+                      </div>
+
+                      <!-- Tx 2 -->
+                      <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between"
+                      >
+                        <div class="flex items-center gap-3">
+                          <div
+                            class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center"
+                          >
+                            <i
+                              data-lucide="arrow-down-left"
+                              class="w-5 h-5"
+                            ></i>
+                          </div>
+                          <div>
+                            <p class="font-bold text-sm text-brand-navy">
+                              Top Up Wallet
+                            </p>
+                            <p class="text-xs text-slate-400">Yesterday</p>
+                          </div>
+                        </div>
+                        <p class="font-bold text-green-600">+$200.00</p>
+                      </div>
+
+                      <!-- Tx 3 -->
+                      <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between"
+                      >
+                        <div class="flex items-center gap-3">
+                          <div
+                            class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center"
+                          >
+                            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                          </div>
+                          <div>
+                            <p class="font-bold text-sm text-brand-navy">
+                              AC Maintenance
+                            </p>
+                            <p class="text-xs text-slate-400">Oct 12, 2026</p>
+                          </div>
+                        </div>
+                        <p class="font-bold text-brand-navy">-$120.00</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fake Bottom Nav -->
+                <div
+                  class="absolute bottom-0 left-0 w-full bg-white border-t border-slate-100 px-6 py-4 pb-8 flex justify-between items-center z-50 rounded-b-3xl"
+                >
+                  <i data-lucide="home" class="w-6 h-6 text-brand-navy"></i>
+                  <i data-lucide="calendar" class="w-6 h-6 text-slate-300"></i>
+                  <div
+                    class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center text-brand-navy -mt-8 shadow-lg border-4 border-white"
+                  >
+                    <i data-lucide="plus" class="w-6 h-6"></i>
+                  </div>
+                  <i
+                    data-lucide="message-square"
+                    class="w-6 h-6 text-slate-300"
+                  ></i>
+                  <i data-lucide="user" class="w-6 h-6 text-slate-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Use Cases (Personas) -->
+    <section id="how-it-works" class="py-24 bg-brand-light">
+      <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+          <h2 class="text-3xl lg:text-5xl font-bold text-brand-navy mb-4">
+            A platform for everyone
+          </h2>
+          <p class="text-lg text-slate-600">
+            Built to empower both the people who need help and the people
+            providing it.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Persona 1 -->
+          <div
+            class="relative h-96 rounded-3xl overflow-hidden group reveal bg-white shadow-soft"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80"
+              class="w-full h-1/2 object-cover"
+            />
+            <div class="p-6 h-1/2 flex flex-col justify-between">
+              <div>
+                <h3 class="text-brand-navy text-xl font-bold mb-2">
+                  For Customers
+                </h3>
+                <p class="text-slate-500 text-sm">
+                  Find reliable, vetted help for everyday tasks instantly. No
+                  cash needed.
+                </p>
+              </div>
+              <a
+                href="/discovery/"
+                class="text-brand-accent font-bold text-sm flex items-center gap-1 hover:text-brand-accentHover transition-colors"
+              >
+                Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Persona 2 -->
+          <div
+            class="relative h-96 rounded-3xl overflow-hidden group reveal delay-100 bg-white shadow-soft"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=600&q=80"
+              class="w-full h-1/2 object-cover"
+            />
+            <div class="p-6 h-1/2 flex flex-col justify-between">
+              <div>
+                <h3 class="text-brand-navy text-xl font-bold mb-2">
+                  For Providers
+                </h3>
+                <p class="text-slate-500 text-sm">
+                  Be your own boss. Set your rates, choose your hours, and get
+                  paid securely.
+                </p>
+              </div>
+              <a
+                href="/auth/"
+                class="text-brand-accent font-bold text-sm flex items-center gap-1 hover:text-brand-accentHover transition-colors"
+              >
+                Start earning <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Persona 3 -->
+          <div
+            class="relative h-96 rounded-3xl overflow-hidden group reveal delay-200 bg-white shadow-soft"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80"
+              class="w-full h-1/2 object-cover"
+            />
+            <div class="p-6 h-1/2 flex flex-col justify-between">
+              <div>
+                <h3 class="text-brand-navy text-xl font-bold mb-2">
+                  For Students
+                </h3>
+                <p class="text-slate-500 text-sm">
+                  Earn extra income between classes by offering tutoring or
+                  moving help.
+                </p>
+              </div>
+              <a
+                href="/auth/"
+                class="text-brand-accent font-bold text-sm flex items-center gap-1 hover:text-brand-accentHover transition-colors"
+              >
+                Join community <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Persona 4 -->
+          <div
+            class="relative h-96 rounded-3xl overflow-hidden group reveal delay-300 bg-white shadow-soft"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80"
+              class="w-full h-1/2 object-cover"
+            />
+            <div class="p-6 h-1/2 flex flex-col justify-between">
+              <div>
+                <h3 class="text-brand-navy text-xl font-bold mb-2">
+                  For Freelancers
+                </h3>
+                <p class="text-slate-500 text-sm">
+                  Expand your local client base and manage invoices seamlessly
+                  in-app.
+                </p>
+              </div>
+              <a
+                href="/auth/"
+                class="text-brand-accent font-bold text-sm flex items-center gap-1 hover:text-brand-accentHover transition-colors"
+              >
+                Grow business <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security & Trust Section -->
+    <section id="security" class="py-24 bg-white border-t border-slate-100">
+      <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="order-2 lg:order-1 reveal">
+            <h2
+              class="text-sm font-bold text-brand-accent tracking-widest uppercase mb-3"
+            >
+              Safety First
+            </h2>
+            <h2
+              class="text-4xl lg:text-5xl font-bold text-brand-navy mb-6 leading-tight"
+            >
+              Trust built into every transaction.
+            </h2>
+            <p class="text-lg text-slate-600 mb-8">
+              We treat your services like financial transactions. With robust
+              verification and secure holds, Edel ensures peace of mind for both
+              parties.
+            </p>
+
+            <ul class="space-y-6">
+              <li class="flex gap-4">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center shrink-0 border border-slate-100 shadow-sm"
+                >
+                  <i data-lucide="qr-code" class="text-brand-navy w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="text-brand-navy font-bold text-xl mb-1">
+                    QR Handshake System
+                  </h4>
+                  <p class="text-slate-500">
+                    Service only begins when the customer scans the provider's
+                    unique QR code on-site.
+                  </p>
+                </div>
+              </li>
+              <li class="flex gap-4">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center shrink-0 border border-slate-100 shadow-sm"
+                >
+                  <i data-lucide="map-pin" class="text-brand-navy w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="text-brand-navy font-bold text-xl mb-1">
+                    Live Location Tracking
+                  </h4>
+                  <p class="text-slate-500">
+                    Track arrivals in real-time. Geo-fencing ensures services
+                    are performed at the correct address.
+                  </p>
+                </div>
+              </li>
+              <li class="flex gap-4">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center shrink-0 border border-slate-100 shadow-sm"
+                >
+                  <i
+                    data-lucide="shield-check"
+                    class="text-brand-navy w-6 h-6"
+                  ></i>
+                </div>
+                <div>
+                  <h4 class="text-brand-navy font-bold text-xl mb-1">
+                    Escrow Payments
+                  </h4>
+                  <p class="text-slate-500">
+                    Funds are held securely by Paystack and only released when
+                    the job is marked complete.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="order-1 lg:order-2 flex justify-center reveal delay-200">
+            <div
+              class="relative w-full max-w-md aspect-square bg-brand-light rounded-[3rem] p-8 overflow-hidden shadow-inner border border-slate-100 flex flex-col items-center justify-center"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-brand-accent/5 to-transparent"
+              ></div>
+              <!-- Abstract Security Graphic -->
+              <div
+                class="relative z-10 w-48 h-48 bg-white rounded-3xl shadow-xl flex items-center justify-center p-6 border border-slate-100 mb-6"
+              >
+                <i
+                  data-lucide="qr-code"
+                  class="w-full h-full text-brand-navy"
+                ></i>
+                <div
+                  class="absolute inset-0 border-2 border-brand-accent rounded-3xl scale-110 opacity-50 animate-pulse"
+                ></div>
+              </div>
+              <div
+                class="bg-white px-6 py-3 rounded-full shadow-md border border-slate-100 flex items-center gap-3 z-10"
+              >
+                <div
+                  class="w-3 h-3 bg-green-500 rounded-full animate-pulse"
+                ></div>
+                <span class="font-bold text-brand-navy">Identity Verified</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="py-24 bg-brand-light">
+      <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="text-center mb-16 reveal">
+          <h2 class="text-3xl lg:text-4xl font-bold text-brand-navy mb-4">
+            Empowering local communities
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Testimonial 1 -->
+          <div
+            class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100 reveal delay-100"
+          >
+            <p class="text-slate-600 text-lg mb-8 italic">
+              "Edel gave me the platform to start my own local tutoring
+              business. The built-in payments and scheduling make it feel
+              incredibly professional."
+            </p>
+            <div class="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=100&q=80"
+                class="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <h4 class="font-bold text-brand-navy">Jessica K.</h4>
+                <p class="text-sm text-slate-500">Math Tutor</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Testimonial 2 -->
+          <div
+            class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100 reveal delay-200"
+          >
+            <p class="text-slate-600 text-lg mb-8 italic">
+              "I use Edel whenever I need quick home repairs. Seeing the
+              provider's distance and exact price upfront removes all the
+              stress."
+            </p>
+            <div class="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80"
+                class="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <h4 class="font-bold text-brand-navy">Michael R.</h4>
+                <p class="text-sm text-slate-500">Homeowner</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Testimonial 3 -->
+          <div
+            class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100 reveal delay-300"
+          >
+            <p class="text-slate-600 text-lg mb-8 italic">
+              "The QR code handshake feature is brilliant. As a cleaner, I know
+              I'm protected and the client knows exactly when I start."
+            </p>
+            <div class="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"
+                class="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <h4 class="font-bold text-brand-navy">Elena V.</h4>
+                <p class="text-sm text-slate-500">Independent Cleaner</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mid-Page CTA -->
+    <section class="py-24 hero-gradient relative overflow-hidden">
+      <div
+        class="absolute inset-0 opacity-[0.03]"
+        style="
+          background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='#ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);
+        "
+      ></div>
+      <div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal">
+        <h2
+          class="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight"
+        >
+          Built for your local economy.
+        </h2>
+        <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+          Join thousands of users and providers making local services
+          frictionless, safe, and professional.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a
+            href="/auth/"
+            class="bg-brand-accent hover:bg-brand-accentHover text-brand-navy px-10 py-4 rounded-full font-bold text-lg transition-all hover:-translate-y-1 hover:shadow-glow"
+          >
+            Get Started Free
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#030816] text-slate-400 py-16 border-t border-white/5">
+      <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+          <div class="col-span-2 lg:col-span-2 reveal">
+            <a
+              href="/"
+              class="text-2xl font-bold text-white tracking-tight flex items-center gap-2 mb-6"
+            >
+              <div
+                class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-brand-navy"
+              >
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+              </div>
+              Edel
+            </a>
+            <p class="text-sm text-slate-400 max-w-sm mb-6">
+              The modern service marketplace. Find help, offer your skills, and
+              manage transactions with bank-level security.
+            </p>
+            <div class="flex gap-4">
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-accent hover:text-brand-navy transition-colors"
+                ><i data-lucide="twitter" class="w-5 h-5"></i
+              ></a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-accent hover:text-brand-navy transition-colors"
+                ><i data-lucide="instagram" class="w-5 h-5"></i
+              ></a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-accent hover:text-brand-navy transition-colors"
+                ><i data-lucide="linkedin" class="w-5 h-5"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="reveal delay-100">
+            <h4 class="text-white font-bold mb-4">Platform</h4>
+            <ul class="space-y-3 text-sm">
+              <li>
+                <a href="/how-it-works/" class="hover:text-white transition-colors"
+                  >How it Works</a
+                >
+              </li>
+              <li>
+                <a href="/for-providers/" class="hover:text-white transition-colors"
+                  >For Providers</a
+                >
+              </li>
+              <li>
+                <a href="/pricing/" class="hover:text-white transition-colors"
+                  >Pricing</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="reveal delay-200">
+            <h4 class="text-white font-bold mb-4">Company</h4>
+            <ul class="space-y-3 text-sm">
+              <li>
+                <a href="/about/" class="hover:text-white transition-colors"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a href="/contact/" class="hover:text-white transition-colors"
+                  >Contact</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="reveal delay-300">
+            <h4 class="text-white font-bold mb-4">Legal</h4>
+            <ul class="space-y-3 text-sm">
+              <li>
+                <a href="/legal/" class="hover:text-white transition-colors"
+                  >Terms & Privacy</a
+                >
+              </li>
+              <li>
+                <a href="/provider-agreement/" class="hover:text-white transition-colors"
+                  >Provider Agreement</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500"
+        >
+          <p>&copy; 2026 Edel Platform. All rights reserved.</p>
+          <div class="flex items-center gap-2">
+            <span>Secured by</span>
+            <strong class="text-slate-300">Paystack</strong>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script src="https://cdn.jsdelivr.net/gh/phuoc-ng/cool-alert@1.0.1/dist/cool-alert.min.js"></script>
+    <script src="js/modules/core.js"></script>
+    <script src="js/modules/ui-utils.js"></script>
+    <script src="js/pages/index.js"></script>
+  </body>
+</html>
+

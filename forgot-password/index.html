@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Edel | Account Recovery</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/config/tailwind.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/utilities.css" />
+    <link rel="stylesheet" href="../css/pages/auth.css" />
+    
+    <style>
+      .recovery-container {
+        min-height: 100vh;
+        background: #fdfdfd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 
+          0 25px 50px -12px rgba(6, 20, 46, 0.1),
+          0 0 0 1px rgba(6, 20, 46, 0.02);
+        border-radius: 2.5rem;
+        width: 100%;
+        max-width: 480px;
+        padding: 3rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      .recovery-bg-blob {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.15;
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body class="antialiased selection:bg-brand-accent selection:text-brand-navy">
+    
+    <div class="recovery-container">
+      <!-- Background Flourish -->
+      <div class="recovery-bg-blob bg-blue-500 -top-48 -left-48 blob-1"></div>
+      <div class="recovery-bg-blob bg-brand-accent -bottom-48 -right-48 blob-2"></div>
+
+      <div class="glass-card fade-enter fade-enter-active">
+        <!-- Logo -->
+        <div class="flex justify-center mb-10">
+          <a href="/" class="flex flex-col items-center gap-3 group">
+            <div class="w-14 h-14 bg-brand-navy rounded-2xl flex items-center justify-center text-brand-accent shadow-glow transition-transform group-hover:scale-110">
+              <i data-lucide="sparkles" class="w-8 h-8"></i>
+            </div>
+            <span class="text-2xl font-extrabold text-brand-navy tracking-tight">Edel</span>
+          </a>
+        </div>
+
+        <!-- Text Content -->
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-extrabold text-brand-navy mb-3 tracking-tight">Forgot Password?</h1>
+          <p class="text-slate-500 font-medium leading-relaxed">
+            Enter your email below. We'll send you a secure link to reset your account access.
+          </p>
+        </div>
+
+        <!-- Form -->
+        <form class="space-y-6" onsubmit="event.preventDefault(); window.location.href='/change-password/';">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Email Address</label>
+            <div class="relative input-focus-lift transition-all">
+              <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+              <input 
+                type="email" 
+                required 
+                placeholder="name@example.com"
+                class="w-full pl-12 pr-4 py-4 bg-white/50 border border-slate-200 rounded-2xl text-brand-navy font-semibold placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-accent/20 focus:border-brand-accent transition-all shadow-sm"
+              />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-2xl shadow-xl transition-all active:scale-[0.98] flex justify-center items-center gap-2"
+          >
+            Send Recovery Link
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </form>
+
+        <!-- Footer Links -->
+        <div class="mt-10 pt-8 border-t border-slate-100 flex flex-col items-center gap-4">
+          <a href="/auth/" class="text-slate-500 hover:text-brand-navy font-bold text-sm flex items-center gap-2 transition-colors">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Back to Sign In
+          </a>
+          <p class="text-xs text-slate-400 font-medium text-center">
+            If you're having trouble, please contact 
+            <a href="/contact/" class="text-brand-navy hover:underline">Support</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/modules/core.js"></script>
+    <script>
+      // Initialize Lucide Icons
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

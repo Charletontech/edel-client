@@ -1,0 +1,15 @@
+.admin-placeholder {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background: #f8fafc;
+  color: #06142e;
+  text-align: center;
+}
+
+.admin-placeholder p {
+  max-width: 40rem;
+  color: #475569;
+}

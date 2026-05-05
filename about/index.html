@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edel | About Us</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/config/tailwind.js"></script>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/utilities.css" />
+    <link rel="stylesheet" href="../css/pages/static-page.css" />
+  </head>
+  <body class="static-page">
+    <header class="static-page__header">
+      <div class="static-page__header-inner">
+        <a href="/" class="static-page__brand">
+          <span class="static-page__brand-badge"><i data-lucide="sparkles" class="w-5 h-5"></i></span>
+          <span>Edel</span>
+        </a>
+        <nav class="static-page__nav">
+          <a href="/how-it-works/">How it Works</a>
+          <a href="/for-providers/">For Providers</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="static-page__hero">
+      <span class="static-page__eyebrow"><i data-lucide="building-2" class="w-4 h-4"></i> Our Mission</span>
+      <h1>The global standard for local services.</h1>
+      <p>Edel bridges the gap between your needs and local talent. We’re building a world where professional services are as accessible and secure as your favorite banking app.</p>
+    </section>
+
+    <main class="static-page__content">
+      <div class="static-page__grid">
+        <div class="static-page__stack">
+          <article class="static-page__card">
+            <h2>The Edel Vision</h2>
+            <p>Edel is a web-based service marketplace platform that connects customers with service providers in their local area. We believe that physical proximity shouldn't be the only barrier to finding high-quality help.</p>
+            <p>Our platform is built to be location-aware, surfacing relevant services and requests based on proximity. Whether you're looking for a deep home clean or offering emergency plumbing, Edel ensures the connection is seamless, verified, and professional.</p>
+          </article>
+
+          <article class="static-page__card">
+            <h2>Built on Trust</h2>
+            <p>Trust is the foundation of the local economy. That's why we've implemented the <strong class="text-brand-navy">Service Start Verification System</strong>. By using cryptographically secure QR codes and precise geolocation, we confirm that a provider has physically arrived at a customer's location before any job begins.</p>
+            <p>This "QR Handshake" prevents fraud and ensures both parties are protected, creating a safe environment for everyone in the community.</p>
+          </article>
+
+          <article class="static-page__card">
+            <h2>Scalable Innovation</h2>
+            <p>Starting as a cash-first MVP, Edel is designed to scale. We are committed to evolving into a fully integrated payment and logistics ecosystem, making the business of local services more efficient and rewarding for all.</p>
+          </article>
+        </div>
+
+        <aside class="static-page__stack">
+          <section class="static-page__card">
+            <h2>At a Glance</h2>
+            <ul>
+              <li><strong class="text-brand-navy">Proximity-First:</strong> Real-time discovery based on your GPS location.</li>
+              <li><strong class="text-brand-navy">Verified Starts:</strong> QR Handshake ensures physical arrival.</li>
+              <li><strong class="text-brand-navy">Tiered Growth:</strong> Users progress through Rookie, Veteran, and Elite tiers.</li>
+              <li><strong class="text-brand-navy">Fair Ratings:</strong> Dynamic rating system for both parties.</li>
+            </ul>
+          </section>
+
+          <section class="static-page__card bg-brand-navy text-white">
+            <h2 class="text-white">Join the Community</h2>
+            <p class="mb-8 text-slate-300">Ready to find help or start earning near you?</p>
+            <a href="/auth/" class="static-page__cta static-page__cta--secondary w-full">Get Started Today</a>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="static-page__footer">
+      <div class="static-page__footer-logo">
+        <div class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-brand-navy">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        Edel
+      </div>
+      <p class="static-page__muted">&copy; 2026 Edel Platform. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/modules/core.js"></script>
+    <script src="../js/pages/static-page.js"></script>
+    <script>
+      // Initialize icons manually if needed
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edel | Contact Us</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/config/tailwind.js"></script>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/utilities.css" />
+    <link rel="stylesheet" href="../css/pages/static-page.css" />
+  </head>
+  <body class="static-page">
+    <header class="static-page__header">
+      <div class="static-page__header-inner">
+        <a href="/" class="static-page__brand">
+          <span class="static-page__brand-badge"><i data-lucide="sparkles" class="w-5 h-5"></i></span>
+          <span>Edel</span>
+        </a>
+        <nav class="static-page__nav">
+          <a href="/about/">About</a>
+          <a href="/how-it-works/">How it Works</a>
+          <a href="/legal/">Legal</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="static-page__hero">
+      <span class="static-page__eyebrow"><i data-lucide="mail" class="w-4 h-4"></i> Support</span>
+      <h1>How can we help?</h1>
+      <p>Whether you're a customer with a question or a provider looking for technical support, our team is ready to assist you.</p>
+    </section>
+
+    <main class="static-page__content">
+      <div class="static-page__grid">
+        <div class="static-page__stack">
+          <article class="static-page__card">
+            <h2>Send us a Message</h2>
+            <form class="static-page__form" onsubmit="event.preventDefault(); alert('Thank you! This is a demo form. Support integration coming soon.');">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="static-page__field">
+                  <label>Full Name</label>
+                  <input type="text" placeholder="John Doe" required />
+                </div>
+                <div class="static-page__field">
+                  <label>Email Address</label>
+                  <input type="email" placeholder="john@example.com" required />
+                </div>
+              </div>
+              <div class="static-page__field">
+                <label>Subject</label>
+                <div class="relative">
+                  <select class="w-full p-4 bg-slate-50/50 border border-slate-200 rounded-2xl outline-none focus:border-brand-accent transition-all text-sm appearance-none cursor-pointer">
+                    <option>General Inquiry</option>
+                    <option>Provider Support</option>
+                    <option>Billing Question</option>
+                    <option>Legal/Privacy</option>
+                    <option>Partnership</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+              <div class="static-page__field">
+                <label>Message</label>
+                <textarea rows="5" placeholder="How can we help you today?" required class="resize-none"></textarea>
+              </div>
+              <button type="submit" class="static-page__cta static-page__cta--primary w-full md:w-auto mt-2">
+                Send Message <i data-lucide="send" class="w-4 h-4"></i>
+              </button>
+            </form>
+          </article>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <article class="static-page__card group">
+              <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+                <i data-lucide="message-circle" class="w-6 h-6"></i>
+              </div>
+              <h3 class="mt-0">Live Chat</h3>
+              <p class="text-sm">Available for logged-in providers and elite tier customers during business hours.</p>
+            </article>
+            <article class="static-page__card group">
+              <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center mb-6 text-brand-navy shadow-sm group-hover:bg-brand-accent transition-colors">
+                <i data-lucide="help-circle" class="w-6 h-6"></i>
+              </div>
+              <h3 class="mt-0">Help Center</h3>
+              <p class="text-sm">Browse our comprehensive guides and FAQs to find instant answers to common questions.</p>
+            </article>
+          </div>
+        </div>
+
+        <aside class="static-page__stack">
+          <section class="static-page__card">
+            <h2>Our Channels</h2>
+            <ul class="text-sm space-y-6">
+              <li class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center shrink-0">
+                  <i data-lucide="mail" class="w-4 h-4 text-brand-navy"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-brand-navy">General Support</p>
+                  <p class="text-xs text-slate-500">support@edelplatform.com</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center shrink-0">
+                  <i data-lucide="briefcase" class="w-4 h-4 text-brand-navy"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-brand-navy">Partnerships</p>
+                  <p class="text-xs text-slate-500">partners@edelplatform.com</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center shrink-0">
+                  <i data-lucide="twitter" class="w-4 h-4 text-brand-navy"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-brand-navy">Social Support</p>
+                  <p class="text-xs text-slate-500">@EdelSupport on X</p>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <section class="static-page__card bg-brand-navy text-white">
+            <h2 class="text-white">Office Hours</h2>
+            <div class="space-y-3 mb-6">
+              <p class="text-sm flex justify-between border-b border-white/10 pb-2">
+                <span class="text-slate-300">Mon - Fri</span>
+                <strong>8am - 6pm</strong>
+              </p>
+              <p class="text-sm flex justify-between border-b border-white/10 pb-2">
+                <span class="text-slate-300">Saturday</span>
+                <strong>10am - 4pm</strong>
+              </p>
+              <p class="text-sm flex justify-between text-slate-400">
+                <span>Sunday</span>
+                <span>Closed</span>
+              </p>
+            </div>
+            <p class="text-xs text-brand-accent tracking-widest uppercase font-bold text-center">Responses within 4 hours</p>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="static-page__footer">
+      <div class="static-page__footer-logo">
+        <div class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-brand-navy">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        Edel
+      </div>
+      <p class="static-page__muted">&copy; 2026 Edel Platform. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/modules/core.js"></script>
+    <script src="../js/pages/static-page.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>

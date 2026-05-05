@@ -1,0 +1,106 @@
+.no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .glass-header {
+        background: rgba(248, 250, 252, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      /* Verified Badge Gradient */
+      .verified-badge {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      }
+
+      /* Custom Dropdown Styles */
+      .status-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+      }
+      .status-available {
+        color: #16a34a;
+        background-color: #f0fdf4;
+        border-color: #bbf7d0;
+      }
+      .status-busy {
+        color: #d97706;
+        background-color: #fffbeb;
+        border-color: #fde68a;
+      }
+      .status-unavailable {
+        color: #dc2626;
+        background-color: #fef2f2;
+        border-color: #fecaca;
+      }
+
+      /* Toggle Switch CSS */
+      .toggle-checkbox:checked {
+        right: 0;
+        border-color: #facc15;
+      }
+      .toggle-checkbox:checked + .toggle-label {
+        background-color: #facc15;
+      }
+      .toggle-checkbox:checked + .toggle-label:after {
+        transform: translateX(100%);
+        border-color: white;
+      }
+      .toggle-label {
+        width: 3rem;
+        height: 1.5rem;
+        background-color: #e2e8f0;
+        border-radius: 9999px;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .toggle-label:after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 1.25rem;
+        height: 1.25rem;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Floating Label CSS for Modals */
+      .float-label {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .float-input:focus ~ .float-label,
+      .float-input:not(:placeholder-shown) ~ .float-label,
+      select.float-input:focus ~ .float-label,
+      select.float-input:valid ~ .float-label {
+        top: 0;
+        left: 1rem;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #06142e;
+        background-color: #ffffff;
+        padding: 0 0.4rem;
+        border-radius: 0.25rem;
+      }
+      textarea ~ .float-label {
+        top: 1.25rem;
+        transform: translateY(-50%);
+      }
+      textarea.float-input:focus ~ .float-label,
+      textarea.float-input:not(:placeholder-shown) ~ .float-label {
+        top: 0;
+        transform: translateY(-50%);
+      }
