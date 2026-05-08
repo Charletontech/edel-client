@@ -55,6 +55,9 @@ window.EdelModules.auth = {
       fullName: payload?.fullName,
       email: payload?.email,
       phoneNumber: payload?.phoneNumber,
+      locationLabel: payload?.locationLabel,
+      latitude: payload?.latitude,
+      longitude: payload?.longitude,
       role: payload?.role,
       serviceCategory: payload?.serviceCategory,
       serviceTitle: payload?.serviceTitle,
@@ -299,11 +302,16 @@ window.EdelModules.auth = {
       const role =
         form.querySelector('input[name="user_role"]:checked')?.value ||
         "customer";
+      const latitudeValue = form.querySelector('[name="signup_latitude"]')?.value;
+      const longitudeValue = form.querySelector('[name="signup_longitude"]')?.value;
 
       return {
         fullName: form.querySelector('[name="signup_full_name"]')?.value.trim(),
         email: form.querySelector('[name="signup_email"]')?.value.trim(),
         phoneNumber: form.querySelector('[name="signup_phone"]')?.value.trim(),
+        locationLabel: form.querySelector('[name="signup_location_label"]')?.value.trim(),
+        latitude: latitudeValue === "" ? null : Number(latitudeValue),
+        longitude: longitudeValue === "" ? null : Number(longitudeValue),
         password: form.querySelector('[name="signup_password"]')?.value,
         role,
         serviceCategory:

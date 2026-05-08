@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/utilities.css" />
     <link rel="stylesheet" href="../css/pages/discovery.css" />
+    <script src="https://cdn.jsdelivr.net/npm/coolalertjs@latest/dist/coolalert.min.js"></script>
   </head>
   <body
     class="bg-brand-light text-slate-800 antialiased overflow-hidden flex h-screen"
@@ -176,6 +177,7 @@
             </div>
             <input
               type="text"
+              id="search-input"
               class="block w-full pl-11 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent shadow-sm transition-all text-sm"
               placeholder="Search for cleaning, repairs, tech..."
             />
@@ -193,8 +195,9 @@
         </div>
 
         <!-- Categories (Horizontal Scroll) -->
-        <div class="flex gap-3 overflow-x-auto no-scrollbar mt-5 pb-1">
+        <div class="flex gap-3 overflow-x-auto no-scrollbar mt-5 pb-1" id="category-list">
           <button
+            data-category="all"
             class="px-5 py-2 bg-brand-navy text-white rounded-full text-sm font-bold whitespace-nowrap shadow-md"
           >
             All Near Me
@@ -557,14 +560,14 @@
         href="/profile/"
         class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-navy transition-colors relative"
       >
-        <i data-lucide="message-square" class="w-6 h-6"></i>
+        <i data-lucide="user" class="w-6 h-6"></i>
         <span
           class="absolute top-0 right-0 w-2 h-2 bg-brand-accent rounded-full border border-white"
         ></span>
-        <span class="text-[10px] font-medium">Inbox</span>
+        <span class="text-[10px] font-medium">Profile</span>
       </a>
       <a
-        href="#"
+        href="/profile/"
         class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-navy transition-colors"
       >
         <i data-lucide="user" class="w-6 h-6"></i>
@@ -634,7 +637,7 @@
               </div>
             </div>
             <div class="flex-1">
-              <h4 class="font-bold text-brand-navy">Maria Silva</h4>
+              <h4 class="font-bold text-brand-navy" id="modal-provider-name">Maria Silva</h4>
               <div
                 class="flex items-center gap-3 text-xs font-medium text-slate-500"
               >
@@ -656,7 +659,7 @@
               <h4 class="font-bold text-brand-navy mb-1 text-sm">
                 Description
               </h4>
-              <p class="text-sm text-slate-500 leading-relaxed">
+              <p class="text-sm text-slate-500 leading-relaxed" id="modal-description">
                 Complete sanitization of living spaces, kitchen, and bathrooms.
                 We bring our own eco-friendly supplies. Ideal for
                 move-in/move-out or seasonal deep cleaning.
@@ -667,6 +670,7 @@
               <div>
                 <p class="text-xs text-slate-400 mb-0.5">Distance</p>
                 <p
+                  id="modal-distance"
                   class="font-bold text-brand-navy text-sm flex items-center gap-1"
                 >
                   <i
@@ -688,6 +692,7 @@
               <div class="text-right">
                 <p class="text-xs text-slate-400 mb-0.5">Price</p>
                 <p
+                  id="modal-price"
                   class="font-extrabold text-brand-navy text-lg text-brand-accent"
                 >
                   ₦15,000
@@ -718,10 +723,13 @@
     </div>
 
     <!-- Scripts -->
-    
     <script src="../js/modules/core.js"></script>
-    <script src="../js/modules/ui.js"></script>
+    <script src="../js/config/env.js"></script>
+    <script src="../js/modules/api.js"></script>
     <script src="../js/modules/location.js"></script>
+    <script src="../js/modules/ui-utils.js"></script>
+    <script src="../js/modules/auth.js"></script>
+    <script src="../js/modules/ui.js"></script>
     <script src="../js/pages/discovery.js"></script>
   </body>
 </html>
