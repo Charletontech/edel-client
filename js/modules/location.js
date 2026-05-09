@@ -1,7 +1,7 @@
 window.EdelModules = window.EdelModules || {};
 
 window.EdelModules.location = {
-  minAcceptedAccuracy: 150,
+  minAcceptedAccuracy: 100,
 
   getCurrentPosition(options) {
     return new Promise((resolve, reject) => {

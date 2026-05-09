@@ -13,6 +13,18 @@
         -webkit-backdrop-filter: blur(12px);
       }
 
-      .verified-badge {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      }
+.verified-badge {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.discovery-scroll-area {
+  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 7.5rem);
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 7.5rem);
+}
+
+@media (min-width: 1024px) {
+  .discovery-scroll-area {
+    padding-bottom: 2rem;
+    scroll-padding-bottom: 2rem;
+  }
+}

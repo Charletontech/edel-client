@@ -20,7 +20,7 @@ async function captureSignupLocation() {
 
   try {
     const coords = await EdelModules.location.getBestBrowserLocation({
-      maxAcceptedAccuracy: 150,
+      maxAcceptedAccuracy: 100,
       timeout: 7000,
       maximumAge: 15000,
     });

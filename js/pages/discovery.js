@@ -336,7 +336,7 @@ async function syncUserLocation(position) {
 async function resolveViewerLocation() {
   try {
     const browserLocation = await EdelModules.location.getBestBrowserLocation({
-      maxAcceptedAccuracy: 150,
+      maxAcceptedAccuracy: 100,
       timeout: 7000,
       maximumAge: 15000,
     });

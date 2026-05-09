@@ -5,8 +5,7 @@ const apiHost = window.location.hostname || "localhost";
 
 window.EdelConfig = {
   apiBaseUrl:
-    window.EdelConfig.apiBaseUrl || `${apiProtocol}//${apiHost}:5000`,
-  socketUrl:
-    window.EdelConfig.socketUrl || `${apiProtocol}//${apiHost}:5000`,
+    window.EdelConfig.apiBaseUrl || "https://edel-server.onrender.com",
+  socketUrl: window.EdelConfig.socketUrl || "wss://edel-server.onrender.com",
   environment: window.EdelConfig.environment || "development",
 };
