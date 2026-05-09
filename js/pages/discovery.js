@@ -13,6 +13,7 @@ const listingsContainer = document.getElementById("listings-container");
 const searchInput = document.getElementById("search-input");
 const categoryList = document.getElementById("category-list");
 const modal = document.getElementById("listing-modal");
+const modalContent = document.getElementById("modal-content");
 const modalActionBtn = document.getElementById("modal-action-btn");
 const modalWarning = document.getElementById("modal-warning");
 const modalTitle = document.getElementById("modal-title");
@@ -21,6 +22,7 @@ const modalProviderName = document.getElementById("modal-provider-name");
 const modalDescription = document.getElementById("modal-description");
 const modalDistance = document.getElementById("modal-distance");
 const modalPrice = document.getElementById("modal-price");
+const modalImg = document.getElementById("modal-img");
 
 const modalController = EdelModules.ui.createOverlayModal({
   overlay: modal,
@@ -270,7 +272,7 @@ function openDiscoveryModal(serviceId) {
   const item = state.currentItems.find((entry) => String(entry.id) === String(serviceId));
   if (!item) return;
 
-  modalController.open(modal, {
+  modalController.open(modalContent, {
     panelClass: "flex",
     hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
     visiblePanelClasses: ["translate-y-0"],
@@ -278,6 +280,9 @@ function openDiscoveryModal(serviceId) {
 
   modalTitle.innerText = item.title;
   modalCategory.innerText = item.category;
+  if (modalImg) {
+    modalImg.src = item.provider.profilePhoto || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80";
+  }
   if (modalProviderName) modalProviderName.innerText = item.provider.fullName;
   if (modalDescription) modalDescription.innerText = item.description;
   if (modalDistance) modalDistance.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4 text-brand-accent"></i> ${formatDistance(item.distanceKm)}`;

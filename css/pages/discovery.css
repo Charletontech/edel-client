@@ -19,8 +19,8 @@
 
 .discovery-scroll-area {
   /* Added extra padding to ensure last cards aren't cut off by the mobile bottom nav or browser toolbars */
-  padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 9rem) !important;
-  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 9rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 10rem) !important;
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 10rem);
 }
 
 @media (min-width: 1024px) {
