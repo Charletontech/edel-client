@@ -1,11 +1,15 @@
 // Initialize Icons
-      Edel.initIcons();
+Edel.initIcons();
 
-      // Safe area padding for mobile
-      Edel.applySafeArea();
+// Safe area padding for mobile
+Edel.applySafeArea();
 
-      // View Toggle Logic
-      function setView(viewType) {
+if (!EdelModules.auth.requireAuth()) {
+  throw new Error("Authentication required");
+}
+
+// View Toggle Logic
+function setView(viewType) {
         const viewCustomer = document.getElementById("view-customer");
         const viewProvider = document.getElementById("view-provider");
         const btnCustomer = document.getElementById("btn-view-customer");

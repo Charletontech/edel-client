@@ -105,3 +105,11 @@ If your goal is distinguishing people a few meters apart (like separate rooms in
 
 If you feed a "Cell Tower" coordinate into your MySQL ST_Distance_Sphere, your backend will perfectly calculate the distance to a point that is already 500 meters wrong. By forcing High Accuracy, you ensure the starting data is as close to the truth as the hardware allows.
 Should we look at the Sequelize model using POINT types now, or would you like a snippet of how to filter out inaccurate GPS hits before they hit your database?
+
+Important remaining gaps:
+
+- This is functional, but not yet real-time Socket.io.
+- QR generation/scanning is still placeholder UI only.
+- No order completion flow yet.
+- No nearest-provider fallback suggestion after decline yet.
+- No admin handling for reports yet.

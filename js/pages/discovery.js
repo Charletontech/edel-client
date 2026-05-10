@@ -50,6 +50,7 @@ const state = {
   search: "",
   location: null,
   currentItems: [],
+  selectedItem: null,
   requestController: null,
 };
 
@@ -271,6 +272,7 @@ function renderCategories(categories = []) {
 function openDiscoveryModal(serviceId) {
   const item = state.currentItems.find((entry) => String(entry.id) === String(serviceId));
   if (!item) return;
+  state.selectedItem = item;
 
   modalController.open(modalContent, {
     panelClass: "flex",
@@ -304,6 +306,42 @@ function openDiscoveryModal(serviceId) {
   modalActionBtn.innerText = "Request Service Now";
   modalActionBtn.disabled = false;
   modalWarning.classList.add("hidden");
+}
+
+async function requestSelectedService() {
+  if (!state.selectedItem) return;
+
+  if (modalActionBtn) {
+    modalActionBtn.disabled = true;
+    modalActionBtn.innerHTML =
+      '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Sending Request...';
+    Edel.initIcons();
+  }
+
+  try {
+    await EdelModules.api.post(
+      "/api/orders",
+      {
+        serviceId: state.selectedItem.id,
+      },
+      {
+        headers: EdelModules.auth.getAuthHeaders(),
+      },
+    );
+
+    Ui.toast("success", "Order Sent", "Your request has been sent to the provider.");
+    window.setTimeout(() => {
+      window.location.href = "/activities/";
+    }, 900);
+  } catch (error) {
+    if (modalActionBtn) {
+      modalActionBtn.disabled = false;
+      modalActionBtn.innerText = "Request Service Now";
+      Edel.initIcons();
+    }
+
+    Ui.toast("error", "Order Failed", error.message || "Could not place the order.");
+  }
 }
 
 function getSavedLocationLabel() {
@@ -350,7 +388,7 @@ async function resolveViewerLocation() {
     return browserLocation;
   } catch (error) {
     const cachedUser = EdelModules.auth.getUser();
-    if (cachedUser?.latitude && cachedUser?.longitude) {
+    if (cachedUser?.latitude != null && cachedUser?.longitude != null) {
       locationText.innerText = EdelModules.location.formatLocationLabel(
         cachedUser.locationLabel,
         "Saved location",
@@ -492,11 +530,7 @@ modal?.addEventListener("click", (event) => {
 });
 
 modalActionBtn?.addEventListener("click", () => {
-  Ui.toast(
-    "info",
-    "Ordering Comes Next",
-    "Discovery is live. The order request flow will be connected in the next implementation block.",
-  );
+  requestSelectedService().catch(() => {});
 });
 
 window.closeModal = () =>
