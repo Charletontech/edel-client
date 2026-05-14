@@ -27,6 +27,19 @@ const activeToggleClass =
 const inactiveToggleClass =
   "px-4 py-2 rounded-lg text-slate-500 font-bold text-xs hover:text-brand-navy transition-all";
 
+let socket = null;
+if (window.io) {
+  const socketUrl = window.EdelConfig?.apiBaseUrl || "";
+  socket = io(socketUrl);
+  socket.on("connect", () => {
+    console.log("Socket connected");
+  });
+  socket.on("orderStatusChanged", (data) => {
+    console.log("Order status changed via socket", data);
+    loadActivities();
+  });
+}
+
 const state = {
   user: EdelModules.auth.getUser() || {},
   activeView: "customer",
@@ -144,7 +157,7 @@ function renderCustomerOrder(order) {
     });
   }
 
-  if (!order) {
+  if (!order || order.status === "completed" || order.status === "cancelled" || order.status === "declined") {
     return buildEmptyState({
       icon: "shopping-bag",
       title: "No active customer order",
@@ -156,29 +169,45 @@ function renderCustomerOrder(order) {
   const service = getOrderService(order);
   const etaMinutes = estimateEta(provider.distanceKm);
   const pending = order.status === "pending";
+  const inProgress = order.status === "in_progress";
+
+  let headerTitle = "Provider on the way";
+  let statusBadgeText = etaMinutes ? `${etaMinutes} mins` : "Nearby";
+  let descriptionText = "Your provider has accepted the order and is preparing to serve you.";
+
+  if (pending) {
+    headerTitle = "Waiting for provider";
+    statusBadgeText = "Pending";
+    descriptionText = "Your order has been sent to the provider. We are waiting for a response.";
+  } else if (inProgress) {
+    headerTitle = "Service in Progress";
+    statusBadgeText = "Active Job";
+    descriptionText = "The provider is currently working on your request.";
+  }
 
   return `
     <div class="p-6 space-y-4">
       <div class="pb-2 border-b border-slate-100">
         <div class="flex justify-between items-start gap-4 mb-2">
           <h2 class="text-2xl font-bold text-brand-navy">
-            ${pending ? "Waiting for provider" : "Provider on the way"}
+            ${headerTitle}
           </h2>
           <div class="bg-blue-50 text-brand-blue px-3 py-1 rounded-lg flex items-center gap-1 text-sm font-bold border border-blue-100">
-            <i data-lucide="clock" class="w-4 h-4"></i>
-            <span>${pending ? "Pending" : etaMinutes ? `${etaMinutes} mins` : "Nearby"}</span>
+            <i data-lucide="${inProgress ? 'hammer' : 'clock'}" class="w-4 h-4"></i>
+            <span>${statusBadgeText}</span>
           </div>
         </div>
         <p class="text-slate-500 text-sm font-medium">
-          ${pending ? "Your order has been sent to the provider. We are waiting for a response." : "Your provider has accepted the order and is preparing to serve you."}
+          ${descriptionText}
         </p>
+        ${!inProgress ? `
         <div class="mt-3 flex items-center gap-2 text-sm bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
           <i data-lucide="navigation" class="w-4 h-4 text-brand-accent"></i>
           <span class="text-slate-500">
             Provider location:
             <strong class="text-brand-navy">${provider.locationLabel || "Location available in-app"}</strong>
           </span>
-        </div>
+        </div>` : ''}
       </div>
 
       <div class="bg-slate-50 rounded-2xl p-4 flex items-center gap-4 border border-slate-100">
@@ -205,7 +234,26 @@ function renderCustomerOrder(order) {
         <p class="text-xs text-slate-400 mt-3">Ordered on ${formatDate(order.createdAt)}</p>
       </div>
 
-      ${pending ? "" : `
+      ${pending ? "" : inProgress ? `
+        <div class="bg-brand-accent/10 border border-brand-accent/20 rounded-2xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+              <i data-lucide="check-circle" class="text-brand-accent w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-brand-navy">Service Completion</p>
+              <p class="text-xs text-slate-500">Generate a token when the job is done.</p>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          data-open-modal="generate-token-modal"
+          class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-glow transition-all active:scale-95 flex justify-center items-center gap-2"
+        >
+          <i data-lucide="key-round" class="w-5 h-5"></i> Generate Confirmatory Token
+        </button>
+      ` : `
         <div class="bg-brand-accent/10 border border-brand-accent/20 rounded-2xl p-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
@@ -227,6 +275,7 @@ function renderCustomerOrder(order) {
       `}
 
       <div class="pt-4 border-t border-slate-100 space-y-3">
+        ${!inProgress ? `
         <button
           type="button"
           data-toggle-form="cancel-form"
@@ -249,7 +298,7 @@ function renderCustomerOrder(order) {
           >
             Submit Cancellation
           </button>
-        </div>
+        </div>` : ''}
 
         <button
           type="button"
@@ -288,7 +337,7 @@ function renderProviderOrder(order) {
     });
   }
 
-  if (!order) {
+  if (!order || order.status === "completed" || order.status === "cancelled" || order.status === "declined") {
     return buildEmptyState({
       icon: "briefcase-business",
       title: "No provider order yet",
@@ -301,21 +350,36 @@ function renderProviderOrder(order) {
   const customerLocationLabel =
     customer.locationLabel || order.customerLocationLabel || "Customer location shared in-app";
   const pending = order.status === "pending";
+  const inProgress = order.status === "in_progress";
+
+  let headerTitle = "Heading to customer";
+  let statusBadgeText = "Accepted";
+  let descriptionText = "This order is active. Head to the customer's location and start the service when you arrive.";
+
+  if (pending) {
+    headerTitle = "New service request";
+    statusBadgeText = "Pending";
+    descriptionText = "A customer has requested your service. Respond now to continue.";
+  } else if (inProgress) {
+    headerTitle = "Service in Progress";
+    statusBadgeText = "Active Job";
+    descriptionText = "You are currently rendering this service. Mark as complete when done.";
+  }
 
   return `
     <div class="p-6 space-y-4">
       <div class="pb-2 border-b border-slate-100">
         <div class="flex justify-between items-start gap-4 mb-2">
           <h2 class="text-2xl font-bold text-brand-navy">
-            ${pending ? "New service request" : "Heading to customer"}
+            ${headerTitle}
           </h2>
           <div class="bg-blue-50 text-brand-blue px-3 py-1 rounded-lg flex items-center gap-1 text-sm font-bold border border-blue-100">
-            <i data-lucide="clock" class="w-4 h-4"></i>
-            <span>${pending ? "Pending" : "Accepted"}</span>
+            <i data-lucide="${inProgress ? 'hammer' : 'clock'}" class="w-4 h-4"></i>
+            <span>${statusBadgeText}</span>
           </div>
         </div>
         <p class="text-slate-500 text-sm font-medium">
-          ${pending ? "A customer has requested your service. Respond now to continue." : "This order is active. Head to the customer's location and start the service when you arrive."}
+          ${descriptionText}
         </p>
       </div>
 
@@ -329,7 +393,7 @@ function renderProviderOrder(order) {
         <div class="flex-1">
           <h4 class="font-bold text-brand-navy text-lg leading-tight">${customer.fullName || "Customer"}</h4>
           <p class="text-sm text-slate-500">${customer.phoneNumber || "Phone not available"}</p>
-          <p class="text-xs text-slate-400 mt-1">${customerLocationLabel}</p>
+          ${!inProgress ? `<p class="text-xs text-slate-400 mt-1">${customerLocationLabel}</p>` : ''}
         </div>
       </div>
 
@@ -342,10 +406,11 @@ function renderProviderOrder(order) {
           <span class="text-slate-500">Category</span>
           <span class="font-bold text-brand-navy">${service.category || "General"}</span>
         </div>
+        ${!inProgress ? `
         <div class="flex justify-between">
           <span class="text-slate-500">Customer location</span>
           <span class="font-bold text-brand-navy text-right w-1/2">${customerLocationLabel}</span>
-        </div>
+        </div>` : ''}
         <div class="flex justify-between">
           <span class="text-slate-500">Time requested</span>
           <span class="font-bold text-brand-navy text-right">${formatDate(order.createdAt)}</span>
@@ -379,6 +444,27 @@ function renderProviderOrder(order) {
           </button>
         </div>
       `
+          : inProgress 
+          ? `
+        <div class="bg-brand-navy/5 border border-brand-navy/10 rounded-2xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+              <i data-lucide="check-circle" class="text-brand-navy w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-brand-navy">Service Completion</p>
+              <p class="text-xs text-slate-500">Collect the token to finish the job.</p>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          data-open-modal="complete-service-modal"
+          class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+        >
+          <i data-lucide="check-square" class="w-5 h-5"></i> Complete Service
+        </button>
+          ` 
           : `
         <div class="bg-brand-navy/5 border border-brand-navy/10 rounded-2xl p-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -419,31 +505,34 @@ function syncMapAndStatus() {
     return;
   }
 
+  const isPending = activeOrder.status === "pending";
+  const isInProgress = activeOrder.status === "in_progress";
+
   if (state.activeView === "customer") {
     movingLabel.innerText =
-      activeOrder.status === "pending"
+      isPending
         ? "Awaiting provider response"
-        : `${activeOrder.provider.fullName} is on the way`;
+        : isInProgress ? "Service in Progress" : `${activeOrder.provider.fullName} is on the way`;
     movingAvatar.src = getPartyAvatar(activeOrder, "provider");
-    routeLine.classList.toggle("hidden", activeOrder.status === "pending");
-    markerDestination.classList.toggle("hidden", activeOrder.status === "pending");
+    routeLine.classList.toggle("hidden", isPending);
+    markerDestination.classList.toggle("hidden", isPending);
     updateStatusBadge(
-      activeOrder.status === "pending" ? "Awaiting Response" : "Active Tracking",
-      activeOrder.status === "accepted",
+      isPending ? "Awaiting Response" : isInProgress ? "Job Active" : "Active Tracking",
+      !isPending,
     );
     return;
   }
 
   movingLabel.innerText =
-    activeOrder.status === "pending"
+    isPending
       ? "New customer request"
-      : "You are heading to the customer";
+      : isInProgress ? "Service in Progress" : "You are heading to the customer";
   movingAvatar.src = getPartyAvatar(activeOrder, "customer");
-  routeLine.classList.toggle("hidden", activeOrder.status === "pending");
-  markerDestination.classList.toggle("hidden", activeOrder.status === "pending");
+  routeLine.classList.toggle("hidden", isPending);
+  markerDestination.classList.toggle("hidden", isPending);
   updateStatusBadge(
-    activeOrder.status === "pending" ? "New Request" : "Active Tracking",
-    activeOrder.status === "accepted",
+    isPending ? "New Request" : isInProgress ? "Job Active" : "Active Tracking",
+    !isPending,
   );
 }
 
@@ -509,6 +598,16 @@ async function loadActivities() {
     state.isLoading = false;
     chooseInitialView();
     renderView();
+
+    // Join WebSocket rooms for real-time updates
+    if (socket) {
+      if (state.customerOrder) {
+        socket.emit("joinRoom", `order_${state.customerOrder.id}`);
+      }
+      if (state.providerOrder) {
+        socket.emit("joinRoom", `order_${state.providerOrder.id}`);
+      }
+    }
   } catch (error) {
     state.isLoading = false;
     viewCustomer.innerHTML = buildEmptyState({
@@ -774,7 +873,7 @@ async function verifyQrSession(decodedText) {
     const position = await EdelModules.location.getBrowserLocation();
     
     // As per user request: explicitly add the disclaimer about accuracy
-    if (position.accuracy > 100) {
+    if (position.accuracy > EdelModules.location.minAcceptedAccuracy) {
       throw new Error(`Your GPS accuracy is poor (${Math.round(position.accuracy)}m). Try stepping outside or away from roofing.`);
     }
 
@@ -847,6 +946,21 @@ openModal = function(modalId) {
     startQrSession();
   } else if (modalId === "scanner-modal") {
     initQrScanner();
+  } else if (modalId === "generate-token-modal") {
+    const btn = document.getElementById("btn-confirm-generate");
+    const displayArea = document.getElementById("token-display-area");
+    const actionArea = document.getElementById("token-action-area");
+    const tokenValue = document.getElementById("completion-token-value");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Yes, Generate";
+    }
+    if (displayArea && actionArea && tokenValue) {
+      displayArea.classList.add("hidden");
+      displayArea.classList.remove("flex");
+      actionArea.classList.remove("hidden");
+      tokenValue.textContent = "------";
+    }
   }
 }
 
@@ -868,11 +982,67 @@ overlay?.addEventListener("click", (event) => {
 
 window.closeModal = closeModal;
 
+document.getElementById("btn-confirm-generate")?.addEventListener("click", async () => {
+  const btn = document.getElementById("btn-confirm-generate");
+  const displayArea = document.getElementById("token-display-area");
+  const actionArea = document.getElementById("token-action-area");
+  const tokenValue = document.getElementById("completion-token-value");
+  
+  if (!state.customerOrder) return;
+  
+  btn.disabled = true;
+  btn.textContent = "Generating...";
+  
+  try {
+    const response = await EdelModules.api.post(`/api/orders/${state.customerOrder.id}/generate-token`, {}, {
+      headers: EdelModules.auth.getAuthHeaders()
+    });
+    
+    tokenValue.textContent = response.token;
+    actionArea.classList.add("hidden");
+    displayArea.classList.remove("hidden");
+    displayArea.classList.add("flex");
+    
+    Ui.toast("success", "Token Generated", "Give this token to your provider.");
+  } catch (error) {
+    btn.disabled = false;
+    btn.textContent = "Yes, Generate";
+    Ui.toast("error", "Failed to generate", error.message);
+  }
+});
+
+document.getElementById("btn-submit-completion")?.addEventListener("click", async () => {
+  const btn = document.getElementById("btn-submit-completion");
+  const tokenInput = document.getElementById("input-completion-token");
+  
+  if (!state.providerOrder) return;
+  
+  const token = tokenInput.value.trim();
+  if (!token || token.length < 6) {
+    Ui.toast("warning", "Invalid Token", "Please enter the 6-digit token.");
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = "Verifying...";
+  
+  try {
+    await EdelModules.api.post(`/api/orders/${state.providerOrder.id}/complete`, { token }, {
+      headers: EdelModules.auth.getAuthHeaders()
+    });
+    
+    Ui.toast("success", "Service Completed", "The job has been marked as complete.");
+    closeModal();
+    tokenInput.value = "";
+    loadActivities();
+  } catch (error) {
+    btn.disabled = false;
+    btn.textContent = "Verify & Complete";
+    tokenInput.value = "";
+    Ui.toast("error", "Verification Failed", error.message);
+  }
+});
+
 loadActivities().catch((error) => {
   Ui.toast("error", "Activities Unavailable", error.message);
 });
-
-state.pollTimer = window.setInterval(() => {
-  if (document.hidden) return;
-  loadActivities().catch(() => {});
-}, 15000);

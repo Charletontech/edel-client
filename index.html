@@ -115,7 +115,9 @@
             >Trust & Safety</a
           >
           <hr class="border-white/10 my-2" />
-          <a href="/auth/" class="text-left text-white py-2 font-medium">Log In</a>
+          <a href="/auth/" class="text-left text-white py-2 font-medium"
+            >Log In</a
+          >
           <a
             href="/auth/"
             class="bg-white/10 border border-white/20 text-white px-6 py-3 rounded-xl font-bold mt-2"
@@ -139,7 +141,7 @@
       <!-- Atmospheric Layers -->
       <div class="data-grid"></div>
       <div class="scanline"></div>
-      
+
       <div
         class="bg-blur-blob bg-blue-600 w-[600px] h-[600px] top-[-15%] left-[-10%] opacity-20"
       ></div>
@@ -153,13 +155,21 @@
           <div class="max-w-2xl reveal hero-text-container">
             <!-- Segmented Control (Toggle) from hero.png -->
             <div class="flex lg:hidden mb-10">
-               <div class="glass-panel p-1.5 rounded-2xl flex items-center gap-1">
-                  <button class="bg-white/10 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-inner-glow">Provider</button>
-                  <button class="text-slate-400 px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2">
-                    <i data-lucide="user" class="w-4 h-4"></i>
-                    Customer
-                  </button>
-               </div>
+              <div
+                class="glass-panel p-1.5 rounded-2xl flex items-center gap-1"
+              >
+                <button
+                  class="bg-white/10 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-inner-glow"
+                >
+                  Provider
+                </button>
+                <button
+                  class="text-slate-400 px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2"
+                >
+                  <i data-lucide="user" class="w-4 h-4"></i>
+                  Customer
+                </button>
+              </div>
             </div>
 
             <div
@@ -185,9 +195,9 @@
             <p
               class="text-lg lg:text-xl text-slate-400 mb-12 leading-relaxed max-w-lg font-medium"
             >
-              Edel redefines the local economy through a high-fidelity 
-              service layer. Instant matching, verified logic, and 
-              sovereign security—architected for the future.
+              Edel redefines the local economy through a high-fidelity service
+              layer. Instant matching, verified logic, and sovereign
+              security—architected for the future.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 items-center">
@@ -227,8 +237,12 @@
                 />
               </div>
               <div class="font-mono-data">
-                <p class="text-white font-bold text-sm tracking-wider">100K+ NODES</p>
-                <p class="text-slate-500 text-[10px]">VERIFIED_SERVICE_PROVIDERS</p>
+                <p class="text-white font-bold text-sm tracking-wider">
+                  100K+ NODES
+                </p>
+                <p class="text-slate-500 text-[10px]">
+                  VERIFIED_SERVICE_PROVIDERS
+                </p>
               </div>
             </div>
           </div>
@@ -236,40 +250,69 @@
           <!-- Hero Image / Visual Component -->
           <div class="relative reveal delay-200 hidden lg:block">
             <div class="relative z-10 p-4">
-              <div class="absolute inset-0 bg-brand-glow/10 blur-[100px] rounded-full"></div>
-              
+              <div
+                class="absolute inset-0 bg-brand-glow/10 blur-[100px] rounded-full"
+              ></div>
+
               <!-- Futuristic Device Frame -->
-              <div class="relative glass-panel rounded-[3rem] p-3 border border-white/10 shadow-floating">
+              <div
+                class="relative glass-panel rounded-[3rem] p-3 border border-white/10 shadow-floating"
+              >
                 <img
                   src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                   alt="Professional"
                   class="w-full h-[600px] object-cover rounded-[2.5rem] opacity-80"
                 />
-                
+
                 <!-- Floating Data Widgets -->
-                <div class="absolute -left-12 top-1/4 glass-panel p-5 rounded-2xl border border-white/10 shadow-2xl animate-float w-64">
-                   <div class="flex items-center gap-3 mb-4">
-                      <div class="w-2 h-2 rounded-full bg-brand-glow animate-pulse"></div>
-                      <span class="text-[10px] font-mono-data text-slate-400">ACTIVE_RECON</span>
-                   </div>
-                   <div class="space-y-3">
-                      <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                         <div class="h-full bg-brand-glow w-3/4 animate-shimmer"></div>
-                      </div>
-                      <p class="text-white text-xs font-bold">Scanning Local Talent...</p>
-                   </div>
+                <div
+                  class="absolute -left-12 top-1/4 glass-panel p-5 rounded-2xl border border-white/10 shadow-2xl animate-float w-64"
+                >
+                  <div class="flex items-center gap-3 mb-4">
+                    <div
+                      class="w-2 h-2 rounded-full bg-brand-glow animate-pulse"
+                    ></div>
+                    <span class="text-[10px] font-mono-data text-slate-400"
+                      >ACTIVE_RECON</span
+                    >
+                  </div>
+                  <div class="space-y-3">
+                    <div
+                      class="h-1 w-full bg-white/5 rounded-full overflow-hidden"
+                    >
+                      <div
+                        class="h-full bg-brand-glow w-3/4 animate-shimmer"
+                      ></div>
+                    </div>
+                    <p class="text-white text-xs font-bold">
+                      Scanning Local Talent...
+                    </p>
+                  </div>
                 </div>
 
-                <div class="absolute -right-8 bottom-1/4 glass-panel p-6 rounded-2xl border border-brand-accent/30 shadow-glow w-72 backdrop-blur-3xl">
-                   <div class="flex justify-between items-start mb-4">
-                      <i data-lucide="shield-check" class="text-brand-accent w-6 h-6"></i>
-                      <span class="text-[10px] font-mono-data text-brand-accent">ENCRYPTED_TX</span>
-                   </div>
-                   <p class="text-white font-bold mb-1">Payment Secured</p>
-                   <p class="text-slate-400 text-xs mb-4">Escrow hold active via Paystack Node</p>
-                   <div class="bg-brand-accent/10 rounded-lg p-2 text-center border border-brand-accent/20">
-                      <span class="text-brand-accent font-bold text-sm">$240.00 RELEASED</span>
-                   </div>
+                <div
+                  class="absolute -right-8 bottom-1/4 glass-panel p-6 rounded-2xl border border-brand-accent/30 shadow-glow w-72 backdrop-blur-3xl"
+                >
+                  <div class="flex justify-between items-start mb-4">
+                    <i
+                      data-lucide="shield-check"
+                      class="text-brand-accent w-6 h-6"
+                    ></i>
+                    <span class="text-[10px] font-mono-data text-brand-accent"
+                      >ENCRYPTED_TX</span
+                    >
+                  </div>
+                  <p class="text-white font-bold mb-1">Payment Secured</p>
+                  <p class="text-slate-400 text-xs mb-4">
+                    Escrow hold active via Paystack Node
+                  </p>
+                  <div
+                    class="bg-brand-accent/10 rounded-lg p-2 text-center border border-brand-accent/20"
+                  >
+                    <span class="text-brand-accent font-bold text-sm"
+                      >$240.00 RELEASED</span
+                    >
+                  </div>
                 </div>
               </div>
             </div>
@@ -796,7 +839,10 @@
                   <div
                     class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center text-brand-navy -mt-8 shadow-lg border-4 border-white"
                   >
-                    <a href="/" class="w-full h-full flex items-center justify-center">
+                    <a
+                      href="/"
+                      class="w-full h-full flex items-center justify-center"
+                    >
                       <i data-lucide="home" class="w-6 h-6"></i>
                     </a>
                   </div>
@@ -1195,12 +1241,16 @@
             <h4 class="text-white font-bold mb-4">Platform</h4>
             <ul class="space-y-3 text-sm">
               <li>
-                <a href="/how-it-works/" class="hover:text-white transition-colors"
+                <a
+                  href="/how-it-works/"
+                  class="hover:text-white transition-colors"
                   >How it Works</a
                 >
               </li>
               <li>
-                <a href="/for-providers/" class="hover:text-white transition-colors"
+                <a
+                  href="/for-providers/"
+                  class="hover:text-white transition-colors"
                   >For Providers</a
                 >
               </li>
@@ -1237,7 +1287,9 @@
                 >
               </li>
               <li>
-                <a href="/provider-agreement/" class="hover:text-white transition-colors"
+                <a
+                  href="/provider-agreement/"
+                  class="hover:text-white transition-colors"
                   >Provider Agreement</a
                 >
               </li>
@@ -1264,4 +1316,3 @@
     <script src="js/pages/index.js"></script>
   </body>
 </html>
-

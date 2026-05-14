@@ -20,6 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/coolalertjs@latest/dist/coolalert.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <script src="../js/config/tailwind.js"></script>
     <link rel="stylesheet" href="../css/base.css" />
@@ -331,6 +332,94 @@
           <div class="scan-line pointer-events-none"></div>
         </div>
         <button id="btn-retry-scan" class="hidden w-full py-3 bg-brand-accent text-brand-navy font-bold rounded-xl shadow-lg mt-2">Retry Scan</button>
+      </div>
+
+      <div
+        id="generate-token-modal"
+        class="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl hidden flex-col items-center p-8 transform scale-95 transition-transform duration-300 relative overflow-hidden"
+      >
+        <button
+          type="button"
+          data-close-modal
+          class="absolute top-6 right-6 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors z-10"
+        >
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+
+        <div class="relative z-10 flex flex-col items-center mt-4 w-full">
+          <div
+            class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center border-4 border-white shadow-md mb-4"
+          >
+            <i data-lucide="key-round" class="text-brand-navy w-8 h-8"></i>
+          </div>
+          <h3 class="text-brand-navy font-bold text-xl mb-1 text-center">Service Completed?</h3>
+          <p class="text-slate-500 text-sm mb-6 text-center">
+            Has the provider successfully completed the job?
+          </p>
+
+          <div id="token-display-area" class="w-full hidden flex-col items-center mb-6">
+            <p class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Your Confirmatory Token</p>
+            <div class="bg-brand-navy w-full py-4 rounded-2xl text-center shadow-inner">
+              <span id="completion-token-value" class="text-brand-accent text-3xl font-mono tracking-[0.2em] font-extrabold">------</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-3 text-center">Give this code to your provider to mark the job as completed. Valid for 15 mins.</p>
+          </div>
+
+          <div id="token-action-area" class="w-full flex gap-3">
+            <button
+              type="button"
+              data-close-modal
+              class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors"
+            >
+              No, wait
+            </button>
+            <button
+              type="button"
+              id="btn-confirm-generate"
+              class="flex-1 py-3 rounded-xl bg-brand-accent text-brand-navy font-bold hover:shadow-glow transition-all"
+            >
+              Yes, Generate
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="complete-service-modal"
+        class="bg-brand-navy border border-white/10 w-full max-w-md rounded-[2.5rem] shadow-2xl hidden flex-col items-center p-8 transform scale-95 transition-transform duration-300"
+      >
+        <div class="w-full flex justify-between items-center mb-8">
+          <div class="w-10 h-10"></div>
+          <h3 class="text-white font-bold text-lg">Complete Service</h3>
+          <button
+            type="button"
+            data-close-modal
+            class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <p class="text-slate-400 text-center text-sm mb-6">
+          Enter the 6-digit confirmatory token provided by the customer to complete this job.
+        </p>
+
+        <div class="w-full mb-6 relative">
+          <input
+            type="text"
+            id="input-completion-token"
+            class="w-full bg-black/50 border border-white/10 rounded-xl text-center text-white text-3xl font-mono tracking-[0.3em] py-4 placeholder:text-slate-700 focus:border-brand-accent focus:outline-none transition-colors"
+            placeholder="000000"
+            maxlength="6"
+          />
+        </div>
+
+        <button
+          type="button"
+          id="btn-submit-completion"
+          class="w-full py-4 bg-brand-accent text-brand-navy font-bold rounded-xl shadow-lg hover:shadow-glow transition-all active:scale-95"
+        >
+          Verify & Complete
+        </button>
       </div>
     </div>
 

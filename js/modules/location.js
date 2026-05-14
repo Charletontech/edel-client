@@ -1,7 +1,10 @@
 window.EdelModules = window.EdelModules || {};
 
 window.EdelModules.location = {
-  minAcceptedAccuracy: 100,
+  get minAcceptedAccuracy() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    return isMobile ? 100 : 500;
+  },
 
   getCurrentPosition(options) {
     return new Promise((resolve, reject) => {
