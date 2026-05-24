@@ -80,12 +80,17 @@
       <div class="p-4 border-t border-white/10 m-4 rounded-2xl bg-white/5">
         <div class="flex items-center gap-3">
           <img
+            id="sidebar-user-img"
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
             class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover"
           />
           <div>
-            <p class="text-sm font-bold text-white">Sarah Jenkins</p>
-            <p class="text-xs text-slate-400" id="sidebar-role">Customer Account</p>
+            <p class="text-sm font-bold text-white" id="sidebar-user-name">
+              Sarah Jenkins
+            </p>
+            <p class="text-xs text-slate-400" id="sidebar-role">
+              Customer Account
+            </p>
           </div>
           <i
             data-lucide="chevron-right"
@@ -120,24 +125,36 @@
             </div>
           </div>
           <div class="flex items-center gap-3 lg:hidden">
-            <div class="relative">
+            <div class="relative cursor-pointer" id="notifications-btn-mobile">
               <i data-lucide="bell" class="w-6 h-6 text-brand-navy"></i>
               <span
-                class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"
+                id="notification-dot-mobile"
+                class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white hidden"
               ></span>
             </div>
             <img
+              id="mobile-user-img"
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
               class="w-10 h-10 rounded-full border-2 border-brand-accent shadow-sm"
             />
           </div>
           <div class="hidden lg:flex items-center gap-3">
+            <div
+              class="relative cursor-pointer w-10 h-10 bg-white rounded-xl shadow-sm border border-slate-100 flex items-center justify-center text-brand-navy hover:bg-slate-50 transition-colors"
+              id="notifications-btn-desktop"
+            >
+              <i data-lucide="bell" class="w-5 h-5"></i>
+              <span
+                id="notification-dot-desktop"
+                class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"
+              ></span>
+            </div>
             <!-- Desktop Header Actions -->
             <div
               class="bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100 flex items-center gap-2 font-bold text-sm text-brand-navy cursor-pointer hover:bg-slate-50"
             >
               <i data-lucide="wallet" class="w-4 h-4 text-brand-accent"></i>
-              Wallet: ₦45,000
+              Coming Soon
             </div>
           </div>
         </div>
@@ -189,7 +206,10 @@
         </div>
 
         <!-- Categories (Horizontal Scroll) -->
-        <div class="flex gap-3 overflow-x-auto no-scrollbar mt-5 pb-1" id="category-list">
+        <div
+          class="flex gap-3 overflow-x-auto no-scrollbar mt-5 pb-1"
+          id="category-list"
+        >
           <button
             data-category="all"
             class="px-5 py-2 bg-brand-navy text-white rounded-full text-sm font-bold whitespace-nowrap shadow-md"
@@ -532,7 +552,10 @@
     <nav
       class="lg:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-between items-center px-6 py-3 pb-safe z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]"
     >
-      <a href="/discovery/" class="flex flex-col items-center gap-1 text-brand-navy">
+      <a
+        href="/discovery/"
+        class="flex flex-col items-center gap-1 text-brand-navy"
+      >
         <i data-lucide="compass" class="w-6 h-6"></i>
         <span class="text-[10px] font-bold">Discover</span>
       </a>
@@ -629,7 +652,9 @@
               </div>
             </div>
             <div class="flex-1">
-              <h4 class="font-bold text-brand-navy" id="modal-provider-name">Maria Silva</h4>
+              <h4 class="font-bold text-brand-navy" id="modal-provider-name">
+                Maria Silva
+              </h4>
               <div
                 class="flex items-center gap-3 text-xs font-medium text-slate-500"
               >
@@ -651,7 +676,10 @@
               <h4 class="font-bold text-brand-navy mb-1 text-sm">
                 Description
               </h4>
-              <p class="text-sm text-slate-500 leading-relaxed" id="modal-description">
+              <p
+                class="text-sm text-slate-500 leading-relaxed"
+                id="modal-description"
+              >
                 Complete sanitization of living spaces, kitchen, and bathrooms.
                 We bring our own eco-friendly supplies. Ideal for
                 move-in/move-out or seasonal deep cleaning.
@@ -714,6 +742,41 @@
       </div>
     </div>
 
+    <!-- Reports/Notifications Modal -->
+    <div
+      id="reports-modal"
+      class="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-[110] hidden flex-col justify-end lg:justify-center items-center opacity-0 transition-opacity duration-300"
+    >
+      <div
+        class="bg-white w-full lg:w-[600px] lg:rounded-3xl rounded-t-3xl max-h-[85vh] flex flex-col transform translate-y-full lg:translate-y-8 transition-transform duration-300"
+        id="reports-modal-content"
+      >
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
+          <div>
+            <h2 class="text-xl font-bold text-brand-navy">Reports & Notifications</h2>
+            <p class="text-xs text-slate-500">Updates on your reported issues and account status</p>
+          </div>
+          <button
+            id="close-reports-btn"
+            class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto" id="reports-list-container">
+          <!-- Reports will be injected here -->
+          <div class="flex flex-col items-center justify-center py-12 text-center">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+              <i data-lucide="bell-off" class="w-8 h-8 text-slate-300"></i>
+            </div>
+            <h3 class="font-bold text-brand-navy">No notifications</h3>
+            <p class="text-sm text-slate-500">You're all caught up!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../js/modules/core.js"></script>
     <script src="../js/config/env.js"></script>
@@ -725,4 +788,3 @@
     <script src="../js/pages/discovery.js"></script>
   </body>
 </html>
-

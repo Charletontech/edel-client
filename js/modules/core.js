@@ -12,3 +12,14 @@ window.Edel = window.Edel || {
     });
   },
 };
+
+// Initialize UI helpers after full page load so modules like `Ui` are available.
+window.addEventListener('load', () => {
+  try {
+    if (window.Ui && typeof window.Ui.initPasswordToggles === 'function') {
+      window.Ui.initPasswordToggles();
+    }
+  } catch (e) {
+    console.error('Global initPasswordToggles error', e);
+  }
+});

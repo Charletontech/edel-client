@@ -64,6 +64,50 @@ window.EdelModules.uiUtils = {
       text: message,
     });
   },
+
+  /**
+   * Initialize password visibility toggles for inputs with an eye icon.
+   * Finds buttons inside `.input-focus-lift` that contain an <i data-lucide="eye"> icon
+   * and toggles the associated input between `password` and `text` on click.
+   */
+  initPasswordToggles() {
+    try {
+      const groups = document.querySelectorAll('.input-focus-lift');
+      groups.forEach((group) => {
+        const btn = group.querySelector('button');
+        const icon = btn && btn.querySelector('[data-lucide="eye"], [data-lucide="eye-off"]');
+        const input = group.querySelector('input[type="password"], input');
+        if (!btn || !icon || !input || btn.__passwordToggleBound) return;
+
+        btn.__passwordToggleBound = true;
+
+        // Ensure button has accessible attributes
+        btn.setAttribute('type', btn.getAttribute('type') || 'button');
+        btn.setAttribute('aria-pressed', 'false');
+        btn.title = btn.title || 'Show password';
+
+        btn.addEventListener('click', () => {
+          const isHidden = input.type === 'password';
+          input.type = isHidden ? 'text' : 'password';
+          btn.setAttribute('aria-pressed', String(isHidden));
+          btn.title = isHidden ? 'Hide password' : 'Show password';
+
+          // Swap icon between eye and eye-off
+          const currentIcon = btn.querySelector('[data-lucide="eye"], [data-lucide="eye-off"]');
+          if (currentIcon) {
+            currentIcon.setAttribute('data-lucide', isHidden ? 'eye-off' : 'eye');
+          }
+
+          if (window.Edel && typeof Edel.initIcons === 'function') {
+            Edel.initIcons();
+          }
+        });
+      });
+    } catch (e) {
+      // fail silently
+      console.error('initPasswordToggles error', e);
+    }
+  },
 };
 
 // Global shorthand

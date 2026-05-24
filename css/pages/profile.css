@@ -7,14 +7,26 @@
       }
 
       .glass-header {
-        background: rgba(248, 250, 252, 0.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(15, 2, 31, 0.05);
+      }
+
+      /* Sidebar Refinement */
+      aside {
+        background: linear-gradient(180deg, var(--brand-navy) 0%, #1a0533 100%);
       }
 
       /* Verified Badge Gradient */
       .verified-badge {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        background: linear-gradient(135deg, #7e22ce 0%, var(--brand-blue) 100%);
+        box-shadow: 0 4px 12px rgba(126, 34, 206, 0.3);
+      }
+
+      /* Metric Cards */
+      .shadow-soft {
+        box-shadow: 0 10px 25px -5px rgba(15, 2, 31, 0.03), 0 8px 10px -6px rgba(15, 2, 31, 0.03);
       }
 
       /* Custom Dropdown Styles */
@@ -46,10 +58,10 @@
       /* Toggle Switch CSS */
       .toggle-checkbox:checked {
         right: 0;
-        border-color: #facc15;
+        border-color: #fbbf24;
       }
       .toggle-checkbox:checked + .toggle-label {
-        background-color: #facc15;
+        background-color: #fbbf24;
       }
       .toggle-checkbox:checked + .toggle-label:after {
         transform: translateX(100%);
@@ -90,7 +102,7 @@
         transform: translateY(-50%);
         font-size: 0.75rem;
         font-weight: 700;
-        color: #06142e;
+        color: var(--brand-navy);
         background-color: #ffffff;
         padding: 0 0.4rem;
         border-radius: 0.25rem;

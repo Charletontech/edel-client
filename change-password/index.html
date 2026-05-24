@@ -4,22 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Edel | Security Reset</title>
-    
-    <!-- Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    
-    <!-- Scripts -->
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="../js/config/tailwind.js"></script>
-    
-    <!-- Styles -->
+
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/utilities.css" />
     <link rel="stylesheet" href="../css/pages/auth.css" />
-    
+
     <style>
       .recovery-container {
         min-height: 100vh;
@@ -31,12 +28,12 @@
         position: relative;
         overflow: hidden;
       }
-      
+
       .glass-card {
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 
+        box-shadow:
           0 25px 50px -12px rgba(6, 20, 46, 0.1),
           0 0 0 1px rgba(6, 20, 46, 0.02);
         border-radius: 2.5rem;
@@ -59,39 +56,35 @@
     </style>
   </head>
   <body class="antialiased selection:bg-brand-accent selection:text-brand-navy">
-    
     <div class="recovery-container">
-      <!-- Background Flourish -->
       <div class="recovery-bg-blob bg-blue-500 -top-48 -left-48 blob-1"></div>
       <div class="recovery-bg-blob bg-brand-accent -bottom-48 -right-48 blob-2"></div>
 
       <div class="glass-card fade-enter fade-enter-active">
-        <!-- Icon -->
         <div class="flex justify-center mb-10">
           <div class="w-16 h-16 bg-brand-navy rounded-3xl flex items-center justify-center text-brand-accent shadow-glow transition-transform hover:scale-110">
             <i data-lucide="key-round" class="w-8 h-8"></i>
           </div>
         </div>
 
-        <!-- Text Content -->
         <div class="text-center mb-8">
           <h1 class="text-3xl font-extrabold text-brand-navy mb-3 tracking-tight">Secure Reset</h1>
           <p class="text-slate-500 font-medium leading-relaxed">
-            Create a unique password that you haven't used before on this platform.
+            Create a unique password that you have not used before on this platform.
           </p>
         </div>
 
-        <!-- Form -->
-        <form class="space-y-6" onsubmit="event.preventDefault(); alert('Security update successful! Returning to Sign In.'); window.location.href='/auth/';">
+        <form id="reset-password-form" class="space-y-6">
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">New Password</label>
               <div class="relative input-focus-lift transition-all">
                 <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
-                <input 
-                  type="password" 
-                  required 
-                  placeholder="••••••••"
+                <input
+                  id="new-password"
+                  type="password"
+                  required
+                  placeholder="........"
                   class="w-full pl-12 pr-12 py-4 bg-white/50 border border-slate-200 rounded-2xl text-brand-navy font-semibold placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-accent/20 focus:border-brand-accent transition-all shadow-sm"
                 />
                 <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-navy transition-colors">
@@ -104,10 +97,11 @@
               <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Confirm New Password</label>
               <div class="relative input-focus-lift transition-all">
                 <i data-lucide="shield-check" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
-                <input 
-                  type="password" 
-                  required 
-                  placeholder="••••••••"
+                <input
+                  id="confirm-password"
+                  type="password"
+                  required
+                  placeholder="........"
                   class="w-full pl-12 pr-4 py-4 bg-white/50 border border-slate-200 rounded-2xl text-brand-navy font-semibold placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-accent/20 focus:border-brand-accent transition-all shadow-sm"
                 />
               </div>
@@ -119,21 +113,19 @@
             <div class="flex items-center gap-2 text-xs text-slate-600 font-medium">
               <i data-lucide="check" class="w-3 h-3 text-green-500"></i> Minimum 8 characters
             </div>
-            <div class="flex items-center gap-2 text-xs text-slate-600 font-medium">
-              <i data-lucide="check" class="w-3 h-3 text-green-500"></i> Mixed case and numbers
-            </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            id="reset-submit-btn"
+            type="submit"
             class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-2xl shadow-xl transition-all active:scale-[0.98] flex justify-center items-center gap-2"
           >
             Update Password
             <i data-lucide="check" class="w-5 h-5"></i>
           </button>
+          <p id="reset-feedback" class="text-sm font-semibold hidden"></p>
         </form>
 
-        <!-- Footer Links -->
         <div class="mt-10 pt-8 border-t border-slate-100 flex flex-col items-center gap-4">
           <a href="/forgot-password/" class="text-slate-500 hover:text-brand-navy font-bold text-sm flex items-center gap-2 transition-colors">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -144,11 +136,72 @@
     </div>
 
     <script src="../js/modules/core.js"></script>
+    <script src="../js/config/env.js"></script>
+    <script src="../js/modules/api.js"></script>
     <script>
-      // Initialize Lucide Icons
-      if (window.lucide) {
-        window.lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
+
+      const form = document.getElementById("reset-password-form");
+      const newPasswordInput = document.getElementById("new-password");
+      const confirmPasswordInput = document.getElementById("confirm-password");
+      const submitBtn = document.getElementById("reset-submit-btn");
+      const feedback = document.getElementById("reset-feedback");
+      const token = new URLSearchParams(window.location.search).get("token");
+
+      const setFeedback = (message, type) => {
+        feedback.textContent = message;
+        feedback.classList.remove("hidden", "text-red-600", "text-green-700");
+        feedback.classList.add(type === "error" ? "text-red-600" : "text-green-700");
+      };
+
+      if (!token) {
+        setFeedback("This reset link is missing a token. Request a new one.", "error");
+        submitBtn.disabled = true;
       }
+
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const newPassword = newPasswordInput?.value || "";
+        const confirmPassword = confirmPasswordInput?.value || "";
+
+        if (newPassword.length < 8) {
+          setFeedback("Password must be at least 8 characters.", "error");
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          setFeedback("Passwords do not match.", "error");
+          return;
+        }
+
+        if (!token) {
+          setFeedback("Invalid reset link. Request a new one.", "error");
+          return;
+        }
+
+        const original = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Updating...";
+
+        try {
+          const response = await EdelModules.api.post("/api/auth/reset-password", {
+            token,
+            newPassword
+          }, { silent: true });
+
+          setFeedback(response.message || "Password updated successfully. Redirecting...", "success");
+          setTimeout(() => {
+            window.location.href = "/auth/";
+          }, 1200);
+        } catch (error) {
+          setFeedback(error.message || "Could not update password right now.", "error");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = original;
+          if (window.lucide) window.lucide.createIcons();
+        }
+      });
     </script>
   </body>
 </html>

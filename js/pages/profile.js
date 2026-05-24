@@ -1,6 +1,8 @@
 Edel.initIcons();
 Edel.applySafeArea();
 
+let currentOpenModal = null;
+
 if (!EdelModules.auth.requireAuth()) {
   throw new Error("Authentication required");
 }
@@ -25,7 +27,86 @@ const profileElements = {
   logoutButton: document.getElementById("logout-button"),
   servicesList: document.getElementById("services-list"),
   statusSelect: document.getElementById("provider-status"),
+  notificationDot: document.getElementById("notification-dot-profile"),
+  reportsList: document.getElementById("reports-list-container"),
 };
+
+const reportsModalController = EdelModules.ui.createOverlayModal({
+  overlay: document.getElementById("reports-modal"),
+  defaultPanelClass: "flex",
+});
+
+function openReportsModal() {
+  reportsModalController.open(document.getElementById('reports-modal-content'), {
+    panelClass: "flex",
+    hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
+    visiblePanelClasses: ["translate-y-0"],
+  });
+}
+
+window.closeReportsModal = () => {
+  reportsModalController.close({
+    hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
+    visiblePanelClasses: ["translate-y-0"],
+  });
+};
+
+function renderReports(reports) {
+  if (!profileElements.reportsList) return;
+
+  const hasUnresolved = reports.some(r => r.reportStatus === 'open');
+  if (profileElements.notificationDot) {
+    profileElements.notificationDot.classList.toggle('hidden', !hasUnresolved);
+  }
+
+  if (reports.length === 0) {
+    profileElements.reportsList.innerHTML = `
+      <div class="flex flex-col items-center justify-center py-12 text-center">
+        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+          <i data-lucide="bell-off" class="w-8 h-8 text-slate-300"></i>
+        </div>
+        <h3 class="font-bold text-brand-navy">No notifications</h3>
+        <p class="text-sm text-slate-500">You're all caught up!</p>
+      </div>
+    `;
+    Edel.initIcons();
+    return;
+  }
+
+  profileElements.reportsList.innerHTML = reports.map(report => {
+    const statusColors = {
+      open: 'bg-blue-100 text-blue-700',
+      reviewed: 'bg-orange-100 text-orange-700',
+      resolved: 'bg-green-100 text-green-700'
+    };
+
+    const resolutionText = report.reportResolution 
+      ? `<div class="mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+           <p class="text-xs font-bold text-slate-500 uppercase mb-1">Admin Resolution</p>
+           <p class="text-sm text-brand-navy font-medium">${report.reportResolution.replace(/_/g, ' ')}</p>
+           ${report.adminNote ? `<p class="text-xs text-slate-500 mt-1 italic">"${report.adminNote}"</p>` : ''}
+         </div>`
+      : '';
+
+    return `
+      <div class="p-4 border border-slate-100 rounded-2xl mb-4 hover:border-brand-accent transition-colors">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-bold ${statusColors[report.reportStatus] || 'bg-slate-100 text-slate-600'} px-2 py-0.5 rounded uppercase tracking-wider">
+            ${report.reportStatus}
+          </span>
+          <span class="text-[10px] text-slate-400 font-medium">
+            ${new Date(report.reportedAt).toLocaleDateString()}
+          </span>
+        </div>
+        <h4 class="font-bold text-brand-navy text-sm mb-1">${report.serviceTitle}</h4>
+        <p class="text-xs text-slate-500 line-clamp-2">${report.reportMessage}</p>
+        ${resolutionText}
+      </div>
+    `;
+  }).join('');
+
+  Edel.initIcons();
+}
 
 function syncProfileInputs(user) {
   if (profileElements.infoName) {
@@ -44,10 +125,37 @@ function syncProfileInputs(user) {
 function hydrateProfile(user) {
   if (!user) return;
 
+  // Populate sidebar (consistency across pages)
+  const sidebarName = document.getElementById("sidebar-user-name");
+  const sidebarRole = document.getElementById("sidebar-role");
+  const sidebarImg = document.getElementById("sidebar-user-img");
+
+  if (sidebarName) sidebarName.textContent = user.fullName || "User";
+  if (sidebarRole) {
+    if (user.role === "both") sidebarRole.textContent = "Customer + Provider";
+    else if (user.role === "provider")
+      sidebarRole.textContent = "Provider Account";
+    else sidebarRole.textContent = "Customer Account";
+  }
+  if (sidebarImg) {
+    sidebarImg.src = EdelModules.api.buildUrl(
+      user.profilePhoto || "/assets/images/avatar.jpg",
+    );
+  }
+
   const isProviderRole = user.role === "provider" || user.role === "both";
   const fullName = user.fullName || "Edel User";
 
   profileElements.name.innerText = fullName;
+  
+  // Update location
+  const locationElement = document.getElementById("profile-location");
+  if (locationElement) {
+    locationElement.innerText = EdelModules.location.formatLocationLabel(
+      user.locationLabel,
+      "Current location",
+    );
+  }
   
   // Logic for initial display (will be refined by setView)
   profileElements.roleTag.innerText = user.role === "provider" ? "Rookie Tier" : "Customer";
@@ -115,6 +223,7 @@ async function updateProfile() {
       },
       {
         headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
       },
     );
 
@@ -141,6 +250,7 @@ async function updatePreferences() {
       },
       {
         headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
       },
     );
 
@@ -176,6 +286,7 @@ async function updatePassword() {
       },
       {
         headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
       },
     );
 
@@ -201,6 +312,7 @@ async function deleteAccount() {
   try {
     await EdelModules.api.delete("/api/", {
       headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
 
     Ui.alert(
@@ -230,14 +342,21 @@ function renderServices(services) {
 
   profileElements.servicesList.innerHTML = services
     .map(
-      (service) => `
-    <div class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-brand-accent transition-all relative hover:z-50">
+      (service) => {
+        const isDisabled = service.serviceStatus === 'disabled';
+        const statusBadge = isDisabled 
+          ? `<span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider rounded-md ml-2">Disabled</span>` 
+          : '';
+        const opacityClass = isDisabled ? 'opacity-60' : '';
+
+        return `
+    <div class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-brand-accent transition-all relative hover:z-50 ${opacityClass}">
       <div class="flex items-center gap-4">
         <div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center">
-          <i data-lucide="${getIconForCategory(service.category)}" class="w-5 h-5 text-brand-navy"></i>
+          <i data-lucide="${getIconForCategory(service.category)}" class="w-5 h-5 ${isDisabled ? 'text-red-500' : 'text-brand-navy'}"></i>
         </div>
         <div>
-          <h4 class="font-bold text-brand-navy text-sm">${service.title}</h4>
+          <h4 class="font-bold text-brand-navy text-sm flex items-center">${service.title} ${statusBadge}</h4>
           <p class="text-xs text-slate-500">₦${Number(service.basePrice).toLocaleString()} Base • ${service.category}</p>
         </div>
       </div>
@@ -247,13 +366,12 @@ function renderServices(services) {
         </button>
         <div class="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-xl border border-slate-100 hidden group-hover:block z-50">
           <button onclick="viewServiceDetails(${service.id})" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 first:rounded-t-xl">Details</button>
-          <button onclick="editService(${service.id})" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Edit</button>
+          ${!isDisabled ? `<button onclick="editService(${service.id})" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Edit</button>` : ''}
           <button onclick="deleteService(${service.id})" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 last:rounded-b-xl">Delete</button>
         </div>
       </div>
     </div>
-  `,
-    )
+  `})
     .join("");
 
   Edel.initIcons();
@@ -309,9 +427,12 @@ function refreshDashboard() {
     .fetchDashboard()
     .then((response) => {
       if (!response?.user) return;
-      EdelModules.auth.setUser(response.user);
-      hydrateProfile(response.user);
-      return response.user;
+      const currentUser = EdelModules.auth.getUser() || {};
+      const updatedUser = { ...currentUser, ...response.user };
+      EdelModules.auth.setUser(updatedUser);
+      hydrateProfile(updatedUser);
+      if (response.reports) renderReports(response.reports);
+      return updatedUser;
     })
     .catch((error) => {
       if (error.status === 401) {
@@ -323,6 +444,8 @@ function refreshDashboard() {
 }
 
 refreshDashboard();
+
+document.getElementById("notifications-btn-profile")?.addEventListener("click", openReportsModal);
 
 profileElements.logoutButton?.addEventListener("click", () => {
   EdelModules.auth.logout();
@@ -392,8 +515,9 @@ function setView(viewType) {
     profileRoleTag.className = customerRoleTagClass;
     profileRating.innerHTML =
       '100% <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>';
-    profileAvatar.src =
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+    profileAvatar.src = EdelModules.api.buildUrl(
+      currentUser.profilePhoto || "/assets/images/avatar.jpg",
+    );
 
     profileBadge.classList.add("hidden");
     metricCompleted.classList.add("hidden");
@@ -410,8 +534,9 @@ function setView(viewType) {
 
     const rating = currentUser.rating || 50;
     profileRating.innerHTML = `${rating}% <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>`;
-    profileAvatar.src =
-      "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=200&q=80";
+    profileAvatar.src = EdelModules.api.buildUrl(
+      currentUser.profilePhoto || "/assets/images/avatar.jpg",
+    );
 
     profileBadge.classList.remove("hidden");
     metricCompleted.classList.remove("hidden");
@@ -428,7 +553,8 @@ async function upgradeAccount(targetRole, payload = {}) {
       targetRole,
       ...payload
     }, {
-      headers: EdelModules.auth.getAuthHeaders()
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
 
     Ui.toast("success", "Account Upgraded", response.message);
@@ -480,6 +606,7 @@ async function updateProviderStatus(selectElement) {
       { status: newStatus },
       {
         headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
       },
     );
 
@@ -557,6 +684,7 @@ async function saveNewService() {
       },
       {
         headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
       },
     );
 
@@ -589,6 +717,7 @@ async function deleteService(id) {
   try {
     await EdelModules.api.delete(`/api/services/${id}`, {
       headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
 
     Ui.toast("success", "Service Deleted", "The service has been removed.");
@@ -639,6 +768,7 @@ async function updateService(id) {
       },
       {
         headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
       },
     );
 
@@ -666,24 +796,51 @@ function viewServiceDetails(id) {
 
   // Populate Details Modal
   const icon = getIconForCategory(service.category);
+  const isDisabled = service.serviceStatus === 'disabled';
+  
   document.getElementById("detail-icon").setAttribute("data-lucide", icon);
   document.getElementById("detail-category").innerText = service.category;
   document.getElementById("detail-title").innerText = service.title;
   document.getElementById("detail-price").innerText = `₦${Number(service.basePrice).toLocaleString()}`;
   document.getElementById("detail-desc").innerText = service.description;
 
+  const statusContainer = document.getElementById("detail-price").parentElement.nextElementSibling;
+  if (statusContainer) {
+    if (isDisabled) {
+      statusContainer.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Status</p>
+          <p class="text-sm font-bold text-red-600 flex items-center gap-1">
+            <i data-lucide="ban" class="w-4 h-4"></i> Disabled
+          </p>
+          ${service.disabledReason ? `<p class="text-[10px] text-red-400 font-medium italic mt-1 leading-tight">"${service.disabledReason}"</p>` : ''}
+        </div>
+      `;
+    } else {
+      statusContainer.innerHTML = `
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Status</p>
+        <p class="text-sm font-bold text-green-600 flex items-center gap-1">
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Active
+        </p>
+      `;
+    }
+  }
+
   // Setup Edit Button in Details
   const editBtn = document.getElementById("btn-edit-from-detail");
-  editBtn.onclick = () => {
-    closeModals();
-    setTimeout(() => editService(id), 350);
-  };
+  if (isDisabled) {
+    editBtn.classList.add("hidden");
+  } else {
+    editBtn.classList.remove("hidden");
+    editBtn.onclick = () => {
+      closeModals();
+      setTimeout(() => editService(id), 350);
+    };
+  }
 
   openModal("modal-service-details");
   Edel.initIcons();
 }
-
-let currentOpenModal = null;
 
 function openModal(modalId) {
   const overlay = document.getElementById("modal-overlay");
@@ -749,3 +906,43 @@ window.updatePreferences = updatePreferences;
 window.updatePassword = updatePassword;
 window.deleteAccount = deleteAccount;
 window.submitProviderUpgrade = submitProviderUpgrade;
+
+// Profile Photo Update
+const photoInput = document.createElement("input");
+photoInput.type = "file";
+photoInput.accept = "image/*";
+photoInput.className = "hidden";
+document.body.appendChild(photoInput);
+
+const editPhotoBtn = document.getElementById("edit-profile-photo-btn");
+if (editPhotoBtn) {
+  editPhotoBtn.addEventListener("click", () => photoInput.click());
+}
+
+photoInput.addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("profilePhoto", file);
+
+  try {
+    Ui.toast("info", "Uploading...", "Updating your profile picture.");
+    const response = await EdelModules.api.put("/api/profile/photo", formData, {
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
+    });
+
+    Ui.toast("success", "Photo Updated", "Your profile picture has been changed.");
+    
+    // Update local user data
+    const user = EdelModules.auth.getUser();
+    if (user) {
+      user.profilePhoto = response.profilePhoto;
+      EdelModules.auth.setUser(user);
+      hydrateProfile(user);
+    }
+  } catch (error) {
+    Ui.toast("error", "Upload Failed", error.message);
+  }
+});

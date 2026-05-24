@@ -88,6 +88,20 @@ window.EdelModules.location = {
     return value || fallback;
   },
 
+  isGenericLabel(label) {
+    if (!label) return true;
+    const genericTerms = [
+      "current location",
+      "currebt location",
+      "saved location",
+      "unknown location",
+      "location captured",
+      "lagos, nigeria",
+    ];
+    const lowerLabel = label.toLowerCase().trim();
+    return genericTerms.some((term) => lowerLabel.includes(term));
+  },
+
   simulateLocationText(target, value = "Lagos, Nigeria", delay = 1200) {
     if (!target) return;
 
@@ -95,5 +109,36 @@ window.EdelModules.location = {
     window.setTimeout(() => {
       target.innerText = value;
     }, delay);
+  },
+
+  async reverseGeocode(latitude, longitude) {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+        {
+          headers: {
+            "Accept-Language": "en",
+            "User-Agent": "Edel-App",
+          },
+        },
+      );
+
+      if (!response.ok) throw new Error("Geocoding failed");
+
+      const data = await response.json();
+      const addr = data.address;
+
+      // Prioritize area-specific fields for a concise label
+      const area = addr.suburb || addr.neighbourhood || addr.city_district || addr.town || addr.village;
+      const city = addr.city || addr.state || "";
+
+      if (area && city) return `${area}, ${city}`;
+      if (area || city) return area || city;
+
+      return data.display_name.split(",")[0] || "Unknown Location";
+    } catch (error) {
+      console.warn("Reverse geocoding failed:", error.message);
+      return null;
+    }
   },
 };

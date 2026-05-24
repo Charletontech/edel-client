@@ -24,8 +24,20 @@ const modalDistance = document.getElementById("modal-distance");
 const modalPrice = document.getElementById("modal-price");
 const modalImg = document.getElementById("modal-img");
 
+const reportsModal = document.getElementById("reports-modal");
+const reportsListContainer = document.getElementById("reports-list-container");
+const notificationsBtnMobile = document.getElementById("notifications-btn-mobile");
+const notificationsBtnDesktop = document.getElementById("notifications-btn-desktop");
+const notificationDotMobile = document.getElementById("notification-dot-mobile");
+const notificationDotDesktop = document.getElementById("notification-dot-desktop");
+
 const modalController = EdelModules.ui.createOverlayModal({
   overlay: modal,
+  defaultPanelClass: "flex",
+});
+
+const reportsModalController = EdelModules.ui.createOverlayModal({
+  overlay: reportsModal,
   defaultPanelClass: "flex",
 });
 
@@ -108,9 +120,9 @@ function getStatusBadge(status) {
 }
 
 function buildCardMarkup(item) {
-  const profilePhoto =
-    item.provider.profilePhoto ||
-    "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=100&q=80";
+  const profilePhoto = EdelModules.api.buildUrl(
+    item.provider.profilePhoto || "/assets/images/avatar.jpg",
+  );
 
   return `
     <div
@@ -252,6 +264,30 @@ function renderListings(items) {
   Edel.initIcons();
 }
 
+function populateUserProfile() {
+  const user = EdelModules.auth.getUser();
+  if (!user) return;
+
+  const sidebarName = document.getElementById("sidebar-user-name");
+  const sidebarRole = document.getElementById("sidebar-role");
+  const sidebarImg = document.getElementById("sidebar-user-img");
+  const mobileImg = document.getElementById("mobile-user-img");
+
+  if (sidebarName) sidebarName.textContent = user.fullName || "User";
+  if (sidebarRole) {
+    if (user.role === "both") sidebarRole.textContent = "Customer + Provider";
+    else if (user.role === "provider") sidebarRole.textContent = "Provider Account";
+    else sidebarRole.textContent = "Customer Account";
+  }
+
+  // Use a default avatar if none provided
+  const profilePhoto = EdelModules.api.buildUrl(
+    user.profilePhoto || "/assets/images/avatar.jpg",
+  );
+  if (sidebarImg) sidebarImg.src = profilePhoto;
+  if (mobileImg) mobileImg.src = profilePhoto;
+}
+
 function renderCategories(categories = []) {
   if (!categoryList) return;
 
@@ -283,7 +319,9 @@ function openDiscoveryModal(serviceId) {
   modalTitle.innerText = item.title;
   modalCategory.innerText = item.category;
   if (modalImg) {
-    modalImg.src = item.provider.profilePhoto || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80";
+    modalImg.src = EdelModules.api.buildUrl(
+      item.provider.profilePhoto || "/assets/images/avatar.jpg",
+    );
   }
   if (modalProviderName) modalProviderName.innerText = item.provider.fullName;
   if (modalDescription) modalDescription.innerText = item.description;
@@ -326,6 +364,7 @@ async function requestSelectedService() {
       },
       {
         headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
       },
     );
 
@@ -344,6 +383,84 @@ async function requestSelectedService() {
   }
 }
 
+async function loadReports() {
+  try {
+    const response = await EdelModules.auth.fetchDashboard();
+    const reports = response.reports || [];
+    
+    // Show/hide notification dots
+    const hasUnresolved = reports.some(r => r.reportStatus === 'open');
+    if (notificationDotMobile) notificationDotMobile.classList.toggle('hidden', !hasUnresolved);
+    if (notificationDotDesktop) notificationDotDesktop.classList.toggle('hidden', !hasUnresolved);
+
+    if (reports.length === 0) {
+      reportsListContainer.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+            <i data-lucide="bell-off" class="w-8 h-8 text-slate-300"></i>
+          </div>
+          <h3 class="font-bold text-brand-navy">No notifications</h3>
+          <p class="text-sm text-slate-500">You're all caught up!</p>
+        </div>
+      `;
+      Edel.initIcons();
+      return;
+    }
+
+    reportsListContainer.innerHTML = reports.map(report => {
+      const statusColors = {
+        open: 'bg-blue-100 text-blue-700',
+        reviewed: 'bg-orange-100 text-orange-700',
+        resolved: 'bg-green-100 text-green-700'
+      };
+
+      const resolutionText = report.reportResolution 
+        ? `<div class="mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+             <p class="text-xs font-bold text-slate-500 uppercase mb-1">Admin Resolution</p>
+             <p class="text-sm text-brand-navy font-medium">${report.reportResolution.replace(/_/g, ' ')}</p>
+             ${report.adminNote ? `<p class="text-xs text-slate-500 mt-1 italic">"${report.adminNote}"</p>` : ''}
+           </div>`
+        : '';
+
+      return `
+        <div class="p-4 border border-slate-100 rounded-2xl mb-4 hover:border-brand-accent transition-colors">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-bold ${statusColors[report.reportStatus] || 'bg-slate-100 text-slate-600'} px-2 py-0.5 rounded uppercase tracking-wider">
+              ${report.reportStatus}
+            </span>
+            <span class="text-[10px] text-slate-400 font-medium">
+              ${new Date(report.reportedAt).toLocaleDateString()}
+            </span>
+          </div>
+          <h4 class="font-bold text-brand-navy text-sm mb-1">${report.serviceTitle}</h4>
+          <p class="text-xs text-slate-500 line-clamp-2">${report.reportMessage}</p>
+          ${resolutionText}
+        </div>
+      `;
+    }).join('');
+
+    Edel.initIcons();
+  } catch (error) {
+    console.error("Failed to load reports:", error);
+  }
+}
+
+function openReportsModal() {
+  reportsModalController.open(document.getElementById('reports-modal-content'), {
+    panelClass: "flex",
+    hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
+    visiblePanelClasses: ["translate-y-0"],
+  });
+  loadReports();
+}
+
+function closeReportsModal() {
+  reportsModalController.close({
+    hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
+    visiblePanelClasses: ["translate-y-0"],
+  });
+}
+
 function getSavedLocationLabel() {
   return EdelModules.location.formatLocationLabel(
     EdelModules.auth.getUser()?.locationLabel,
@@ -353,10 +470,24 @@ function getSavedLocationLabel() {
 
 async function syncUserLocation(position) {
   try {
+    let currentLabel = getSavedLocationLabel();
+
+    // If the label is generic or placeholder, try to resolve a real address
+    if (EdelModules.location.isGenericLabel(currentLabel)) {
+      const realAddress = await EdelModules.location.reverseGeocode(
+        position.latitude,
+        position.longitude,
+      );
+      if (realAddress) {
+        currentLabel = realAddress;
+        if (locationText) locationText.innerText = currentLabel;
+      }
+    }
+
     await EdelModules.api.put(
       "/api/location",
       {
-        locationLabel: getSavedLocationLabel(),
+        locationLabel: currentLabel,
         latitude: position.latitude,
         longitude: position.longitude,
       },
@@ -367,7 +498,7 @@ async function syncUserLocation(position) {
     );
 
     const user = EdelModules.auth.getUser() || {};
-    user.locationLabel = getSavedLocationLabel();
+    user.locationLabel = currentLabel;
     user.latitude = position.latitude;
     user.longitude = position.longitude;
     EdelModules.auth.setUser(user);
@@ -448,6 +579,7 @@ async function loadDiscoveryFeed() {
       {
         headers: EdelModules.auth.getAuthHeaders(),
         signal: state.requestController.signal,
+        silent: true,
       },
     );
 
@@ -533,6 +665,13 @@ modalActionBtn?.addEventListener("click", () => {
   requestSelectedService().catch(() => {});
 });
 
+notificationsBtnMobile?.addEventListener("click", openReportsModal);
+notificationsBtnDesktop?.addEventListener("click", openReportsModal);
+document.getElementById("close-reports-btn")?.addEventListener("click", closeReportsModal);
+reportsModal?.addEventListener("click", (event) => {
+  if (event.target === reportsModal) closeReportsModal();
+});
+
 window.closeModal = () =>
   modalController.close({
     hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
@@ -541,6 +680,8 @@ window.closeModal = () =>
 
 window.addEventListener("load", () => {
   setActiveTab("customer");
+  populateUserProfile();
+  loadReports();
   loadDiscoveryFeed().catch((error) => {
     Ui.toast("error", "Discovery Unavailable", error.message);
   });

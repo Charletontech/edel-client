@@ -1,35 +1,86 @@
 window.EdelModules = window.EdelModules || {};
 
 window.EdelModules.api = {
+  getErrorMessage(data) {
+    if (!data) return "Request failed";
+
+    if (typeof data === "string") {
+      const trimmed = data.trim();
+      return trimmed || "Request failed";
+    }
+
+    if (typeof data === "object") {
+      return (
+        data.message ||
+        data.error ||
+        data.details ||
+        "Request failed"
+      );
+    }
+
+    return "Request failed";
+  },
+
   buildUrl(path = "") {
     if (/^https?:\/\//i.test(path)) return path;
 
+    const normalizedPath = (path.startsWith("/") ? path : `/${path}`)
+      .replace("/assets/images/avatar.webp", "/assets/images/avatar.jpg");
+    if (normalizedPath.startsWith("/assets/")) {
+      const pathSegments = window.location.pathname
+        .split("/")
+        .filter(Boolean);
+      const lastSegment = pathSegments[pathSegments.length - 1] || "";
+      const isFilePath = lastSegment.includes(".");
+      const directoryDepth = isFilePath
+        ? pathSegments.length - 1
+        : pathSegments.length;
+      const relativePrefix = directoryDepth > 0 ? "../" : "./";
+      return `${relativePrefix}${normalizedPath.slice(1)}`;
+    }
+
     const baseUrl = (window.EdelConfig?.apiBaseUrl || "").replace(/\/$/, "");
-    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
     return `${baseUrl}${normalizedPath}`;
   },
 
   async request(path, options = {}) {
     try {
-      const { headers, ...restOptions } = options;
-      const response = await fetch(this.buildUrl(path), {
+      const { headers, body, ...restOptions } = options;
+      
+      const config = {
         ...restOptions,
         headers: {
-          "Content-Type": "application/json",
           ...(headers || {}),
         },
-      });
+      };
+
+      if (body) {
+        if (body instanceof FormData) {
+          config.body = body;
+          // Let browser set multipart/form-data with boundary
+        } else {
+          if (!config.headers["Content-Type"]) {
+            config.headers["Content-Type"] = "application/json";
+          }
+          config.body = typeof body === "string" ? body : JSON.stringify(body);
+        }
+      }
+
+      const response = await fetch(this.buildUrl(path), config);
 
       const contentType = response.headers.get("content-type") || "";
-      const data = contentType.includes("application/json")
-        ? await response.json()
-        : await response.text();
+      let data = null;
+
+      try {
+        data = contentType.includes("application/json")
+          ? await response.json()
+          : await response.text();
+      } catch (parseError) {
+        data = null;
+      }
 
       if (!response.ok) {
-        const message =
-          (data && typeof data === "object" && data.message) ||
-          (typeof data === "string" && data) ||
-          "Request failed";
+        const message = this.getErrorMessage(data);
         
         // Auto-toast error unless silent option is true
         if (!options.silent) {
@@ -43,6 +94,7 @@ window.EdelModules.api = {
         const error = new Error(message);
         error.status = response.status;
         error.data = data;
+        error.isApiError = true;
         throw error;
       }
 
@@ -63,7 +115,7 @@ window.EdelModules.api = {
   post(path, body, options = {}) {
     return this.request(path, {
       method: "POST",
-      body: JSON.stringify(body),
+      body,
       ...options,
     });
   },
@@ -78,7 +130,7 @@ window.EdelModules.api = {
   put(path, body, options = {}) {
     return this.request(path, {
       method: "PUT",
-      body: JSON.stringify(body),
+      body,
       ...options,
     });
   },

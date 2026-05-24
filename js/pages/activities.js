@@ -33,9 +33,48 @@ if (window.io) {
   socket = io(socketUrl);
   socket.on("connect", () => {
     console.log("Socket connected");
+    const user = EdelModules.auth.getUser();
+    if (user) {
+      socket.emit("joinRoom", `user_${user.id}`);
+    }
   });
+  
   socket.on("orderStatusChanged", (data) => {
     console.log("Order status changed via socket", data);
+    loadActivities();
+  });
+
+  socket.on("newOrderReceived", (data) => {
+    console.log("New order received via socket", data);
+    if (typeof coolalert !== 'undefined') {
+      coolalert.alert({ type: "info", title: "New Request", text: "A new service request has arrived!" });
+    }
+    loadActivities();
+  });
+
+  socket.on("orderAccepted", (data) => {
+    console.log("Order accepted via socket", data);
+    loadActivities();
+  });
+
+  socket.on("orderDeclined", (data) => {
+    console.log("Order declined via socket", data);
+    if (typeof coolalert !== 'undefined') {
+      coolalert.alert({ type: "error", title: "Declined", text: "The provider declined your request." });
+    }
+    loadActivities();
+  });
+
+  socket.on("orderCancelled", (data) => {
+    console.log("Order cancelled via socket", data);
+    if (typeof coolalert !== 'undefined') {
+      coolalert.alert({ type: "info", title: "Cancelled", text: "The other party has cancelled the order." });
+    }
+    loadActivities();
+  });
+
+  socket.on("orderReported", (data) => {
+    console.log("Order reported via socket", data);
     loadActivities();
   });
 }
@@ -81,6 +120,21 @@ function getUserRoleLabel(role) {
   if (role === "both") return "Customer + Provider";
   if (role === "provider") return "Provider Account";
   return "Customer Account";
+}
+
+function populateUserProfile() {
+  const sidebarImg = document.getElementById("sidebar-user-img");
+  const mobileImg = document.getElementById("mobile-user-img");
+
+  if (sidebarUserName)
+    sidebarUserName.textContent = state.user.fullName || "User";
+  if (sidebarRole) sidebarRole.textContent = getUserRoleLabel(state.user.role);
+
+  const profilePhoto = EdelModules.api.buildUrl(
+    state.user.profilePhoto || "/assets/images/avatar.jpg",
+  );
+  if (sidebarImg) sidebarImg.src = profilePhoto;
+  if (mobileImg) mobileImg.src = profilePhoto;
 }
 
 function canUseCustomerView() {
@@ -591,6 +645,7 @@ async function loadActivities() {
   try {
     const response = await EdelModules.api.get("/api/orders/activity", {
       headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
 
     state.customerOrder = response.customerOrder || null;
@@ -626,6 +681,7 @@ async function acceptOrder(orderId) {
     {},
     {
       headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     },
   );
   Ui.toast("success", "Order Accepted", "The customer has been notified.");
@@ -638,6 +694,7 @@ async function declineOrder(orderId) {
     {},
     {
       headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     },
   );
   Ui.toast("success", "Order Declined", "You are ready for the next request.");
@@ -657,6 +714,7 @@ async function cancelOrder(orderId) {
     { reason },
     {
       headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     },
   );
   Ui.toast("success", "Order Cancelled", "Your order has been cancelled.");
@@ -676,6 +734,7 @@ async function reportOrder(orderId) {
     { message },
     {
       headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     },
   );
   Ui.toast("success", "Report Submitted", "An admin will review your report.");
@@ -802,7 +861,8 @@ async function startQrSession() {
     };
 
     const res = await EdelModules.api.post("/api/orders/start-session", payload, {
-      headers: EdelModules.auth.getAuthHeaders()
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
 
     container.innerHTML = "";
@@ -886,7 +946,8 @@ async function verifyQrSession(decodedText) {
     };
 
     await EdelModules.api.post("/api/orders/verify-session", verifyPayload, {
-      headers: EdelModules.auth.getAuthHeaders()
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
 
     statusEl.textContent = "Verification Successful! Service Started.";
@@ -995,7 +1056,8 @@ document.getElementById("btn-confirm-generate")?.addEventListener("click", async
   
   try {
     const response = await EdelModules.api.post(`/api/orders/${state.customerOrder.id}/generate-token`, {}, {
-      headers: EdelModules.auth.getAuthHeaders()
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
     
     tokenValue.textContent = response.token;
@@ -1028,7 +1090,8 @@ document.getElementById("btn-submit-completion")?.addEventListener("click", asyn
   
   try {
     await EdelModules.api.post(`/api/orders/${state.providerOrder.id}/complete`, { token }, {
-      headers: EdelModules.auth.getAuthHeaders()
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
     });
     
     Ui.toast("success", "Service Completed", "The job has been marked as complete.");
@@ -1043,6 +1106,7 @@ document.getElementById("btn-submit-completion")?.addEventListener("click", asyn
   }
 });
 
+populateUserProfile();
 loadActivities().catch((error) => {
   Ui.toast("error", "Activities Unavailable", error.message);
 });

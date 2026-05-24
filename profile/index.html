@@ -30,6 +30,13 @@
 
     <!-- CoolAlert.js -->
     <script src="https://cdn.jsdelivr.net/npm/coolalertjs@latest/dist/coolalert.min.js"></script>
+    <style>
+      :root {
+        --brand-navy: #0F021F;
+        --brand-blue: #240046;
+        --brand-purple-accent: #7e22ce;
+      }
+    </style>
   </head>
   <body
     class="bg-brand-light text-slate-800 antialiased overflow-hidden flex h-screen h-[100dvh]"
@@ -41,14 +48,9 @@
       <div class="p-6">
         <a
           href="/"
-          class="text-2xl font-bold tracking-tight flex items-center gap-3"
+          class="flex items-center group"
         >
-          <div
-            class="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center text-brand-navy shadow-glow"
-          >
-            <i data-lucide="sparkles" class="w-6 h-6"></i>
-          </div>
-          Edel
+          <img src="../assets/images/edel-logo-inverse.png" alt="Edel Logo" class="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
         </a>
       </div>
 
@@ -78,6 +80,22 @@
           <i data-lucide="user" class="w-5 h-5"></i> Profile
         </a>
       </nav>
+
+      <div class="p-4 border-t border-white/10 m-4 rounded-2xl bg-white/5">
+        <div class="flex items-center gap-3">
+          <img
+            id="sidebar-user-img"
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover"
+          />
+          <div>
+            <p class="text-sm font-bold text-white" id="sidebar-user-name">Sarah Jenkins</p>
+            <p class="text-xs text-slate-400" id="sidebar-role">
+              Customer Account
+            </p>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- Main Content Area -->
@@ -97,10 +115,18 @@
           </p>
         </div>
 
-        <!-- Developer Toggle (For Demonstration) -->
-        <div
-          class="hidden md:flex bg-white/90 backdrop-blur p-1 rounded-xl shadow-sm border border-slate-200 items-center"
-        >
+        <div class="flex items-center gap-4">
+          <div class="relative cursor-pointer" id="notifications-btn-profile">
+            <i data-lucide="bell" class="w-6 h-6 text-brand-navy"></i>
+            <span
+              id="notification-dot-profile"
+              class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white hidden"
+            ></span>
+          </div>
+          <!-- Developer Toggle (For Demonstration) -->
+          <div
+            class="hidden md:flex bg-white/90 backdrop-blur p-1 rounded-xl shadow-sm border border-slate-200 items-center"
+          >
           <button
             onclick="setView('customer')"
             id="btn-view-customer"
@@ -188,7 +214,7 @@
                 class="text-slate-500 text-sm mb-4 flex items-center justify-center md:justify-start gap-2"
               >
                 <i data-lucide="map-pin" class="w-4 h-4 text-brand-accent"></i>
-                Lagos, Nigeria
+                <span id="profile-location">Lagos, Nigeria</span>
               </p>
 
               <!-- Metrics row -->
@@ -232,6 +258,7 @@
             </div>
 
             <button
+              id="edit-profile-photo-btn"
               class="absolute top-6 right-6 w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors shadow-sm border border-slate-200"
             >
               <i data-lucide="edit-2" class="w-4 h-4"></i>
@@ -319,7 +346,7 @@
             >
               <div class="flex items-center gap-4">
                 <div
-                  class="w-10 h-10 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center"
+                  class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center"
                 >
                   <i data-lucide="user" class="w-5 h-5"></i>
                 </div>
@@ -334,7 +361,7 @@
               </div>
               <i
                 data-lucide="chevron-right"
-                class="w-5 h-5 text-slate-300 group-hover:text-brand-accent transition-colors"
+                class="w-5 h-5 text-slate-300 group-hover:text-purple-600 transition-colors"
               ></i>
             </div>
 
@@ -369,7 +396,7 @@
             >
               <div class="flex items-center gap-4">
                 <div
-                  class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"
+                  class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center"
                 >
                   <i data-lucide="shield" class="w-5 h-5"></i>
                 </div>
@@ -384,7 +411,7 @@
               </div>
               <i
                 data-lucide="chevron-right"
-                class="w-5 h-5 text-slate-300 group-hover:text-brand-accent transition-colors"
+                class="w-5 h-5 text-slate-300 group-hover:text-purple-600 transition-colors"
               ></i>
             </div>
           </div>
@@ -1230,11 +1257,48 @@
       </div>
     </div>
 
+    <!-- Reports/Notifications Modal -->
+    <div
+      id="reports-modal"
+      class="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-[110] hidden flex-col justify-end lg:justify-center items-center opacity-0 transition-opacity duration-300"
+    >
+      <div
+        class="bg-white w-full lg:w-[600px] lg:rounded-3xl rounded-t-3xl max-h-[85vh] flex flex-col transform translate-y-full lg:translate-y-8 transition-transform duration-300"
+        id="reports-modal-content"
+      >
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
+          <div>
+            <h2 class="text-xl font-bold text-brand-navy">Reports & Notifications</h2>
+            <p class="text-xs text-slate-500">Updates on your reported issues and account status</p>
+          </div>
+          <button
+            onclick="closeReportsModal()"
+            class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar" id="reports-list-container">
+          <!-- Reports will be injected here -->
+          <div class="flex flex-col items-center justify-center py-12 text-center">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+              <i data-lucide="bell-off" class="w-8 h-8 text-slate-300"></i>
+            </div>
+            <h3 class="font-bold text-brand-navy">No notifications</h3>
+            <p class="text-sm text-slate-500">You're all caught up!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../js/modules/core.js"></script>
     <script src="../js/config/env.js"></script>
     <script src="../js/modules/api.js"></script>
+    <script src="../js/modules/location.js"></script>
     <script src="../js/modules/ui-utils.js"></script>
+    <script src="../js/modules/ui.js"></script>
     <script src="../js/modules/auth.js"></script>
     <script src="../js/pages/profile.js"></script>
   </body>

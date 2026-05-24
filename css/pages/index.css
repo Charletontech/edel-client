@@ -1,11 +1,11 @@
 /* Custom Animations & Utilities */
       :root {
-        --brand-accent: #facc15;
+        --brand-accent: #fbbf24;
         --brand-glow: #22d3ee;
       }
 
       .gradient-text {
-        background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+        background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -13,22 +13,22 @@
       /* Digital Horizon Mesh Gradient */
       .hero-gradient {
         background: 
-          radial-gradient(at 0% 0%, hsla(217, 100%, 15%, 1) 0, transparent 50%), 
-          radial-gradient(at 100% 0%, hsla(188, 86%, 53%, 0.1) 0, transparent 50%),
-          radial-gradient(at 50% 100%, hsla(48, 100%, 50%, 0.05) 0, transparent 50%),
-          #030816;
+          radial-gradient(at 0% 0%, var(--brand-navy) 0, transparent 60%), 
+          radial-gradient(at 100% 0%, hsla(258, 86%, 53%, 0.08) 0, transparent 50%),
+          radial-gradient(at 50% 100%, hsla(48, 100%, 50%, 0.03) 0, transparent 50%),
+          #120526;
         position: relative;
       }
 
       /* High-End Glassmorphism */
       .glass-panel {
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(255, 255, 255, 0.015);
         backdrop-filter: blur(24px) saturate(180%);
         -webkit-backdrop-filter: blur(24px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.05);
         box-shadow: 
-          0 8px 32px 0 rgba(0, 0, 0, 0.37),
-          inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+          0 8px 32px 0 rgba(0, 0, 0, 0.4),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.03);
       }
 
       .glass-border-glow {
@@ -40,7 +40,7 @@
         inset: 0;
         border-radius: inherit;
         padding: 1px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent, rgba(34, 211, 238, 0.2));
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent, rgba(147, 51, 234, 0.1));
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
@@ -64,8 +64,8 @@
           to bottom,
           rgba(255, 255, 255, 0) 0%,
           rgba(255, 255, 255, 0) 50%,
-          rgba(34, 211, 238, 0.02) 50%,
-          rgba(34, 211, 238, 0.02) 100%
+          rgba(139, 92, 246, 0.01) 50%,
+          rgba(139, 92, 246, 0.01) 100%
         );
         background-size: 100% 4px;
         z-index: 1;
