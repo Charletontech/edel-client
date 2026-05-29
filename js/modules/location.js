@@ -118,7 +118,7 @@ window.EdelModules.location = {
         {
           headers: {
             "Accept-Language": "en",
-            "User-Agent": "Edel-App",
+            "User-Agent": "E-del-App",
           },
         },
       );

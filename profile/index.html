@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Edel | Profile & Settings</title>
+    <title>E-del | Profile & Settings</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,13 +30,6 @@
 
     <!-- CoolAlert.js -->
     <script src="https://cdn.jsdelivr.net/npm/coolalertjs@latest/dist/coolalert.min.js"></script>
-    <style>
-      :root {
-        --brand-navy: #0F021F;
-        --brand-blue: #240046;
-        --brand-purple-accent: #7e22ce;
-      }
-    </style>
   </head>
   <body
     class="bg-brand-light text-slate-800 antialiased overflow-hidden flex h-screen h-[100dvh]"
@@ -50,26 +43,26 @@
           href="/"
           class="flex items-center group"
         >
-          <img src="../assets/images/edel-logo-inverse.png" alt="Edel Logo" class="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+          <img src="../assets/images/edel-logo-inverse.png" alt="E-del Logo" class="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
         </a>
       </div>
 
       <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
         <a
           href="/discovery/"
-          class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
+          class="flex items-center gap-4 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
         >
           <i data-lucide="compass" class="w-5 h-5"></i> Discovery
         </a>
         <a
           href="/activities/"
-          class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
+          class="flex items-center gap-4 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
         >
           <i data-lucide="map" class="w-5 h-5"></i> Activity Map
         </a>
         <a
           href="/billing/"
-          class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
+          class="flex items-center gap-4 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl font-medium transition-all"
         >
           <i data-lucide="credit-card" class="w-5 h-5"></i> Billing
         </a>
@@ -100,7 +93,7 @@
 
     <!-- Main Content Area -->
     <main
-      class="flex-1 flex flex-col h-full relative bg-slate-50 overflow-hidden"
+      class="flex-1 flex flex-col h-full relative bg-brand-light overflow-hidden"
     >
       <!-- Header (Sticky) -->
       <header
@@ -187,10 +180,9 @@
               <!-- Badge Container -->
               <div
                 id="profile-badge-container"
-                class="hidden absolute -bottom-2 -right-2 w-8 h-8 verified-badge rounded-xl flex items-center justify-center border-2 border-white shadow-sm"
+                class="hidden absolute -bottom-2 -right-2 w-8 h-8 bg-brand-blue rounded-xl flex items-center justify-center border-2 border-white shadow-sm"
                 title="Verified Rookie"
-              >
-                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+              >                <i data-lucide="check" class="w-4 h-4 text-white"></i>
               </div>
             </div>
 
@@ -346,7 +338,7 @@
             >
               <div class="flex items-center gap-4">
                 <div
-                  class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center"
+                  class="w-10 h-10 rounded-xl bg-brand-glow/10 text-brand-blue flex items-center justify-center"
                 >
                   <i data-lucide="user" class="w-5 h-5"></i>
                 </div>
@@ -361,7 +353,7 @@
               </div>
               <i
                 data-lucide="chevron-right"
-                class="w-5 h-5 text-slate-300 group-hover:text-purple-600 transition-colors"
+                class="w-5 h-5 text-slate-300 group-hover:text-brand-blue transition-colors"
               ></i>
             </div>
 
@@ -371,7 +363,7 @@
             >
               <div class="flex items-center gap-4">
                 <div
-                  class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center"
+                  class="w-10 h-10 rounded-xl bg-brand-accent/10 text-brand-accent flex items-center justify-center"
                 >
                   <i data-lucide="bell" class="w-5 h-5"></i>
                 </div>
@@ -396,7 +388,7 @@
             >
               <div class="flex items-center gap-4">
                 <div
-                  class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center"
+                  class="w-10 h-10 rounded-xl bg-brand-glow/10 text-brand-blue flex items-center justify-center"
                 >
                   <i data-lucide="shield" class="w-5 h-5"></i>
                 </div>
@@ -411,7 +403,7 @@
               </div>
               <i
                 data-lucide="chevron-right"
-                class="w-5 h-5 text-slate-300 group-hover:text-purple-600 transition-colors"
+                class="w-5 h-5 text-slate-300 group-hover:text-brand-blue transition-colors"
               ></i>
             </div>
           </div>
@@ -606,7 +598,7 @@
         </div>
 
         <div class="p-6 overflow-y-auto no-scrollbar space-y-6">
-          <p class="text-sm text-slate-500 mb-4">Complete your profile setup to start receiving service requests and earning on Edel.</p>
+          <p class="text-sm text-slate-500 mb-4">Complete your profile setup to start receiving service requests and earning on E-del.</p>
           <div class="relative group z-0">
             <i
               data-lucide="grid"

@@ -144,7 +144,7 @@ function hydrateProfile(user) {
   }
 
   const isProviderRole = user.role === "provider" || user.role === "both";
-  const fullName = user.fullName || "Edel User";
+  const fullName = user.fullName || "E-del User";
 
   profileElements.name.innerText = fullName;
   
@@ -404,7 +404,7 @@ function showPostAuthNotifications(user) {
       Ui.alert(
         "success",
         "Signed In",
-        `Welcome back, ${user?.fullName || "Edel User"}!`,
+        `Welcome back, ${user?.fullName || "E-del User"}!`,
       );
       return;
     }
@@ -414,7 +414,7 @@ function showPostAuthNotifications(user) {
       Ui.toast(
         "success",
         "Account Created",
-        `Welcome ${user?.fullName || "to Edel"}!`,
+        `Welcome ${user?.fullName || "to E-del"}!`,
       );
     }
   } catch (e) {
@@ -497,7 +497,7 @@ function setView(viewType) {
   const profileBadge = document.getElementById("profile-badge-container");
   const metricCompleted = document.getElementById("metric-completed-jobs");
   const providerSections = document.getElementById("provider-sections");
-  const fullName = currentUser.fullName || "Edel User";
+  const fullName = currentUser.fullName || "E-del User";
 
   const activeClass =
     "px-6 py-2 rounded-lg bg-brand-navy text-brand-accent font-bold text-sm shadow-sm transition-all flex-1 md:flex-none";

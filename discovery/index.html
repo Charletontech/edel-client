@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Edel App | Discovery</title>
+    <title>E-del App | Discovery</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,7 +46,7 @@
           >
             <i data-lucide="sparkles" class="w-6 h-6"></i>
           </div>
-          Edel
+          E-del
         </a>
       </div>
 
@@ -159,11 +159,12 @@
           </div>
         </div>
 
-        <!-- View Toggle & Search -->
-        <div class="flex flex-col lg:flex-row gap-4 items-center">
+        <!-- View Toggle & Header Row -->
+        <div class="flex items-center mb-5">
           <!-- View Toggle (Customer vs Provider) -->
           <div
             class="bg-slate-200/70 p-1 rounded-xl flex w-full lg:w-auto shrink-0"
+            id="tab-container"
           >
             <button
               class="flex-1 lg:px-6 py-2 rounded-lg bg-white text-brand-navy font-bold text-sm shadow-sm transition-all"
@@ -179,29 +180,51 @@
             </button>
           </div>
 
-          <!-- Search Bar -->
-          <div class="relative w-full flex-1">
-            <div
-              class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          <!-- Single Role Header (Hidden by default) -->
+          <div
+            id="single-role-header"
+            class="hidden w-full lg:w-auto shrink-0 flex items-center gap-4 py-1"
+          >
+            <button
+              id="category-back-btn"
+              class="hidden p-2.5 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all shadow-sm active:scale-95 group"
             >
-              <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
-            </div>
-            <input
-              type="text"
-              id="search-input"
-              class="block w-full pl-11 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent shadow-sm transition-all text-sm"
-              placeholder="Search for cleaning, repairs, tech..."
-            />
-            <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
-              <button
-                class="p-2 bg-brand-light rounded-lg hover:bg-slate-200 transition-colors"
+              <i data-lucide="chevron-left" class="w-6 h-6 text-brand-navy group-hover:text-brand-blue"></i>
+            </button>
+            <div class="flex flex-col">
+              <h3
+                class="text-2xl lg:text-3xl font-black text-brand-navy tracking-tight leading-none"
+                id="role-header-text"
               >
-                <i
-                  data-lucide="sliders-horizontal"
-                  class="w-4 h-4 text-brand-navy"
-                ></i>
-              </button>
+                Trending Services
+              </h3>
+              <div class="h-1 w-12 bg-brand-accent rounded-full mt-2"></div>
             </div>
+          </div>
+        </div>
+
+        <!-- Search Bar Row -->
+        <div class="relative w-full">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+          </div>
+          <input
+            type="text"
+            id="search-input"
+            class="block w-full pl-11 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent shadow-sm transition-all text-sm"
+            placeholder="Search for cleaning, repairs, tech..."
+          />
+          <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+            <button
+              class="p-2 bg-brand-light rounded-lg hover:bg-slate-200 transition-colors"
+            >
+              <i
+                data-lucide="sliders-horizontal"
+                class="w-4 h-4 text-brand-navy"
+              ></i>
+            </button>
           </div>
         </div>
 

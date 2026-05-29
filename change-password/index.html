@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Edel | Security Reset</title>
+    <title>E-del | Security Reset</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,7 +20,7 @@
     <style>
       .recovery-container {
         min-height: 100vh;
-        background: #fdfdfd;
+        background: #F1F1F1;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -30,12 +30,11 @@
       }
 
       .glass-card {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(40px);
+        border: 1px solid rgba(45, 17, 87, 0.08);
         box-shadow:
-          0 25px 50px -12px rgba(6, 20, 46, 0.1),
-          0 0 0 1px rgba(6, 20, 46, 0.02);
+          0 25px 50px -12px rgba(45, 17, 87, 0.1);
         border-radius: 2.5rem;
         width: 100%;
         max-width: 480px;
@@ -50,21 +49,21 @@
         height: 600px;
         border-radius: 50%;
         filter: blur(120px);
-        opacity: 0.15;
+        opacity: 0.1;
         z-index: 0;
       }
     </style>
   </head>
   <body class="antialiased selection:bg-brand-accent selection:text-brand-navy">
     <div class="recovery-container">
-      <div class="recovery-bg-blob bg-blue-500 -top-48 -left-48 blob-1"></div>
+      <div class="recovery-bg-blob bg-[#3A1A6A] -top-48 -left-48 blob-1"></div>
       <div class="recovery-bg-blob bg-brand-accent -bottom-48 -right-48 blob-2"></div>
 
       <div class="glass-card fade-enter fade-enter-active">
         <div class="flex justify-center mb-10">
-          <div class="w-16 h-16 bg-brand-navy rounded-3xl flex items-center justify-center text-brand-accent shadow-glow transition-transform hover:scale-110">
-            <i data-lucide="key-round" class="w-8 h-8"></i>
-          </div>
+          <a href="/" class="flex flex-col items-center gap-3 group">
+            <img src="../assets/images/edel-logo-main.png" alt="E-del Logo" class="h-16 w-auto object-contain transition-transform group-hover:scale-105" />
+          </a>
         </div>
 
         <div class="text-center mb-8">

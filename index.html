@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edel | Local Services, Fintech Standard</title>
+    <title>E-del | Local Services, Trusted Marketplace</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,44 +24,39 @@
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/utilities.css" />
     <link rel="stylesheet" href="css/pages/index.css" />
-    <style>
-      :root {
-        --brand-navy: #1A0B2E;
-        --brand-blue: #31105C;
-      }
-    </style>
   </head>
   <body class="bg-brand-light text-slate-800 antialiased overflow-x-hidden">
     <!-- Navigation -->
     <nav
-      class="fixed w-full z-50 transition-all duration-300 border-b border-white/5 backdrop-blur-md"
+      class="fixed w-full z-50 transition-all duration-300 border-b border-white/5 backdrop-blur-md py-4"
       id="navbar"
     >
       <div
-        class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex justify-between items-center"
+        class="max-w-7xl mx-auto px-6 lg:px-24 flex justify-between items-center"
       >
-        <a
-          href="/"
-          class="flex items-center group"
-        >
-          <img src="assets/images/edel-logo-inverse.png" alt="Edel Logo" class="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+        <a href="/" class="flex items-center group">
+          <img
+            src="assets/images/edel-logo-inverse.png"
+            alt="E-del Logo"
+            class="h-16 w-auto object-contain transition-transform group-hover:scale-105"
+          />
         </a>
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center gap-8">
           <a
             href="#features"
-            class="text-slate-400 hover:text-brand-glow transition-colors font-medium text-xs font-mono-data"
+            class="text-brand-accent hover:text-white transition-colors font-medium text-xs font-mono-data"
             >[ Features ]</a
           >
           <a
             href="#how-it-works"
-            class="text-slate-400 hover:text-brand-glow transition-colors font-medium text-xs font-mono-data"
+            class="text-brand-accent hover:text-white transition-colors font-medium text-xs font-mono-data"
             >[ Solutions ]</a
           >
           <a
             href="#security"
-            class="text-slate-400 hover:text-brand-glow transition-colors font-medium text-xs font-mono-data"
+            class="text-brand-accent hover:text-white transition-colors font-medium text-xs font-mono-data"
             >[ Trust & Safety ]</a
           >
           <div
@@ -96,8 +91,11 @@
 
       <!-- Mobile Menu Dropdown -->
       <div
-        class="md:hidden hidden backdrop-blur-2xl absolute top-full left-0 w-full border-t border-white/20 shadow-2xl"
-        style="background: rgba(26, 11, 46, 0.7); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);"
+        class="md:hidden hidden backdrop-blur-3xl absolute top-full left-0 w-full border-t border-white/10 shadow-2xl"
+        style="
+          background: rgba(45, 17, 87, 0.6);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        "
         id="mobile-menu"
       >
         <div class="px-6 py-6 flex flex-col gap-4">
@@ -138,7 +136,7 @@
 
     <!-- Hero Section -->
     <header
-      class="relative pt-32 pb-24 lg:pt-48 lg:pb-32 hero-gradient overflow-hidden flex items-center min-h-[100dvh] hero-mobile-layout"
+      class="relative pt-32 pb-24 lg:pt-36 lg:pb-32 hero-gradient overflow-hidden flex items-center min-h-[100dvh] hero-mobile-layout"
     >
       <!-- Atmospheric Layers -->
       <div class="data-grid"></div>
@@ -151,7 +149,7 @@
         class="bg-blur-blob bg-brand-glow w-[500px] h-[500px] bottom-[-10%] right-[-10%] opacity-15"
       ></div>
 
-      <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10 w-full">
+      <div class="max-w-7xl mx-auto px-6 lg:px-24 relative z-10 w-full">
         <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <!-- Hero Text -->
           <div class="max-w-2xl reveal hero-text-container">
@@ -174,45 +172,32 @@
               </div>
             </div>
 
-            <div
-              class="inline-flex items-center gap-3 px-4 py-2 rounded-full glass-panel text-brand-glow text-xs font-mono-data mb-8 border border-brand-glow/20"
-            >
-              <span class="relative flex h-2 w-2">
-                <span
-                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-glow opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-full h-2 w-2 bg-brand-glow"
-                ></span>
-              </span>
-              SYS.STATUS: GLOBAL_READY_2.0
-            </div>
             <h1
-              class="text-5xl lg:text-8xl font-extrabold text-white leading-[0.95] mb-8 tracking-tighter"
+              class="text-5xl lg:text-7xl font-extrabold text-white leading-[0.95] mb-8 tracking-tighter"
             >
               Local talent.<br />
               Digital<br />
               <span class="gradient-text">Precision.</span>
             </h1>
             <p
-              class="text-lg lg:text-xl text-slate-400 mb-12 leading-relaxed max-w-lg font-medium"
+              class="text-lg lg:text-lg text-slate-400 mb-12 leading-relaxed max-w-lg font-medium"
             >
-              Edel redefines the local economy through a high-fidelity service
-              layer. Instant matching, verified logic, and sovereign
-              security—architected for the future.
+              E-del connects customers with nearby service providers through
+              clear pricing, location-aware discovery, and verified service
+              profiles. Simple for customers, practical for providers.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 items-center">
               <a
                 href="/auth/"
-                class="w-full sm:w-auto bg-brand-accent hover:bg-brand-accentHover text-brand-navy px-10 py-5 rounded-full font-bold text-lg transition-all hover:shadow-glow magnetic-button flex items-center justify-center gap-2"
+                class="w-full sm:w-auto bg-brand-accent hover:bg-brand-accentHover text-brand-navy px-8 py-4 rounded-full font-bold text-base transition-all hover:shadow-glow magnetic-button flex items-center justify-center gap-2 whitespace-nowrap"
               >
-                Launch Protocol
+                Get Started
                 <i data-lucide="arrow-right" class="w-5 h-5"></i>
               </a>
               <a
                 href="/auth/"
-                class="w-full sm:w-auto glass-panel text-white px-10 py-5 rounded-full font-semibold text-lg transition-all flex items-center justify-center gap-2 glass-border-glow hover:bg-white/5"
+                class="w-full sm:w-auto glass-panel text-white px-8 py-4 rounded-full font-semibold text-base transition-all flex items-center justify-center gap-2 glass-border-glow hover:bg-white/5 whitespace-nowrap"
               >
                 Become Provider
               </a>
@@ -224,26 +209,26 @@
               <div class="flex -space-x-3">
                 <img
                   class="w-10 h-10 rounded-full border-2 border-[var(--brand-navy)] object-cover ring-1 ring-white/10"
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"
+                  src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=100&q=80"
                   alt="User"
                 />
                 <img
                   class="w-10 h-10 rounded-full border-2 border-[var(--brand-navy)] object-cover ring-1 ring-white/10"
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80"
+                  src="https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=100&q=80"
                   alt="User"
                 />
                 <img
                   class="w-10 h-10 rounded-full border-2 border-[var(--brand-navy)] object-cover ring-1 ring-white/10"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"
+                  src="https://images.unsplash.com/photo-1530268729851-f28f14376250?auto=format&fit=crop&w=100&q=80"
                   alt="User"
                 />
               </div>
               <div class="font-mono-data">
                 <p class="text-white font-bold text-sm tracking-wider">
-                  100K+ NODES
+                  100K+ MATCHES
                 </p>
                 <p class="text-slate-500 text-[10px]">
-                  VERIFIED_SERVICE_PROVIDERS
+                  LOCAL_SERVICE_PROVIDERS
                 </p>
               </div>
             </div>
@@ -256,12 +241,12 @@
                 class="absolute inset-0 bg-brand-glow/10 blur-[100px] rounded-full"
               ></div>
 
-              <!-- Futuristic Device Frame -->
+              <!-- Device Frame -->
               <div
-                class="relative glass-panel rounded-[3rem] p-3 border border-white/10 shadow-floating"
+                class="relative glass-panel rounded-[3rem] p-3 border border-[#fbbf24]/30 shadow-floating"
               >
                 <img
-                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                  src="assets/images/hero-1.jpg"
                   alt="Professional"
                   class="w-full h-[600px] object-cover rounded-[2.5rem] opacity-80"
                 />
@@ -272,10 +257,10 @@
                 >
                   <div class="flex items-center gap-3 mb-4">
                     <div
-                      class="w-2 h-2 rounded-full bg-brand-glow animate-pulse"
+                      class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.8)]"
                     ></div>
                     <span class="text-[10px] font-mono-data text-slate-400"
-                      >ACTIVE_RECON</span
+                      >NEARBY_MATCHES</span
                     >
                   </div>
                   <div class="space-y-3">
@@ -283,11 +268,11 @@
                       class="h-1 w-full bg-white/5 rounded-full overflow-hidden"
                     >
                       <div
-                        class="h-full bg-brand-glow w-3/4 animate-shimmer"
+                        class="h-full bg-cyan-400 w-3/4 animate-shimmer"
                       ></div>
                     </div>
                     <p class="text-white text-xs font-bold">
-                      Scanning Local Talent...
+                      Scanning Nearby Providers...
                     </p>
                   </div>
                 </div>
@@ -301,18 +286,18 @@
                       class="text-brand-accent w-6 h-6"
                     ></i>
                     <span class="text-[10px] font-mono-data text-brand-accent"
-                      >ENCRYPTED_TX</span
+                      >ACCESS_FEE_TX</span
                     >
                   </div>
-                  <p class="text-white font-bold mb-1">Payment Secured</p>
+                  <p class="text-white font-bold mb-1">Access Fee Ready</p>
                   <p class="text-slate-400 text-xs mb-4">
-                    Escrow hold active via Paystack Node
+                    Provider unlock payment tracked via Paystack
                   </p>
                   <div
                     class="bg-brand-accent/10 rounded-lg p-2 text-center border border-brand-accent/20"
                   >
                     <span class="text-brand-accent font-bold text-sm"
-                      >$240.00 RELEASED</span
+                      >NGN 3,500 ACCESS FEE</span
                     >
                   </div>
                 </div>
@@ -324,69 +309,71 @@
     </header>
 
     <!-- Full-Width Feature Highlights -->
-    <section class="py-12 bg-brand-light">
-      <div class="max-w-7xl mx-auto px-6 lg:px-12 space-y-8">
+    <section class="bg-brand-light">
+      <div class="w-full">
         <!-- Highlight Card 1 -->
         <div
-          class="relative h-[400px] lg:h-[500px] w-full rounded-[2.5rem] overflow-hidden reveal group"
+          class="relative h-[400px] lg:h-[500px] w-full overflow-hidden reveal group"
         >
           <img
-            src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=1600&q=80"
+            src="assets/images/man-is-working-ceiling-inside-house-replacing-light-fixture-technician-replacing-light-fixture_538213-60434.jpg"
             alt="Local store"
             class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
           <div
-            class="absolute inset-0 bg-gradient-to-r from-brand-navy/90 via-brand-navy/50 to-transparent"
+            class="absolute inset-0 bg-[#4B2A7F]/35 backdrop-blur-[100px] backdrop-saturate-200"
           ></div>
           <div
-            class="relative h-full flex flex-col justify-center p-10 lg:p-16 max-w-2xl"
+            class="relative h-full flex flex-col justify-center p-10 lg:p-24 max-w-7xl mx-auto w-full"
           >
             <div
-              class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center mb-6"
+              class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center mb-6 shadow-glow"
             >
               <i data-lucide="map-pin" class="text-brand-navy w-6 h-6"></i>
             </div>
             <h2
-              class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight"
+              class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-lg"
             >
-              Find services near you, instantly.
+              Find service providers near you, instantly.
             </h2>
-            <p class="text-xl text-slate-300 mb-8 font-medium">
-              Our advanced location matching connects you with top-rated
-              professionals in your exact neighborhood within seconds.
+            <p
+              class="text-xl text-white mb-8 font-medium max-w-2xl drop-shadow-md"
+            >
+              Location-aware discovery connects you with nearby providers, their
+              prices, and their availability within seconds.
             </p>
           </div>
         </div>
 
         <!-- Highlight Card 2 -->
         <div
-          class="relative h-[400px] lg:h-[500px] w-full rounded-[2.5rem] overflow-hidden reveal group delay-100"
+          class="relative h-[400px] lg:h-[500px] w-full overflow-hidden reveal group delay-100"
         >
           <img
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80"
+            src="assets/images/professional-calibrating-vacuum-pump_482257-96228.jpg"
             alt="Team meeting"
             class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
           <div
-            class="absolute inset-0 bg-gradient-to-l from-brand-navy/90 via-brand-navy/50 to-transparent"
+            class="absolute inset-0 bg-[#4B2A7F]/35 backdrop-blur-[100px] backdrop-saturate-200"
           ></div>
           <div
-            class="relative h-full flex flex-col justify-center items-end text-right p-10 lg:p-16 w-full"
+            class="relative h-full flex flex-col justify-center items-end text-right p-10 lg:p-24 max-w-7xl mx-auto w-full"
           >
             <div class="max-w-2xl flex flex-col items-end">
               <div
-                class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center mb-6"
+                class="w-12 h-12 bg-brand-accent rounded-full flex items-center justify-center mb-6 shadow-glow"
               >
                 <i data-lucide="briefcase" class="text-brand-navy w-6 h-6"></i>
               </div>
               <h2
-                class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight"
+                class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-lg"
               >
-                Get hired by people around you.
+                Turn local demand into steady work.
               </h2>
-              <p class="text-xl text-slate-300 mb-8 font-medium">
-                Turn your skills into a business. Receive real-time requests,
-                manage your schedule, and get paid securely.
+              <p class="text-xl text-white mb-8 font-medium drop-shadow-md">
+                Offer a service profile, respond to nearby requests, and keep
+                your availability clear for the people around you.
               </p>
             </div>
           </div>
@@ -394,7 +381,7 @@
       </div>
     </section>
 
-    <!-- Product App Showcase (Fintech Transition) -->
+    <!-- Product App Showcase -->
     <section class="py-32 bg-brand-navy relative overflow-hidden" id="features">
       <div
         class="absolute top-0 right-0 w-[600px] h-full bg-brand-blue/10 rounded-l-full blur-3xl"
@@ -405,14 +392,14 @@
           <h2
             class="text-sm font-bold text-brand-accent tracking-widest uppercase mb-3"
           >
-            The Edel Interface
+            The E-del Interface
           </h2>
           <h3 class="text-4xl lg:text-5xl font-bold text-white mb-6">
-            Designed like your banking app. Built for real life.
+            Designed like a premium marketplace. Built for local service.
           </h3>
           <p class="text-xl text-slate-400">
-            Experience a service marketplace that feels incredibly seamless,
-            secure, and premium.
+            Experience a marketplace that makes it easy to find help, compare
+            providers, and manage service requests.
           </p>
         </div>
 
@@ -467,11 +454,11 @@
                     data-lucide="credit-card"
                     class="w-6 h-6 text-slate-300"
                   ></i>
-                  Ledger History
+                  Access Fee History
                 </h4>
                 <p class="text-slate-400">
-                  A clean, banking-style transaction ledger for total financial
-                  clarity and receipt tracking.
+                  Track provider access fee payments and unlock status in one
+                  place.
                 </p>
               </button>
             </div>
@@ -482,11 +469,11 @@
             class="lg:col-span-7 flex justify-center lg:justify-end reveal delay-200"
           >
             <div
-              class="relative w-[340px] h-[680px] bg-black rounded-[50px] border-[12px] border-slate-800 shadow-2xl overflow-hidden shadow-brand-accent/10"
+              class="relative w-[340px] h-[680px] bg-white rounded-[50px] border-[12px] border-slate-200 shadow-2xl overflow-hidden shadow-brand-accent/10"
             >
               <!-- Notch -->
               <div
-                class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-7 bg-slate-800 rounded-b-3xl z-30"
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-7 bg-slate-200 rounded-b-3xl z-30"
               ></div>
 
               <!-- Screen Container -->
@@ -506,7 +493,7 @@
                     <div class="flex justify-between items-center mb-6">
                       <div class="flex items-center gap-3">
                         <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+                          src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=100&q=80"
                           class="w-10 h-10 rounded-full border-2 border-white/20"
                         />
                         <div class="text-white">
@@ -599,7 +586,7 @@
                         <div class="flex justify-between items-start">
                           <div class="flex gap-3">
                             <img
-                              src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=100&q=80"
+                              src="https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=100&q=80"
                               class="w-12 h-12 rounded-xl object-cover"
                             />
                             <div>
@@ -739,15 +726,13 @@
                     class="bg-brand-navy pt-14 pb-8 px-5 rounded-b-3xl shadow-sm"
                   >
                     <h2 class="text-white text-xl font-bold text-center mb-6">
-                      Wallet & History
+                      Access Fee History
                     </h2>
                     <div class="text-center">
                       <p class="text-slate-400 text-sm mb-1">
-                        Available Balance
+                        Access Fee Status
                       </p>
-                      <h3 class="text-white text-4xl font-extrabold">
-                        $450.00
-                      </h3>
+                      <h3 class="text-white text-4xl font-extrabold">₦3,500</h3>
                     </div>
                   </div>
 
@@ -774,12 +759,12 @@
                           </div>
                           <div>
                             <p class="font-bold text-sm text-brand-navy">
-                              Deep Home Cleaning
+                              Access Fee Due
                             </p>
                             <p class="text-xs text-slate-400">Today, 2:30 PM</p>
                           </div>
                         </div>
-                        <p class="font-bold text-brand-navy">-$90.00</p>
+                        <p class="font-bold text-brand-navy">Pending</p>
                       </div>
 
                       <!-- Tx 2 -->
@@ -797,12 +782,12 @@
                           </div>
                           <div>
                             <p class="font-bold text-sm text-brand-navy">
-                              Top Up Wallet
+                              Access Fee Paid
                             </p>
                             <p class="text-xs text-slate-400">Yesterday</p>
                           </div>
                         </div>
-                        <p class="font-bold text-green-600">+$200.00</p>
+                        <p class="font-bold text-green-600">Completed</p>
                       </div>
 
                       <!-- Tx 3 -->
@@ -817,12 +802,12 @@
                           </div>
                           <div>
                             <p class="font-bold text-sm text-brand-navy">
-                              AC Maintenance
+                              Provider Unlock
                             </p>
                             <p class="text-xs text-slate-400">Oct 12, 2026</p>
                           </div>
                         </div>
-                        <p class="font-bold text-brand-navy">-$120.00</p>
+                        <p class="font-bold text-brand-navy">NGN 3,500</p>
                       </div>
                     </div>
                   </div>
@@ -870,8 +855,8 @@
             A platform for everyone
           </h2>
           <p class="text-lg text-slate-600">
-            Built to empower both the people who need help and the people
-            providing it.
+            Built to help customers find the right provider and help providers
+            turn local skills into reliable work.
           </p>
         </div>
 
@@ -881,7 +866,7 @@
             class="relative h-96 rounded-3xl overflow-hidden group reveal bg-white shadow-soft"
           >
             <img
-              src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80"
+              src="assets/images/artisan.jpg"
               class="w-full h-1/2 object-cover"
             />
             <div class="p-6 h-1/2 flex flex-col justify-between">
@@ -890,8 +875,8 @@
                   For Customers
                 </h3>
                 <p class="text-slate-500 text-sm">
-                  Find reliable, vetted help for everyday tasks instantly. No
-                  cash needed.
+                  Find nearby providers, compare prices, and request the right
+                  help with confidence.
                 </p>
               </div>
               <a
@@ -908,7 +893,7 @@
             class="relative h-96 rounded-3xl overflow-hidden group reveal delay-100 bg-white shadow-soft"
           >
             <img
-              src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=600&q=80"
+              src="assets/images/confident-crossing-hands-young-african-american-builder-uniform-isolated-blue-background_141793-139705.jpg"
               class="w-full h-1/2 object-cover"
             />
             <div class="p-6 h-1/2 flex flex-col justify-between">
@@ -917,8 +902,8 @@
                   For Providers
                 </h3>
                 <p class="text-slate-500 text-sm">
-                  Be your own boss. Set your rates, choose your hours, and get
-                  paid securely.
+                  Create a provider profile, set your availability, and respond
+                  to nearby requests.
                 </p>
               </div>
               <a
@@ -944,8 +929,8 @@
                   For Students
                 </h3>
                 <p class="text-slate-500 text-sm">
-                  Earn extra income between classes by offering tutoring or
-                  moving help.
+                  Offer tutoring, moving help, or other local services while
+                  staying visible to people nearby.
                 </p>
               </div>
               <a
@@ -971,8 +956,8 @@
                   For Freelancers
                 </h3>
                 <p class="text-slate-500 text-sm">
-                  Expand your local client base and manage invoices seamlessly
-                  in-app.
+                  Manage multiple service listings from one account and stay
+                  easy to find in your area.
                 </p>
               </div>
               <a
@@ -1000,12 +985,11 @@
             <h2
               class="text-4xl lg:text-5xl font-bold text-brand-navy mb-6 leading-tight"
             >
-              Trust built into every transaction.
+              Trust built into every service.
             </h2>
             <p class="text-lg text-slate-600 mb-8">
-              We treat your services like financial transactions. With robust
-              verification and secure holds, Edel ensures peace of mind for both
-              parties.
+              E-del keeps every service clear with verified profiles, live
+              location tracking, and QR-based service start checks.
             </p>
 
             <ul class="space-y-6">
@@ -1036,8 +1020,8 @@
                     Live Location Tracking
                   </h4>
                   <p class="text-slate-500">
-                    Track arrivals in real-time. Geo-fencing ensures services
-                    are performed at the correct address.
+                    Track arrivals in real-time. Location-aware tools help both
+                    sides stay aligned on the right address.
                   </p>
                 </div>
               </li>
@@ -1052,11 +1036,11 @@
                 </div>
                 <div>
                   <h4 class="text-brand-navy font-bold text-xl mb-1">
-                    Escrow Payments
+                    Access Fee Payments
                   </h4>
                   <p class="text-slate-500">
-                    Funds are held securely by Paystack and only released when
-                    the job is marked complete.
+                    Provider access fees are tracked through Paystack when the
+                    account reaches the unlock stage.
                   </p>
                 </div>
               </li>
@@ -1101,7 +1085,7 @@
       <div class="max-w-7xl mx-auto px-6 lg:px-12">
         <div class="text-center mb-16 reveal">
           <h2 class="text-3xl lg:text-4xl font-bold text-brand-navy mb-4">
-            Empowering local communities
+            Built around local service
           </h2>
         </div>
 
@@ -1111,9 +1095,9 @@
             class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100 reveal delay-100"
           >
             <p class="text-slate-600 text-lg mb-8 italic">
-              "Edel gave me the platform to start my own local tutoring
-              business. The built-in payments and scheduling make it feel
-              incredibly professional."
+              "E-del makes it easy for me to find nearby customers, keep my
+              services visible, and manage my provider profile without
+              confusion."
             </p>
             <div class="flex items-center gap-4">
               <img
@@ -1132,13 +1116,12 @@
             class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100 reveal delay-200"
           >
             <p class="text-slate-600 text-lg mb-8 italic">
-              "I use Edel whenever I need quick home repairs. Seeing the
-              provider's distance and exact price upfront removes all the
-              stress."
+              "I use E-del when I need quick home repairs. Seeing the provider's
+              distance, availability, and price upfront removes the guesswork."
             </p>
             <div class="flex items-center gap-4">
               <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80"
+                src="https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=100&q=80"
                 class="w-12 h-12 rounded-full object-cover"
               />
               <div>
@@ -1153,12 +1136,12 @@
             class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100 reveal delay-300"
           >
             <p class="text-slate-600 text-lg mb-8 italic">
-              "The QR code handshake feature is brilliant. As a cleaner, I know
-              I'm protected and the client knows exactly when I start."
+              "The QR start flow is brilliant. As a cleaner, I know the client
+              can confirm when the job begins without any confusion."
             </p>
             <div class="flex items-center gap-4">
               <img
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"
+                src="https://images.unsplash.com/photo-1530268729851-f28f14376250?auto=format&fit=crop&w=100&q=80"
                 class="w-12 h-12 rounded-full object-cover"
               />
               <div>
@@ -1183,37 +1166,41 @@
         <h2
           class="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight"
         >
-          Built for your local economy.
+          Built for the way local services work.
         </h2>
         <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
-          Join thousands of users and providers making local services
-          frictionless, safe, and professional.
+          Join customers and providers using one platform to discover nearby
+          services, manage requests, and keep each job clear from start to
+          finish.
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-4">
           <a
             href="/auth/"
             class="bg-brand-accent hover:bg-brand-accentHover text-brand-navy px-10 py-4 rounded-full font-bold text-lg transition-all hover:-translate-y-1 hover:shadow-glow"
           >
-            Get Started Free
+            Get Started
           </a>
         </div>
       </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-[var(--brand-navy)] text-slate-400 py-16 border-t border-white/5">
+    <footer
+      class="bg-[var(--brand-navy)] text-slate-400 py-16 border-t border-white/5"
+    >
       <div class="max-w-7xl mx-auto px-6 lg:px-12">
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
           <div class="col-span-2 lg:col-span-2 reveal">
-            <a
-              href="/"
-              class="flex items-center mb-6 group"
-            >
-              <img src="assets/images/edel-logo-inverse.png" alt="Edel Logo" class="h-8 w-auto object-contain transition-transform group-hover:scale-105" />
+            <a href="/" class="flex items-center mb-6 group">
+              <img
+                src="assets/images/edel-logo-inverse.png"
+                alt="E-del Logo"
+                class="h-8 w-auto object-contain transition-transform group-hover:scale-105"
+              />
             </a>
             <p class="text-sm text-slate-400 max-w-sm mb-6">
-              The modern service marketplace. Find help, offer your skills, and
-              manage transactions with bank-level security.
+              The local service marketplace. Find help nearby, offer your
+              skills, and manage service access with secure verification.
             </p>
             <div class="flex gap-4">
               <a
@@ -1297,9 +1284,9 @@
         <div
           class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500"
         >
-          <p>&copy; 2026 Edel Platform. All rights reserved.</p>
+          <p>&copy; 2026 E-del Platform. All rights reserved.</p>
           <div class="flex items-center gap-2">
-            <span>Secured by</span>
+            <span>Access fees via</span>
             <strong class="text-slate-300">Paystack</strong>
           </div>
         </div>
@@ -1314,3 +1301,4 @@
   </body>
 </html>
 <!-- cd /home/eletavex/elevatex-build && /home/eletavex/nodevenv/elevatex-build/22/bin/node cron-jobs.js -->
+n-jobs.js --> s -->

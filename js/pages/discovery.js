@@ -64,7 +64,25 @@ const state = {
   currentItems: [],
   selectedItem: null,
   requestController: null,
+  viewMode: "list", // 'list' or 'categories'
 };
+
+const categoryIcons = {
+  Cleaning: "sparkles",
+  Repairs: "wrench",
+  Beauty: "scissors",
+  Tutoring: "book-open",
+  "Tech Help": "laptop",
+  Laundry: "droplets",
+  Health: "activity",
+  Transport: "car",
+  Food: "utensils",
+  Default: "briefcase",
+};
+
+function getCategoryIcon(category) {
+  return categoryIcons[category] || categoryIcons["Default"];
+}
 
 function setActiveTab(activeTab) {
   state.activeTab = activeTab;
@@ -119,16 +137,41 @@ function getStatusBadge(status) {
   `;
 }
 
+function getProviderBrowseBanner() {
+  return `
+    <div class="col-span-full mb-4">
+      <div class="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 flex items-start gap-3 shadow-sm">
+        <div class="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center shrink-0">
+          <i data-lucide="eye" class="w-5 h-5 text-amber-700"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-amber-900">Provider browse mode</h3>
+          <p class="text-sm text-amber-800/80 mt-1">
+            You can review nearby services and categories here, but requests are disabled for provider accounts.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function buildCardMarkup(item) {
   const profilePhoto = EdelModules.api.buildUrl(
     item.provider.profilePhoto || "/assets/images/avatar.jpg",
   );
+  const providerBrowseMode = state.activeTab === "provider";
 
   return `
     <div
-      class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+      class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft transition-all duration-300 ${providerBrowseMode ? "group ring-1 ring-amber-100" : "hover:-translate-y-1 cursor-pointer group"}"
       data-service-id="${item.id}"
     >
+      ${providerBrowseMode ? `
+        <div class="mb-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold uppercase tracking-wider">
+          <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+          View Only
+        </div>
+      ` : ''}
       <div class="flex justify-between items-start mb-4">
         <div class="flex gap-3 items-center">
           <div class="relative">
@@ -154,7 +197,7 @@ function buildCardMarkup(item) {
         ${getStatusBadge(item.provider.availabilityStatus)}
       </div>
 
-      <h3 class="text-lg font-bold text-brand-navy mb-2 group-hover:text-brand-blue transition-colors">
+      <h3 class="text-lg font-bold text-brand-navy mb-2 ${providerBrowseMode ? "" : "group-hover:text-brand-blue"} transition-colors">
         ${item.title}
       </h3>
       <p class="text-sm text-slate-500 mb-5 line-clamp-2">
@@ -229,7 +272,7 @@ function renderLocationPermissionState() {
       </div>
       <h3 class="text-xl font-bold text-brand-navy mb-2">Enable location access</h3>
       <p class="text-slate-500 max-w-lg mx-auto mb-6">
-        You need to enable browser location access for the full Edel experience and to see nearby services around you.
+        You need to enable browser location access for the full E-del experience and to see nearby services around you.
       </p>
       <button
         type="button"
@@ -252,6 +295,7 @@ function renderLocationPermissionState() {
 
 function renderListings(items) {
   state.currentItems = items;
+  const providerBrowseMode = state.activeTab === "provider";
 
   if (!items.length) {
     renderEmptyState(
@@ -260,7 +304,91 @@ function renderListings(items) {
     return;
   }
 
-  listingsContainer.innerHTML = items.map(buildCardMarkup).join("");
+  listingsContainer.innerHTML = `
+    ${providerBrowseMode ? getProviderBrowseBanner() : ""}
+    ${items.map(buildCardMarkup).join("")}
+  `;
+  Edel.initIcons();
+}
+
+function updateHeaderForRole() {
+  const user = EdelModules.auth.getUser();
+  if (!user) return;
+
+  const tabContainer = document.getElementById("tab-container");
+  const singleRoleHeader = document.getElementById("single-role-header");
+  const roleHeaderText = document.getElementById("role-header-text");
+  const backBtn = document.getElementById("category-back-btn");
+
+  const isDualRole = user.role === "both" || user.role === "admin";
+
+  if (!isDualRole) {
+    if (tabContainer) tabContainer.classList.add("hidden");
+    if (singleRoleHeader) {
+      singleRoleHeader.classList.remove("hidden");
+
+      if (user.role === "customer") {
+        roleHeaderText.textContent = "Trending Services";
+        backBtn.classList.add("hidden");
+      } else {
+        // Provider role
+        if (state.viewMode === "categories") {
+          roleHeaderText.textContent = "Trending Categories";
+          backBtn.classList.add("hidden");
+        } else {
+          roleHeaderText.textContent = `Trending ${state.selectedCategory}`;
+          backBtn.classList.remove("hidden");
+        }
+      }
+    }
+  } else {
+    // Dual Role (Both or Admin) - Show Tabs
+    if (tabContainer) tabContainer.classList.remove("hidden");
+
+    // Show header only if in provider category view
+    if (singleRoleHeader) {
+      if (state.activeTab === "provider" && state.viewMode === "list") {
+        singleRoleHeader.classList.remove("hidden");
+        roleHeaderText.textContent = `Trending ${state.selectedCategory}`;
+        backBtn.classList.remove("hidden");
+      } else {
+        singleRoleHeader.classList.add("hidden");
+      }
+    }
+  }
+}
+
+function renderCategoryGrid(categories) {
+  if (!categories || !categories.length) {
+    renderEmptyState("No categories available at the moment.");
+    return;
+  }
+
+  listingsContainer.innerHTML = `
+    ${state.activeTab === "provider" ? getProviderBrowseBanner() : `
+      <div class="col-span-full mb-2">
+        <h3 class="text-xl font-bold text-brand-navy">Trending Categories</h3>
+        <p class="text-sm text-slate-500 mt-1">Select a category to see trending services around you</p>
+      </div>
+    `}
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 col-span-full mt-4">
+      ${categories
+        .map(
+          (category) => `
+        <div 
+          data-category-card="${category}"
+          class="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center group ${state.activeTab === "provider" ? "ring-1 ring-amber-100" : "hover:shadow-glow hover:-translate-y-1"}"
+        >
+          <div class="w-16 h-16 ${state.activeTab === "provider" ? "bg-amber-50" : "bg-brand-light"} rounded-2xl flex items-center justify-center mb-4 ${state.activeTab === "provider" ? "" : "group-hover:bg-brand-accent"} transition-colors">
+            <i data-lucide="${getCategoryIcon(category)}" class="w-8 h-8 text-brand-navy"></i>
+          </div>
+          <h4 class="font-bold text-brand-navy text-sm ${state.activeTab === "provider" ? "" : "group-hover:text-brand-blue"} transition-colors">${category}</h4>
+        </div>
+      `,
+        )
+        .join("")}
+    </div>
+  `;
   Edel.initIcons();
 }
 
@@ -276,7 +404,8 @@ function populateUserProfile() {
   if (sidebarName) sidebarName.textContent = user.fullName || "User";
   if (sidebarRole) {
     if (user.role === "both") sidebarRole.textContent = "Customer + Provider";
-    else if (user.role === "provider") sidebarRole.textContent = "Provider Account";
+    else if (user.role === "provider")
+      sidebarRole.textContent = "Provider Account";
     else sidebarRole.textContent = "Customer Account";
   }
 
@@ -286,6 +415,8 @@ function populateUserProfile() {
   );
   if (sidebarImg) sidebarImg.src = profilePhoto;
   if (mobileImg) mobileImg.src = profilePhoto;
+
+  updateHeaderForRole();
 }
 
 function renderCategories(categories = []) {
@@ -309,6 +440,7 @@ function openDiscoveryModal(serviceId) {
   const item = state.currentItems.find((entry) => String(entry.id) === String(serviceId));
   if (!item) return;
   state.selectedItem = item;
+  const providerBrowseMode = state.activeTab === "provider";
 
   modalController.open(modalContent, {
     panelClass: "flex",
@@ -329,6 +461,24 @@ function openDiscoveryModal(serviceId) {
   if (modalPrice) modalPrice.innerText = formatCurrency(item.basePrice);
   Edel.initIcons();
 
+  modalActionBtn.classList.remove(
+    "bg-brand-navy",
+    "text-brand-accent",
+    "hover:bg-brand-blue",
+    "bg-slate-200",
+    "text-slate-500",
+    "cursor-not-allowed",
+  );
+
+  if (providerBrowseMode) {
+    modalActionBtn.classList.add("bg-slate-200", "text-slate-500", "cursor-not-allowed");
+    modalActionBtn.innerText = "Browse Only";
+    modalActionBtn.disabled = true;
+    modalWarning.classList.remove("hidden");
+    modalWarning.innerText = "Provider accounts can preview services only. Requests are disabled in this tab.";
+    return;
+  }
+
   if (item.provider.availabilityStatus !== "available") {
     modalActionBtn.classList.remove("bg-brand-navy", "text-brand-accent", "hover:bg-brand-blue");
     modalActionBtn.classList.add("bg-slate-200", "text-slate-500", "cursor-not-allowed");
@@ -340,7 +490,6 @@ function openDiscoveryModal(serviceId) {
   }
 
   modalActionBtn.classList.add("bg-brand-navy", "text-brand-accent", "hover:bg-brand-blue");
-  modalActionBtn.classList.remove("bg-slate-200", "text-slate-500", "cursor-not-allowed");
   modalActionBtn.innerText = "Request Service Now";
   modalActionBtn.disabled = false;
   modalWarning.classList.add("hidden");
@@ -348,6 +497,7 @@ function openDiscoveryModal(serviceId) {
 
 async function requestSelectedService() {
   if (!state.selectedItem) return;
+  if (state.activeTab === "provider") return;
 
   if (modalActionBtn) {
     modalActionBtn.disabled = true;
@@ -540,9 +690,21 @@ async function resolveViewerLocation() {
 }
 
 async function loadDiscoveryFeed() {
-  if (state.activeTab === "provider") {
-    listingsContainer.innerHTML = providerViewMarkup;
-    Edel.initIcons();
+  if (state.activeTab === "provider" && state.viewMode === "categories") {
+    renderLoadingState();
+    try {
+      const response = await EdelModules.api.get(
+        "/api/services/discovery?limit=1",
+        {
+          headers: EdelModules.auth.getAuthHeaders(),
+          silent: true,
+        },
+      );
+      renderCategoryGrid(response.categories || []);
+      updateHeaderForRole();
+    } catch (error) {
+      renderEmptyState(error.message || "Could not load categories.");
+    }
     return;
   }
 
@@ -585,6 +747,7 @@ async function loadDiscoveryFeed() {
 
     renderCategories(response.categories || []);
     renderListings(response.services || []);
+    updateHeaderForRole();
   } catch (error) {
     if (error.name === "AbortError") {
       return;
@@ -597,7 +760,7 @@ async function loadDiscoveryFeed() {
 
     if (error.isLowAccuracy) {
       renderEmptyState(
-        "Your location signal is too weak right now. Please try again in a clearer signal area for the full Edel experience.",
+        "Your location signal is too weak right now. Please try again in a clearer signal area for the full E-del experience.",
       );
       return;
     }
@@ -622,11 +785,15 @@ locationBtn?.addEventListener("click", () => {
 });
 
 tabCustomer?.addEventListener("click", () => {
+  state.viewMode = "list";
+  state.selectedCategory = "all";
   setActiveTab("customer");
   loadDiscoveryFeed().catch(() => {});
 });
 
 tabProvider?.addEventListener("click", () => {
+  state.viewMode = "categories";
+  state.selectedCategory = "all";
   setActiveTab("provider");
   loadDiscoveryFeed().catch(() => {});
 });
@@ -644,13 +811,28 @@ categoryList?.addEventListener("click", (event) => {
   if (!button) return;
 
   state.selectedCategory = button.dataset.category || "all";
+  state.viewMode = "list"; // If they use the pills, they want the list
   loadDiscoveryFeed().catch(() => {});
 });
 
 listingsContainer?.addEventListener("click", (event) => {
+  const categoryCard = event.target.closest("[data-category-card]");
+  if (categoryCard) {
+    state.viewMode = "list";
+    state.selectedCategory = categoryCard.dataset.categoryCard;
+    loadDiscoveryFeed().catch(() => {});
+    return;
+  }
+
   const card = event.target.closest("[data-service-id]");
   if (!card) return;
   openDiscoveryModal(card.dataset.serviceId);
+});
+
+document.getElementById("category-back-btn")?.addEventListener("click", () => {
+  state.viewMode = "categories";
+  state.selectedCategory = "all";
+  loadDiscoveryFeed().catch(() => {});
 });
 
 modal?.addEventListener("click", (event) => {
@@ -679,7 +861,16 @@ window.closeModal = () =>
   });
 
 window.addEventListener("load", () => {
-  setActiveTab("customer");
+  const user = EdelModules.auth.getUser();
+  if (user && user.role === "provider") {
+    state.activeTab = "provider";
+    state.viewMode = "categories";
+  } else {
+    state.activeTab = "customer";
+    state.viewMode = "list";
+  }
+
+  setActiveTab(state.activeTab);
   populateUserProfile();
   loadReports();
   loadDiscoveryFeed().catch((error) => {

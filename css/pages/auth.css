@@ -14,9 +14,9 @@
       .auth-gradient {
         background: radial-gradient(
           120% 120% at 50% 50%,
-          #1b3358 0%,
-          #06142e 60%,
-          #030816 100%
+          #4B2A7F 0%,
+          #3A1A6A 40%,
+          #2D1157 100%
         );
       }
 
@@ -24,7 +24,7 @@
         position: absolute;
         filter: blur(100px);
         z-index: 0;
-        opacity: 0.4;
+        opacity: 0.25;
         border-radius: 50%;
       }
 
@@ -42,7 +42,7 @@
         --anim-ease: cubic-bezier(0.2, 0.9, 0.2, 1);
         --anim-fast: 200ms;
         --anim-medium: 400ms;
-        --accent-glow: rgba(250, 204, 21, 0.12);
+        --accent-glow: rgba(251, 191, 36, 0.12);
       }
 
       /* Smooth transitions for interactive elements */

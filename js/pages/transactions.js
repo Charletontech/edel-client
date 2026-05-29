@@ -92,7 +92,7 @@ function renderProviderView() {
                 <i data-lucide="check-circle-2" class="w-6 h-6"></i>
               </div>
               <h3 class="text-lg font-bold text-brand-navy mb-1">Pass Active</h3>
-              <p class="text-xs text-slate-500 mb-6 leading-relaxed">No further payments required. You have full, unrestricted access to the Edel marketplace.</p>
+              <p class="text-xs text-slate-500 mb-6 leading-relaxed">No further payments required. You have full, unrestricted access to the E-del marketplace.</p>
             </div>
             <div class="w-full bg-green-50 text-green-700 font-bold py-3.5 px-4 rounded-xl border border-green-200 flex items-center justify-center gap-2 text-sm relative z-10">
               <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
@@ -185,7 +185,7 @@ function renderProviderView() {
               ${remaining} <span class="text-slate-400 font-medium text-2xl lg:text-3xl">Orders Left</span>
             </h2>
             <p class="text-sm text-slate-500 max-w-md leading-relaxed">
-              Complete your first few orders for free to build your reputation on Edel. Earn your 5-star rating before you pay a dime.
+              Complete your first few orders for free to build your reputation on E-del. Earn your 5-star rating before you pay a dime.
             </p>
 
             ${progressVisual}

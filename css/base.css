@@ -1,3 +1,17 @@
+:root {
+  --brand-accent: #fbbf24;
+  --edel-purple-dark: #2D1157;
+  --edel-purple-main: #3A1A6A;
+  --edel-purple-light: #4B2A7F;
+  --edel-white: #FFFFFF;
+  --edel-soft-white: #F1F1F1;
+  
+  /* Semantic mappings to preserve existing structure */
+  --brand-navy: var(--edel-purple-dark);
+  --brand-blue: var(--edel-purple-main);
+  --brand-light: var(--edel-soft-white);
+}
+
 html,
 body {
   min-height: 100%;

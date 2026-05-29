@@ -759,7 +759,7 @@ function closeModal() {
   });
 }
 
-sidebarUserName.textContent = state.user.fullName || "Edel User";
+sidebarUserName.textContent = state.user.fullName || "E-del User";
 sidebarRole.textContent = getUserRoleLabel(state.user.role);
 
 if (!canUseCustomerView()) {
@@ -923,7 +923,7 @@ async function verifyQrSession(decodedText) {
     try {
       payload = JSON.parse(decodedText);
     } catch(e) {
-      throw new Error("Invalid QR Code format. Please scan a valid Edel Handshake QR.");
+      throw new Error("Invalid QR Code format. Please scan a valid E-del Handshake QR.");
     }
 
     if (!payload.sessionId || !payload.token) {
