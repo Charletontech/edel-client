@@ -12,6 +12,12 @@ const Admin = (() => {
     orders: [],
     reports: [],
     settings: [],
+    emailComposer: {
+      to: "",
+      subject: "",
+      message: "",
+    },
+    emailSendFeedback: null,
     currentUserDetail: null,
     currentOrderDetail: null,
     currentReportDetail: null,
@@ -21,6 +27,7 @@ const Admin = (() => {
       orders: { search: "", status: "", reportedOnly: false },
       reports: { search: "", status: "open" },
       settings: { search: "" },
+      emails: { search: "" },
     },
     loading: false,
   };
@@ -54,6 +61,10 @@ const Admin = (() => {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value).replace(/`/g, "&#96;");
   }
 
   function formatCurrency(amount) {
@@ -639,6 +650,188 @@ const Admin = (() => {
     Edel.initIcons();
   }
 
+  function renderEmailPreview() {
+    const to = state.emailComposer.to || "recipient@email.com";
+    const subject = state.emailComposer.subject || "Your subject line appears here";
+    const message = state.emailComposer.message || "Your message content will appear here.";
+    const paragraphs = message
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    return `
+      <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-[#F8FAFC] shadow-soft">
+        <div class="bg-gradient-to-br from-brand-navy to-brand-blue px-6 py-6">
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-brand-accent flex items-center justify-center text-brand-navy">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-[0.24em] text-brand-accent">Email Preview</span>
+          </div>
+          <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-accent mb-2">E-del Admin</p>
+          <h3 class="text-2xl font-extrabold text-white leading-tight">${escapeHtml(subject)}</h3>
+          <p class="text-white/80 text-sm mt-3">Designed to match the E-del brand palette and render cleanly in major email clients.</p>
+        </div>
+
+        <div class="bg-white px-6 py-7">
+          <div class="flex items-start gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-brand-navy font-bold text-xs border border-slate-200">
+              A
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-bold text-brand-navy">Admin Broadcast</p>
+              <p class="text-xs text-slate-400 truncate">To: ${escapeHtml(to)}</p>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm leading-7 text-slate-700">
+            ${paragraphs.length ? paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("") : "<p>Your message content will appear here.</p>"}
+          </div>
+
+          <div class="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-accent px-5 py-3 text-sm font-extrabold text-brand-navy shadow-glow">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            Send Message
+          </div>
+
+          <div class="mt-6 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">Footer Note</p>
+            <p class="text-xs text-slate-500">This email uses the branded E-del template and SendPulse API delivery.</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function updateEmailPreview() {
+    const preview = document.getElementById("custom-email-preview");
+    if (!preview) return;
+    preview.innerHTML = renderEmailPreview();
+    Edel.initIcons();
+  }
+
+  function renderEmails() {
+    const composer = state.emailComposer;
+    const emailSendFeedback = state.emailSendFeedback;
+
+    els.moduleContainer.innerHTML = `
+      <div class="animate-fade-in space-y-6">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-brand-navy">Emails</h1>
+            <p class="text-slate-500 text-sm">Send branded custom emails directly through SendPulse using the admin dashboard.</p>
+          </div>
+          <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+            Use this for manual announcements, account notices, and one-off customer communication.
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
+          <section class="bg-white rounded-[28px] border border-slate-200 shadow-soft p-6 md:p-8">
+            ${emailSendFeedback ? `
+              <div class="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-4">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 shrink-0">
+                    <i data-lucide="circle-check-big" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-green-800">${escapeHtml(emailSendFeedback.title || "Email sent")}</p>
+                    <p class="text-sm text-green-700 mt-1">${escapeHtml(emailSendFeedback.message || "The email was delivered successfully.")}</p>
+                  </div>
+                </div>
+              </div>
+            ` : ""}
+            <div class="flex items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-brand-navy">Compose Email</h2>
+                <p class="text-sm text-slate-500">Fill in the recipient, subject, and message.</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-brand-navy text-brand-accent flex items-center justify-center shadow-glow-purple">
+                <i data-lucide="pen-line" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <form id="custom-email-form" class="space-y-5">
+              <div>
+                <label for="custom-email-to" class="block text-sm font-bold text-brand-navy mb-2">Destination Email</label>
+                <input
+                  id="custom-email-to"
+                  data-email-field="to"
+                  type="email"
+                  inputmode="email"
+                  autocomplete="email"
+                  placeholder="customer@example.com"
+                  value="${escapeAttribute(composer.to)}"
+                  class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none text-sm focus:border-brand-accent focus:bg-white transition-all"
+                  required
+                />
+                <p class="text-xs text-slate-400 mt-2">The message will be sent to this address only.</p>
+              </div>
+
+              <div>
+                <label for="custom-email-subject" class="block text-sm font-bold text-brand-navy mb-2">Subject</label>
+                <input
+                  id="custom-email-subject"
+                  data-email-field="subject"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Service update from E-del"
+                  value="${escapeAttribute(composer.subject)}"
+                  class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none text-sm focus:border-brand-accent focus:bg-white transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label for="custom-email-message" class="block text-sm font-bold text-brand-navy mb-2">Message</label>
+                <textarea
+                  id="custom-email-message"
+                  data-email-field="message"
+                  placeholder="Write the email body here. Use line breaks to separate paragraphs."
+                  class="w-full min-h-[220px] px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none text-sm leading-7 focus:border-brand-accent focus:bg-white transition-all resize-y"
+                  required
+                >${escapeHtml(composer.message)}</textarea>
+                <p class="text-xs text-slate-400 mt-2">The email uses a branded HTML template with a yellow CTA and navy header.</p>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button type="submit" class="flex-1 bg-brand-accent hover:bg-brand-accentHover text-brand-navy px-5 py-3.5 rounded-2xl font-extrabold shadow-glow transition-all">
+                  Send Email
+                </button>
+                <button type="button" class="px-5 py-3.5 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all" onclick="Admin.clearEmailComposer()">
+                  Clear
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <aside class="space-y-6">
+            <div class="bg-white rounded-[28px] border border-slate-200 shadow-soft p-5 md:p-6">
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <h3 class="text-lg font-bold text-brand-navy">Live Preview</h3>
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Rendered HTML</span>
+              </div>
+              <div id="custom-email-preview">
+                ${renderEmailPreview()}
+              </div>
+            </div>
+
+            <div class="rounded-[28px] border border-brand-accent/30 bg-brand-navy p-6 text-white shadow-floating">
+              <p class="text-xs font-bold uppercase tracking-[0.22em] text-brand-accent mb-3">Guidelines</p>
+              <ul class="space-y-3 text-sm text-white/85 leading-6">
+                <li>Keep subjects short and specific.</li>
+                <li>Use concise paragraphs for best mobile rendering.</li>
+                <li>Send to one recipient at a time for custom notices.</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </div>
+    `;
+
+    Edel.initIcons();
+    updateEmailPreview();
+  }
+
   function renderCurrentModule() {
     updateSidebar();
     if (els.globalSearch) {
@@ -650,6 +843,7 @@ const Admin = (() => {
     if (state.currentModule === "orders") renderOrders();
     if (state.currentModule === "reports") renderReports();
     if (state.currentModule === "settings") renderSettings();
+    if (state.currentModule === "emails") renderEmails();
   }
 
   async function switchModule(moduleName) {
@@ -1003,6 +1197,46 @@ const Admin = (() => {
     }
   }
 
+  function syncEmailComposer() {
+    const to = document.getElementById("custom-email-to")?.value.trim() || "";
+    const subject = document.getElementById("custom-email-subject")?.value.trim() || "";
+    const message = document.getElementById("custom-email-message")?.value || "";
+
+    state.emailComposer = { to, subject, message };
+    updateEmailPreview();
+  }
+
+  async function sendCustomEmail() {
+    const to = document.getElementById("custom-email-to")?.value.trim() || "";
+    const subject = document.getElementById("custom-email-subject")?.value.trim() || "";
+    const message = document.getElementById("custom-email-message")?.value.trim() || "";
+
+    if (!to || !subject || !message) {
+      Ui.toast("warning", "Missing Fields", "Fill in the destination email, subject, and message.");
+      return;
+    }
+
+    try {
+      await EdelModules.api.post("/api/admin/emails/send", { to, subject, message }, getAuthOptions());
+      const recipient = to;
+      state.emailSendFeedback = {
+        title: "Email sent successfully",
+        message: `The message was sent to ${recipient}.`,
+      };
+      Ui.toast("success", "Email Sent", `The message was sent to ${recipient}.`, { timer: 6000 });
+      state.emailComposer = { to: "", subject: "", message: "" };
+      renderEmails();
+    } catch (error) {
+      Ui.toast("error", "Send Failed", error.message);
+    }
+  }
+
+  function clearEmailComposer() {
+    state.emailComposer = { to: "", subject: "", message: "" };
+    state.emailSendFeedback = null;
+    renderEmails();
+  }
+
   function bindStaticEvents() {
     document.querySelectorAll(".nav-item").forEach((item) => {
       item.addEventListener("click", () => {
@@ -1025,6 +1259,13 @@ const Admin = (() => {
       }
     });
 
+    document.addEventListener("input", (event) => {
+      const emailField = event.target.closest("[data-email-field]");
+      if (emailField) {
+        syncEmailComposer();
+      }
+    });
+
     els.globalSearch?.addEventListener("input", debounce((event) => {
       const value = event.target.value.trim();
       if (state.filters[state.currentModule]) {
@@ -1034,6 +1275,12 @@ const Admin = (() => {
     }, 300));
 
     document.addEventListener("change", (event) => {
+      const emailField = event.target.closest("[data-email-field]");
+      if (emailField) {
+        syncEmailComposer();
+        return;
+      }
+
       const userFilter = event.target.closest("[data-user-filter]");
       if (userFilter) {
         state.filters.users[userFilter.dataset.userFilter] =
@@ -1058,6 +1305,12 @@ const Admin = (() => {
     });
 
     document.addEventListener("input", debounce((event) => {
+      const emailField = event.target.closest("[data-email-field]");
+      if (emailField) {
+        syncEmailComposer();
+        return;
+      }
+
       const userFilter = event.target.closest("[data-user-filter='search']");
       if (userFilter) {
         state.filters.users.search = userFilter.value.trim();
@@ -1078,6 +1331,13 @@ const Admin = (() => {
         loadCurrentModule();
       }
     }, 300));
+
+    document.addEventListener("submit", (event) => {
+      if (event.target && event.target.id === "custom-email-form") {
+        event.preventDefault();
+        sendCustomEmail();
+      }
+    });
   }
 
   async function init() {

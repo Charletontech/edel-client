@@ -8,6 +8,9 @@
     />
     <title>E-del | Welcome</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/images/edel-logo-main.png" />
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -41,11 +44,13 @@
       >
         <!-- Mobile Background (visible only on mobile) -->
         <div
-          class="absolute inset-0 lg:hidden pointer-events-none opacity-5 z-0"
+          class="absolute inset-0 lg:hidden pointer-events-none z-0"
           style="
-            background-image: url(&quot;https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1000&q=80&quot;);
+            background-image: url(../assets/images/hero-2.jpg);
+
             background-size: cover;
             background-position: center;
+            opacity: 0.15;
           "
         ></div>
 
@@ -53,11 +58,12 @@
         <div
           class="p-6 lg:p-10 flex justify-between items-center z-10 shrink-0"
         >
-          <a
-            href="/"
-            class="flex items-center group"
-          >
-            <img src="../assets/images/edel-logo-main.png" alt="E-del Logo" class="h-14 w-auto object-contain transition-transform group-hover:scale-105" />
+          <a href="/" class="flex items-center group">
+            <img
+              src="../assets/images/edel-logo-main.png"
+              alt="E-del Logo"
+              class="h-14 w-auto object-contain transition-transform group-hover:scale-105"
+            />
           </a>
           <div class="hidden sm:flex bg-slate-100 p-1 rounded-xl">
             <button
@@ -366,7 +372,9 @@
                               id="signup-location-status"
                               class="text-xs text-slate-500 mt-1"
                             >
-                              We use this to show nearby services and providers. If location detection fails, enter your area and city like "Yaba, Lagos" or "Wuse 2, Abuja".
+                              We use this to show nearby services and providers.
+                              If location detection fails, enter your area and
+                              city like "Yaba, Lagos" or "Wuse 2, Abuja".
                             </p>
                           </div>
                           <button
@@ -571,7 +579,7 @@
           class="relative w-[80%] max-w-lg aspect-[4/5] z-20 rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 group tilt-container"
         >
           <img
-            src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+            src="../assets/images/black-american-electrician-man-holding-tools_1162745-1673.jpg"
             alt="Professional using app"
             class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
@@ -628,7 +636,6 @@
     </div>
 
     <!-- Interactive Scripts -->
-    <script src="https://cdn.jsdelivr.net/gh/phuoc-ng/cool-alert@1.0.1/dist/cool-alert.min.js"></script>
     <script src="../js/modules/core.js"></script>
     <script src="../js/config/env.js"></script>
     <script src="../js/modules/api.js"></script>

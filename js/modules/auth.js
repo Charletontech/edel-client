@@ -276,11 +276,23 @@ window.EdelModules.auth = {
           return;
         }
 
-        Ui.toast(
-          "error",
-          type === "login" ? "Login Failed" : "Signup Failed",
-          message,
-        );
+        if (type === "login") {
+          Ui.alert(
+            "error",
+            "Login Failed",
+            message === "Unauthorized" || message === "Request failed" 
+              ? "Invalid email or password. Please try again." 
+              : message,
+            true,
+            false,
+          );
+        } else {
+          Ui.toast(
+            "error",
+            "Signup Failed",
+            message,
+          );
+        }
       }
     };
 

@@ -23,23 +23,47 @@ window.EdelModules.uiUtils = {
       typeof showCancelButton === "boolean" ? showCancelButton : isAction;
 
     try {
-      if (typeof CoolAlert === "undefined") {
+      const alertLib = typeof CoolAlert !== "undefined" ? CoolAlert : (typeof coolalert !== "undefined" ? coolalert : undefined);
+
+      if (typeof alertLib === "undefined") {
         console.warn("CoolAlert.js not loaded. Falling back to browser alert.");
         alert(`${title}: ${message}`);
         return Promise.resolve({ isConfirmed: true });
       }
 
-      return CoolAlert.show({
-        icon,
-        title,
-        text: message,
-        showConfirmButton: confirm,
-        showCancelButton: cancel,
-        confirmButtonColor: "#FACC15",
-        cancelButtonColor: "#1B3358",
-      });
+      // Handle different CoolAlert API versions
+      if (typeof alertLib.show === "function") {
+        return alertLib.show({
+          icon,
+          title,
+          text: message,
+          showConfirmButton: confirm,
+          showCancelButton: cancel,
+          confirmButtonColor: "#fbbf24",
+          cancelButtonColor: "#1B3358",
+          background: "#2D1157",
+          color: "#ffffff",
+        });
+      } else if (typeof alertLib.alert === "function") {
+        return alertLib.alert({
+          type: icon === "error" ? "error" : (icon === "warning" ? "warning" : (icon === "success" ? "success" : "info")),
+          title,
+          text: message,
+          background: "#2D1157",
+          color: "#ffffff",
+        });
+      } else {
+        // Direct call if alertLib is a function itself (unlikely but safe)
+        if (typeof alertLib === "function") {
+            alertLib({ type: icon, title, text: message });
+            return Promise.resolve({ isConfirmed: true });
+        }
+        alert(`${title}: ${message}`);
+        return Promise.resolve({ isConfirmed: true });
+      }
     } catch (e) {
       console.error("Alert error:", e);
+      alert(`${title}: ${message}`);
       return Promise.resolve({ isConfirmed: true });
     }
   },
@@ -47,22 +71,39 @@ window.EdelModules.uiUtils = {
   /**
    * Lightweight Toast Notification
    */
-  toast(icon = "success", title = "", message = "") {
-    if (typeof CoolAlert === "undefined") {
+  toast(icon = "success", title = "", message = "", options = {}) {
+    const alertLib = typeof CoolAlert !== "undefined" ? CoolAlert : (typeof coolalert !== "undefined" ? coolalert : undefined);
+    const timer = Number(options?.timer) > 0 ? Number(options.timer) : 3000;
+
+    if (typeof alertLib === "undefined") {
       console.info("Toast (fallback):", title, message);
+      // For errors, fallback to alert if toast is not available
+      if (icon === "error") alert(`${title}: ${message}`);
       return;
     }
 
-    CoolAlert.show({
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      icon,
-      title,
-      text: message,
-    });
+    try {
+      if (typeof alertLib.show === "function") {
+        alertLib.show({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer,
+          timerProgressBar: true,
+          icon,
+          title,
+          text: message,
+          background: "#2D1157",
+          color: "#ffffff",
+        });
+      } else {
+        // Fallback to regular alert if toast is not supported by this version
+        this.alert(icon, title, message);
+      }
+    } catch (e) {
+      console.error("Toast error:", e);
+      if (icon === "error") alert(`${title}: ${message}`);
+    }
   },
 
   /**
