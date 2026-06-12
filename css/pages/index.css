@@ -1,159 +1,186 @@
 /* Custom Animations & Utilities */
-      .gradient-text {
-        background: linear-gradient(135deg, var(--brand-accent) 0%, #d97706 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
+.gradient-text {
+  background: linear-gradient(135deg, var(--brand-accent) 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-      /* Digital Horizon Mesh Gradient */
-      .hero-gradient {
-        background: 
-          radial-gradient(at 0% 0%, var(--edel-purple-dark) 0, transparent 60%), 
-          radial-gradient(at 100% 0%, rgba(75, 42, 127, 0.15) 0, transparent 50%),
-          radial-gradient(at 50% 100%, rgba(251, 191, 36, 0.05) 0, transparent 50%),
-          var(--edel-purple-dark);
-        position: relative;
-      }
+/* Digital Horizon Mesh Gradient */
+.hero-gradient {
+  background:
+    radial-gradient(at 0% 0%, var(--edel-purple-dark) 0, transparent 60%),
+    radial-gradient(at 100% 0%, rgba(75, 42, 127, 0.15) 0, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(251, 191, 36, 0.05) 0, transparent 50%),
+    var(--edel-purple-dark);
+  position: relative;
+}
 
-      /* High-End Glassmorphism */
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.02);
-        backdrop-filter: blur(24px) saturate(180%);
-        -webkit-backdrop-filter: blur(24px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 
-          0 8px 32px 0 rgba(0, 0, 0, 0.4),
-          inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-      }
+/* High-End Glassmorphism */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
 
-      .glass-border-glow {
-        position: relative;
-      }
-      .glass-border-glow::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 1px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent, rgba(75, 42, 127, 0.2));
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        pointer-events: none;
-      }
+.glass-border-glow {
+  position: relative;
+}
+.glass-border-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    transparent,
+    rgba(75, 42, 127, 0.2)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
 
-      /* Cyber Typography */
-      .font-mono-data {
-        font-family: 'Space Mono', monospace;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-      }
+/* Mobile Menu Glassmorphism */
+.glass-menu {
+  background: rgba(45, 17, 87, 0.4) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
 
-      /* Atmospheric Effects */
-      .scanline {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          to bottom,
-          rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0) 50%,
-          rgba(75, 42, 127, 0.02) 50%,
-          rgba(75, 42, 127, 0.02) 100%
-        );
-        background-size: 100% 4px;
-        z-index: 1;
-        pointer-events: none;
-        opacity: 0.3;
-      }
+/* Cyber Typography */
+.font-mono-data {
+  font-family: "Space Mono", monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
 
-      .data-grid {
-        position: absolute;
-        inset: 0;
-        background-image: 
-          linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-        background-size: 50px 50px;
-        pointer-events: none;
-        z-index: 0;
-      }
+/* Atmospheric Effects */
+.scanline {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(75, 42, 127, 0.02) 50%,
+    rgba(75, 42, 127, 0.02) 100%
+  );
+  background-size: 100% 4px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.3;
+}
 
-      /* Scroll Reveal Animation Classes */
-      .reveal {
-        opacity: 0;
-        transform: translateY(30px) scale(0.98);
-        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-      }
+.data-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-      .reveal.active {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+/* Scroll Reveal Animation Classes */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px) scale(0.98);
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-      .delay-100 { transition-delay: 100ms; }
-      .delay-200 { transition-delay: 200ms; }
-      .delay-300 { transition-delay: 300ms; }
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 
-      /* Abstract Background Blur */
-      .bg-blur-blob {
-        position: absolute;
-        filter: blur(140px);
-        z-index: 0;
-        opacity: 0.4;
-        border-radius: 50%;
-        animation: blob-float 20s infinite alternate ease-in-out;
-      }
+.delay-100 {
+  transition-delay: 100ms;
+}
+.delay-200 {
+  transition-delay: 200ms;
+}
+.delay-300 {
+  transition-delay: 300ms;
+}
 
-      @keyframes blob-float {
-        from { transform: translate(0, 0) scale(1); }
-        to { transform: translate(50px, 30px) scale(1.1); }
-      }
+/* Abstract Background Blur */
+.bg-blur-blob {
+  position: absolute;
+  filter: blur(140px);
+  z-index: 0;
+  opacity: 0.4;
+  border-radius: 50%;
+  animation: blob-float 20s infinite alternate ease-in-out;
+}
 
-      /* Hide scrollbar for UI showcase */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
+@keyframes blob-float {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(50px, 30px) scale(1.1);
+  }
+}
 
-      /* Magnetic Pull Simulation on Hover */
-      .magnetic-button {
-        transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-      }
-      .magnetic-button:hover {
-        transform: translateY(-4px) scale(1.02);
-      }
+/* Hide scrollbar for UI showcase */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-      /* World-Class Mobile Hero Background (Half-View Provider) */
-      @media (max-width: 1023px) {
-        .hero-mobile-layout {
-          position: relative;
-        }
-        .hero-mobile-layout::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          right: -10%;
-          width: 80%;
-          height: 100%;
-          background-image: url('https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&q=80&w=800'); /* High-quality Nigerian provider */
-          background-size: cover;
-          background-repeat: no-repeat;
-          background-position: center;
-          z-index: 1;
-          opacity: 0.85;
-          pointer-events: none;
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60%);
-          mask-image: linear-gradient(to right, transparent 0%, black 60%);
-        }
-        
-        /* Ensure text is above the image but stays on the left */
-        .hero-text-container {
-          position: relative;
-          z-index: 10;
-          max-width: 85%;
-        }
-      }
+/* Magnetic Pull Simulation on Hover */
+.magnetic-button {
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.magnetic-button:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* World-Class Mobile Hero Background (Half-View Provider) */
+@media (max-width: 1023px) {
+  .hero-mobile-layout {
+    position: relative;
+  }
+  .hero-mobile-layout::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -10%;
+    width: 80%;
+    height: 100%;
+    background-image: url(../../assets/images/black-american-electrician-man-holding-tools_1162745-1673.jpg); /* High-quality Nigerian provider */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+    opacity: 0.85;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60%);
+    mask-image: linear-gradient(to right, transparent 0%, black 60%);
+  }
+
+  /* Ensure text is above the image but stays on the left */
+  .hero-text-container {
+    position: relative;
+    z-index: 10;
+    max-width: 85%;
+  }
+}

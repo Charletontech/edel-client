@@ -150,8 +150,8 @@
 
       /* Verified Badge Gradient */
       .verified-badge {
-        background: linear-gradient(135deg, var(--brand-accent) 0%, var(--edel-purple-light) 55%, var(--edel-purple-main) 100%);
-        box-shadow: 0 8px 18px rgba(75, 42, 127, 0.24);
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%);
+        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
       }
 
       /* Metric Cards */

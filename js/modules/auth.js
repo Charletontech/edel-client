@@ -22,9 +22,63 @@ window.EdelModules.auth = {
     }
   },
 
+  getSessionRole(user = this.getUser()) {
+    if (!user) return null;
+
+    if (user.role === "both") {
+      return user.activeRole || null;
+    }
+
+    return user.role || null;
+  },
+
+  getRoleLabel(user = this.getUser()) {
+    const sessionRole = this.getSessionRole(user);
+    const role = sessionRole || user?.role;
+
+    if (role === "provider") return "Provider Account";
+    if (role === "admin") return "Admin";
+    if (role === "customer") return "Customer Account";
+    if (user?.role === "both") return "Choose Account";
+    return "Customer Account";
+  },
+
+  setSessionRole(role) {
+    const user = this.getUser();
+    if (!user) return null;
+
+    if (user.role !== "both") {
+      return user;
+    }
+
+    if (!["customer", "provider"].includes(role)) {
+      return user;
+    }
+
+    user.activeRole = role;
+    this.setUser(user);
+    return user;
+  },
+
+  clearSessionRole() {
+    const user = this.getUser();
+    if (!user || !user.activeRole) return user;
+
+    delete user.activeRole;
+    this.setUser(user);
+    return user;
+  },
+
   getAuthHeaders() {
     const user = this.getUser();
-    return user?.token ? { Authorization: `Bearer ${user.token}` } : {};
+    const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
+    const sessionRole = this.getSessionRole(user);
+
+    if (sessionRole) {
+      headers["X-Edel-Session-Role"] = sessionRole;
+    }
+
+    return headers;
   },
 
   isLoggedIn() {
@@ -43,6 +97,16 @@ window.EdelModules.auth = {
   requireAuth() {
     const user = this.getUser();
     if (!user || !user.token) {
+      window.location.href = "/auth/";
+      return false;
+    }
+
+    if (user.emailVerified === false && !window.location.pathname.includes("/auth/")) {
+      this.logout();
+      return false;
+    }
+
+    if (user.role === "both" && !this.getSessionRole(user) && !window.location.pathname.includes("/auth/")) {
       window.location.href = "/auth/";
       return false;
     }
@@ -90,18 +154,13 @@ window.EdelModules.auth = {
   createPageController() {
     const state = {
       role: "customer",
-      step: 1,
-      providerData: {
-        category: "",
-        title: "",
-        price: "",
-        description: "",
-      },
     };
 
     const activateView = (view) => {
       const loginView = document.getElementById("view-login");
       const signupView = document.getElementById("view-signup");
+      const accountChoiceView = document.getElementById("view-account-choice");
+      const verificationView = document.getElementById("view-email-verification");
       const toggleLogin = document.getElementById("btn-toggle-login");
       const toggleSignup = document.getElementById("btn-toggle-signup");
 
@@ -110,6 +169,10 @@ window.EdelModules.auth = {
         loginView.classList.add("fade-enter-active");
         signupView.classList.add("hidden");
         signupView.classList.remove("fade-enter-active");
+        accountChoiceView?.classList.add("hidden");
+        accountChoiceView?.classList.remove("fade-enter-active", "flex");
+        verificationView?.classList.add("hidden");
+        verificationView?.classList.remove("fade-enter-active", "flex");
         
         // Update toggle buttons if they exist
         if (toggleLogin && toggleSignup) {
@@ -123,6 +186,10 @@ window.EdelModules.auth = {
         signupView.classList.add("fade-enter-active");
         loginView.classList.add("hidden");
         loginView.classList.remove("fade-enter-active");
+        accountChoiceView?.classList.add("hidden");
+        accountChoiceView?.classList.remove("fade-enter-active", "flex");
+        verificationView?.classList.add("hidden");
+        verificationView?.classList.remove("fade-enter-active", "flex");
 
         // Update toggle buttons if they exist
         if (toggleLogin && toggleSignup) {
@@ -136,59 +203,15 @@ window.EdelModules.auth = {
     };
 
     const updateRoleUI = () => {
+      const btnSubmit = document.getElementById("btn-submit");
       const roleInput = document.querySelector('input[name="user_role"]:checked');
       state.role = roleInput ? roleInput.value : "customer";
-
-      const btnNext = document.getElementById("btn-next");
-      const btnSubmit = document.getElementById("btn-submit");
-
-      if (state.role === "provider") {
-        if (state.step === 1) {
-          btnNext?.classList.remove("hidden");
-          btnNext?.classList.add("flex");
-          btnSubmit?.classList.add("hidden");
-          btnSubmit?.classList.remove("flex");
-        }
-      } else {
-        btnNext?.classList.add("hidden");
-        btnNext?.classList.remove("flex");
-        btnSubmit?.classList.remove("hidden");
-        btnSubmit?.classList.add("flex");
-      }
+      btnSubmit?.classList.remove("hidden");
+      btnSubmit?.classList.add("flex");
     };
 
     const goToStep = (step) => {
-      const step1 = document.getElementById("signup-step-1");
-      const step2 = document.getElementById("signup-step-2");
-      const btnNext = document.getElementById("btn-next");
-      const btnSubmit = document.getElementById("btn-submit");
-
-      if (step === 2) {
-        step1.classList.add("hidden");
-        step1.classList.remove("fade-enter-active");
-        step2.classList.remove("hidden");
-        step2.classList.add("fade-enter-active");
-        
-        btnNext?.classList.add("hidden");
-        btnNext?.classList.remove("flex");
-        btnSubmit?.classList.remove("hidden");
-        btnSubmit?.classList.add("flex");
-      } else {
-        step2.classList.add("hidden");
-        step2.classList.remove("fade-enter-active");
-        step1.classList.remove("hidden");
-        step1.classList.add("fade-enter-active");
-
-        if (state.role === "provider") {
-          btnNext?.classList.remove("hidden");
-          btnNext?.classList.add("flex");
-          btnSubmit?.classList.add("hidden");
-          btnSubmit?.classList.remove("flex");
-        }
-      }
-      state.step = step;
       window.scrollTo(0, 0);
-      Edel.initIcons();
     };
 
     const handleSubmit = async (event, type) => {
@@ -222,17 +245,23 @@ window.EdelModules.auth = {
           if (photoFile && photoFile.size > 0) {
             formData.append("profilePhoto", photoFile);
           }
-          
-          if (state.role === "provider") {
-            formData.append("serviceCategory", rawFormData.get("provider_service_category"));
-            formData.append("serviceTitle", rawFormData.get("provider_service_title"));
-            formData.append("basePrice", rawFormData.get("provider_base_price"));
-            formData.append("serviceDescription", rawFormData.get("provider_service_description"));
-          }
 
           const response = await EdelModules.api.post("/api/auth/signup", formData, {
             silent: true,
           });
+          if (response?.requiresVerification) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnHtml;
+              Edel.initIcons();
+            }
+            window.dispatchEvent(
+              new CustomEvent("edel:verification-required", {
+                detail: { email: response.email, message: response.message },
+              }),
+            );
+            return;
+          }
           handleAuthSuccess(response);
         } else {
           const rawFormData = new FormData(form);
@@ -243,7 +272,15 @@ window.EdelModules.auth = {
           const response = await EdelModules.api.post("/api/auth/login", data, {
             silent: true,
           });
-          handleAuthSuccess(response);
+          const requiresRoleChoice = handleAuthSuccess(response);
+          if (requiresRoleChoice) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnHtml;
+              Edel.initIcons();
+            }
+            return;
+          }
         }
       } catch (error) {
         if (submitBtn) {
@@ -277,6 +314,19 @@ window.EdelModules.auth = {
         }
 
         if (type === "login") {
+          if (error.data?.code === "EMAIL_NOT_VERIFIED" || error.data?.requiresVerification) {
+            window.dispatchEvent(
+              new CustomEvent("edel:verification-required", {
+                detail: {
+                  email: error.data?.email,
+                  message: error.data?.message || error.message,
+                  type: "login"
+                },
+              }),
+            );
+            return;
+          }
+
           Ui.alert(
             "error",
             "Login Failed",
@@ -297,15 +347,26 @@ window.EdelModules.auth = {
     };
 
     const handleAuthSuccess = (user) => {
-      EdelModules.auth.setUser(user);
       localStorage.setItem("edel_just_logged_in", "true");
+
+      if (user?.role === "both") {
+        EdelModules.auth.setUser({ ...user, activeRole: null });
+        window.dispatchEvent(
+          new CustomEvent("edel:account-choice-required", {
+            detail: user,
+          }),
+        );
+        return true;
+      }
+
+      EdelModules.auth.setUser(user);
       EdelModules.auth.redirectAfterLogin(user?.role);
+      return false;
     };
 
     return {
       activateView,
       updateRoleUI,
-      goToStep,
       handleSubmit,
     };
   },

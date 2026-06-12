@@ -23,7 +23,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/lib/lucide.min.js"></script>
 
     <!-- Tailwind Config -->
     <script src="../js/config/tailwind.js"></script>
@@ -119,9 +119,15 @@
               class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white hidden"
             ></span>
           </div>
-          <!-- Developer Toggle (For Demonstration) -->
+          <button
+            id="btn-switch-account"
+            class="hidden bg-brand-navy text-brand-accent px-4 py-2 rounded-xl font-bold text-sm hover:bg-brand-blue transition-colors shadow-sm"
+          >
+            Switch Account
+          </button>
+          <!-- Developer Toggle (Hidden) -->
           <div
-            class="hidden md:flex bg-white/90 backdrop-blur p-1 rounded-xl shadow-sm border border-slate-200 items-center"
+            class="hidden"
           >
           <button
             onclick="setView('customer')"
@@ -147,7 +153,7 @@
         <div class="max-w-3xl mx-auto space-y-6">
           <!-- Mobile Developer Toggle -->
           <div
-            class="md:hidden flex bg-white p-1 rounded-xl shadow-sm border border-slate-200 items-center mb-6"
+            class="hidden"
           >
             <button
               onclick="setView('customer')"
@@ -183,8 +189,8 @@
               <!-- Badge Container -->
               <div
                 id="profile-badge-container"
-                class="hidden absolute -bottom-2 -right-2 w-8 h-8 bg-brand-blue rounded-xl flex items-center justify-center border-2 border-white shadow-sm"
-                title="Verified Rookie"
+                class="hidden absolute -bottom-2 -right-2 w-8 h-8 verified-badge rounded-xl flex items-center justify-center border-2 border-white shadow-sm"
+                title="Verified provider"
               >                <i data-lucide="check" class="w-4 h-4 text-white"></i>
               </div>
             </div>
@@ -570,6 +576,28 @@
               >Short Description</label
             >
           </div>
+
+          <!-- Business Photo Upload -->
+          <div class="space-y-2">
+            <label class="block text-sm font-bold text-brand-navy ml-1">Business Photo</label>
+            <div class="relative group">
+              <input
+                type="file"
+                id="new-business-photo"
+                accept="image/*"
+                class="hidden"
+              />
+              <button
+                type="button"
+                onclick="document.getElementById('new-business-photo').click()"
+                class="w-full flex items-center justify-center gap-3 px-4 py-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:border-brand-navy hover:text-brand-navy transition-all duration-300"
+              >
+                <i data-lucide="image-plus" class="w-5 h-5"></i>
+                <span id="photo-upload-label" class="text-sm font-medium">Upload Business Photo</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 ml-1 italic">This is the picture that will be displayed with your service in the discovery page</p>
+          </div>
         </div>
 
         <div class="p-6 pt-0 mt-auto">
@@ -681,6 +709,28 @@
               >Brief Description</label
             >
           </div>
+
+          <!-- Business Photo Upload for Upgrade -->
+          <div class="space-y-2">
+            <label class="block text-sm font-bold text-brand-navy ml-1">Business Photo</label>
+            <div class="relative group">
+              <input
+                type="file"
+                id="upgrade-business-photo"
+                accept="image/*"
+                class="hidden"
+              />
+              <button
+                type="button"
+                onclick="document.getElementById('upgrade-business-photo').click()"
+                class="w-full flex items-center justify-center gap-3 px-4 py-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:border-brand-navy hover:text-brand-navy transition-all duration-300"
+              >
+                <i data-lucide="image-plus" class="w-5 h-5"></i>
+                <span id="upgrade-photo-upload-label" class="text-sm font-medium">Upload Business Photo</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 ml-1 italic">This is the picture that will be displayed with your service in the discovery page</p>
+          </div>
         </div>
 
         <div class="p-6 pt-0 mt-auto">
@@ -739,6 +789,49 @@
         </div>
       </div>
 
+      <!-- Account Switch Modal -->
+      <div
+        id="modal-switch-account"
+        class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div class="p-8 flex flex-col items-center text-center">
+          <div
+            class="w-20 h-20 bg-brand-light rounded-[2.5rem] flex items-center justify-center mb-6 shadow-sm border border-brand-accent/20"
+          >
+            <i data-lucide="switch-camera" class="w-10 h-10 text-brand-navy"></i>
+          </div>
+          <h3 class="text-2xl font-extrabold text-brand-navy mb-3 px-4">
+            Switch account
+          </h3>
+          <p class="text-slate-500 text-sm leading-relaxed px-6">
+            Choose which account mode should stay active for this session.
+          </p>
+        </div>
+
+        <div class="p-8 pt-0 space-y-3">
+          <button
+            type="button"
+            onclick="setView('customer')"
+            class="w-full bg-white border border-slate-200 hover:border-brand-accent text-brand-navy font-bold py-4 rounded-xl shadow-sm transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            <i data-lucide="search" class="w-5 h-5"></i> Switch to Customer
+          </button>
+          <button
+            type="button"
+            onclick="setView('provider')"
+            class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            <i data-lucide="briefcase" class="w-5 h-5"></i> Switch to Provider
+          </button>
+          <button
+            onclick="closeModals()"
+            class="w-full bg-slate-50 text-slate-400 hover:text-slate-600 font-bold py-4 rounded-xl transition-all active:scale-95"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
       <!-- Service Details Modal -->
       <div
         id="modal-service-details"
@@ -756,32 +849,31 @@
           </button>
         </div>
 
-        <div class="p-8 overflow-y-auto no-scrollbar space-y-6">
-          <div class="flex flex-col items-center text-center">
-            <div
-              id="detail-icon-container"
-              class="w-20 h-20 bg-brand-light rounded-[2.5rem] flex items-center justify-center mb-4 shadow-sm border border-brand-accent/20"
-            >
-              <i
-                id="detail-icon"
-                data-lucide="package"
-                class="w-10 h-10 text-brand-navy"
-              ></i>
+        <div class="p-0 overflow-y-auto no-scrollbar space-y-6">
+          <div class="relative h-48 w-full shrink-0">
+            <img
+              id="detail-photo"
+              src="../assets/images/business-photo-default.jpg"
+              class="w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-6 right-6">
+              <span
+                id="detail-category"
+                class="bg-brand-accent text-brand-navy text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block"
+                >Category</span
+              >
+              <h2
+                id="detail-title"
+                class="text-2xl font-extrabold text-white leading-tight"
+              >
+                Service Title
+              </h2>
             </div>
-            <span
-              id="detail-category"
-              class="bg-brand-accent text-brand-navy text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest mb-2"
-              >Category</span
-            >
-            <h2
-              id="detail-title"
-              class="text-2xl font-extrabold text-brand-navy leading-tight"
-            >
-              Service Title
-            </h2>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="px-8 pb-8 space-y-6">
+            <div class="grid grid-cols-2 gap-4">
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
               <p
                 class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1"

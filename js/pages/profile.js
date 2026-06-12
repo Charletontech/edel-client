@@ -12,6 +12,27 @@ const customerRoleTagClass =
 const providerRoleTagClass =
   "bg-brand-accent text-brand-navy text-xs font-bold px-3 py-1 rounded-full self-center md:self-auto shadow-sm tracking-wide";
 
+function getSessionRole(user = EdelModules.auth.getUser()) {
+  if (!user) return "customer";
+  if (user.role === "both") {
+    return EdelModules.auth.getSessionRole(user) || "customer";
+  }
+  return user.role || "customer";
+}
+
+function getRoleLabel(user = EdelModules.auth.getUser()) {
+  return EdelModules.auth.getRoleLabel(user);
+}
+
+function updateVerifiedBadge(user = EdelModules.auth.getUser()) {
+  if (!profileElements.badge) return;
+
+  const sessionRole = getSessionRole(user);
+  const shouldShowBadge = !!user?.hasPaidAccessFee && sessionRole === "provider";
+
+  profileElements.badge.classList.toggle("hidden", !shouldShowBadge);
+}
+
 const profileElements = {
   name: document.getElementById("profile-name"),
   roleTag: document.getElementById("profile-role-tag"),
@@ -132,10 +153,7 @@ function hydrateProfile(user) {
 
   if (sidebarName) sidebarName.textContent = user.fullName || "User";
   if (sidebarRole) {
-    if (user.role === "both") sidebarRole.textContent = "Customer + Provider";
-    else if (user.role === "provider")
-      sidebarRole.textContent = "Provider Account";
-    else sidebarRole.textContent = "Customer Account";
+    sidebarRole.textContent = getRoleLabel(user);
   }
   if (sidebarImg) {
     sidebarImg.src = EdelModules.api.buildUrl(
@@ -143,7 +161,8 @@ function hydrateProfile(user) {
     );
   }
 
-  const isProviderRole = user.role === "provider" || user.role === "both";
+  const sessionRole = getSessionRole(user);
+  const isProviderRole = sessionRole === "provider";
   const fullName = user.fullName || "E-del User";
 
   profileElements.name.innerText = fullName;
@@ -158,14 +177,14 @@ function hydrateProfile(user) {
   }
   
   // Logic for initial display (will be refined by setView)
-  profileElements.roleTag.innerText = user.role === "provider" ? "Rookie Tier" : "Customer";
-  profileElements.roleTag.className = user.role === "provider"
+  profileElements.roleTag.innerText = sessionRole === "provider" ? "Provider" : "Customer";
+  profileElements.roleTag.className = sessionRole === "provider"
     ? providerRoleTagClass
     : customerRoleTagClass;
 
   // Rating logic
-  const rating = user.rating || (user.role === "provider" ? 50 : 100);
-  const ratingTrend = rating >= (user.role === "provider" ? 50 : 100)
+  const rating = user.rating || (sessionRole === "provider" ? 50 : 100);
+  const ratingTrend = rating >= (sessionRole === "provider" ? 50 : 100)
       ? "trending-up"
       : "trending-down";
   const trendColor =
@@ -194,10 +213,15 @@ function hydrateProfile(user) {
 
   syncProfileInputs(user);
 
-  // If role is 'both', we default to provider view if they just upgraded, 
-  // otherwise we try to stay in their current view if setView is smart enough.
+  const switchButton = document.getElementById("btn-switch-account");
+  if (switchButton) {
+    switchButton.classList.toggle("hidden", user.role !== "both");
+  }
+
   const currentView = document.getElementById("provider-sections")?.classList.contains("hidden") ? "customer" : "provider";
-  const targetView = user.role === "provider" ? "provider" : (user.role === "both" ? currentView : "customer");
+  const targetView = user.role === "both"
+    ? (user.activeRole || currentView || "customer")
+    : (user.role === "provider" ? "provider" : "customer");
   
   setView(targetView);
   Edel.initIcons();
@@ -352,22 +376,27 @@ function renderServices(services) {
         return `
     <div class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-brand-accent transition-all relative hover:z-50 ${opacityClass}">
       <div class="flex items-center gap-4">
-        <div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center">
-          <i data-lucide="${getIconForCategory(service.category)}" class="w-5 h-5 ${isDisabled ? 'text-red-500' : 'text-brand-navy'}"></i>
+        <div class="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-100 shadow-sm">
+          <img 
+            src="${EdelModules.api.buildUrl(service.businessPhoto || "/assets/images/business-photo-default.jpg")}" 
+            class="w-full h-full object-cover"
+          />
         </div>
         <div>
           <h4 class="font-bold text-brand-navy text-sm flex items-center">${service.title} ${statusBadge}</h4>
           <p class="text-xs text-slate-500">₦${Number(service.basePrice).toLocaleString()} Base • ${service.category}</p>
         </div>
       </div>
-      <div class="relative group">
-        <button class="text-slate-400 hover:text-brand-navy p-2">
-          <i data-lucide="more-vertical" class="w-5 h-5"></i>
+      <div class="relative group service-menu-container">
+        <button class="text-slate-400 hover:text-brand-navy focus:text-brand-navy p-2" onclick="toggleServiceMenu(this); event.stopPropagation();">
+          <i data-lucide="more-vertical" class="w-5 h-5 pointer-events-none"></i>
         </button>
-        <div class="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-xl border border-slate-100 hidden group-hover:block z-50">
-          <button onclick="viewServiceDetails(${service.id})" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 first:rounded-t-xl">Details</button>
-          ${!isDisabled ? `<button onclick="editService(${service.id})" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Edit</button>` : ''}
-          <button onclick="deleteService(${service.id})" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 last:rounded-b-xl">Delete</button>
+        <div class="service-dropdown-menu absolute right-0 top-full pt-1 w-40 hidden lg:group-hover:block z-50">
+          <div class="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
+            <button onclick="viewServiceDetails(${service.id})" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 first:rounded-t-xl">Details</button>
+            ${!isDisabled ? `<button onclick="editService(${service.id})" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Edit</button>` : ''}
+            <button onclick="deleteService(${service.id})" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 last:rounded-b-xl">Delete</button>
+          </div>
         </div>
       </div>
     </div>
@@ -377,22 +406,31 @@ function renderServices(services) {
   Edel.initIcons();
 }
 
-function getIconForCategory(category) {
-  const icons = {
-    cleaning: "sparkles",
-    repairs: "wrench",
-    beauty: "scissors",
-    tutoring: "book-open",
-    laundry: "shirt",
-  };
-  return icons[category.toLowerCase()] || "package";
-}
-
 const cachedUser = EdelModules.auth.getUser();
 if (cachedUser) {
   hydrateProfile(cachedUser);
   showPostAuthNotifications(cachedUser);
 }
+
+// Load Categories
+(async function loadCategories() {
+  try {
+    const categories = await EdelModules.api.get("/api/services/categories", {
+      headers: EdelModules.auth.getAuthHeaders()
+    });
+    
+    const newCatSelect = document.getElementById("new-category");
+    const upgradeCatSelect = document.getElementById("upgrade-category");
+    
+    const optionsHtml = `<option value="" disabled selected hidden></option>` + 
+      categories.map(c => `<option value="${c.name}">${c.name.charAt(0).toUpperCase() + c.name.slice(1)}</option>`).join('');
+
+    if (newCatSelect) newCatSelect.innerHTML = optionsHtml;
+    if (upgradeCatSelect) upgradeCatSelect.innerHTML = optionsHtml;
+  } catch (error) {
+    console.error("Failed to load categories", error);
+  }
+})();
 
 function showPostAuthNotifications(user) {
   try {
@@ -447,6 +485,12 @@ refreshDashboard();
 
 document.getElementById("notifications-btn-profile")?.addEventListener("click", openReportsModal);
 
+document.getElementById("btn-switch-account")?.addEventListener("click", () => {
+  const user = EdelModules.auth.getUser();
+  if (user?.role !== "both") return;
+  openModal("modal-switch-account");
+});
+
 profileElements.logoutButton?.addEventListener("click", () => {
   EdelModules.auth.logout();
 });
@@ -455,7 +499,84 @@ function setView(viewType) {
   const currentUser = EdelModules.auth.getUser() || {};
   const currentRole = currentUser.role || "customer";
 
-  if (currentRole !== "both" && currentRole !== viewType) {
+  const btnCustDes = document.getElementById("btn-view-customer");
+  const btnProvDes = document.getElementById("btn-view-provider");
+  const btnCustMob = document.getElementById("btn-view-customer-mob");
+  const btnProvMob = document.getElementById("btn-view-provider-mob");
+  const profileName = document.getElementById("profile-name");
+  const profileRoleTag = document.getElementById("profile-role-tag");
+  const profileRating = document.getElementById("profile-rating");
+  const profileAvatar = document.getElementById("profile-avatar");
+  const profileBadge = document.getElementById("profile-badge-container");
+  const metricCompleted = document.getElementById("metric-completed-jobs");
+  const providerSections = document.getElementById("provider-sections");
+  const fullName = currentUser.fullName || "E-del User";
+
+  const activeClass =
+    "px-6 py-2 rounded-lg bg-brand-navy text-brand-accent font-bold text-sm shadow-sm transition-all flex-1 md:flex-none";
+  const inactiveClass =
+    "px-6 py-2 rounded-lg text-slate-500 font-bold text-sm hover:text-brand-navy transition-all flex-1 md:flex-none opacity-60";
+
+  if (currentRole === "both") {
+    if (!["customer", "provider"].includes(viewType)) return;
+
+    EdelModules.auth.setSessionRole(viewType);
+    const updatedUser = EdelModules.auth.getUser() || currentUser;
+
+    if (viewType === "customer") {
+      if (btnCustDes) btnCustDes.className = activeClass;
+      if (btnCustMob) btnCustMob.className = activeClass;
+      if (btnProvDes) btnProvDes.className = inactiveClass;
+      if (btnProvMob) btnProvMob.className = inactiveClass;
+
+      if (profileName) profileName.innerText = fullName;
+      if (profileRoleTag) {
+        profileRoleTag.innerText = "Customer";
+        profileRoleTag.className = customerRoleTagClass;
+      }
+      if (profileRating) {
+        profileRating.innerHTML =
+          '100% <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>';
+      }
+      if (profileAvatar) {
+        profileAvatar.src = EdelModules.api.buildUrl(
+          updatedUser.profilePhoto || "/assets/images/avatar.jpg",
+        );
+      }
+      metricCompleted?.classList.add("hidden");
+      providerSections?.classList.add("hidden");
+    } else {
+      if (btnProvDes) btnProvDes.className = activeClass;
+      if (btnProvMob) btnProvMob.className = activeClass;
+      if (btnCustDes) btnCustDes.className = inactiveClass;
+      if (btnCustMob) btnCustMob.className = inactiveClass;
+
+      if (profileName) profileName.innerText = fullName;
+      if (profileRoleTag) {
+        profileRoleTag.innerText = "Provider";
+        profileRoleTag.className = providerRoleTagClass;
+      }
+      if (profileRating) {
+        const rating = updatedUser.rating || 50;
+        profileRating.innerHTML = `${rating}% <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>`;
+      }
+      if (profileAvatar) {
+        profileAvatar.src = EdelModules.api.buildUrl(
+          updatedUser.profilePhoto || "/assets/images/avatar.jpg",
+        );
+      }
+      metricCompleted?.classList.remove("hidden");
+      providerSections?.classList.remove("hidden");
+    }
+
+    syncProfileInputs(updatedUser);
+    updateVerifiedBadge(updatedUser);
+    Edel.initIcons();
+    closeModals();
+    return;
+  }
+
+  if (currentRole !== viewType) {
     const promptTitle = document.getElementById("upgrade-prompt-title");
     const promptMsg = document.getElementById("upgrade-prompt-message");
     const promptIcon = document.getElementById("upgrade-prompt-icon");
@@ -485,65 +606,56 @@ function setView(viewType) {
     return;
   }
 
-  const btnCustDes = document.getElementById("btn-view-customer");
-  const btnProvDes = document.getElementById("btn-view-provider");
-  const btnCustMob = document.getElementById("btn-view-customer-mob");
-  const btnProvMob = document.getElementById("btn-view-provider-mob");
-
-  const profileName = document.getElementById("profile-name");
-  const profileRoleTag = document.getElementById("profile-role-tag");
-  const profileRating = document.getElementById("profile-rating");
-  const profileAvatar = document.getElementById("profile-avatar");
-  const profileBadge = document.getElementById("profile-badge-container");
-  const metricCompleted = document.getElementById("metric-completed-jobs");
-  const providerSections = document.getElementById("provider-sections");
-  const fullName = currentUser.fullName || "E-del User";
-
-  const activeClass =
-    "px-6 py-2 rounded-lg bg-brand-navy text-brand-accent font-bold text-sm shadow-sm transition-all flex-1 md:flex-none";
-  const inactiveClass =
-    "px-6 py-2 rounded-lg text-slate-500 font-bold text-sm hover:text-brand-navy transition-all flex-1 md:flex-none opacity-60"; // Added opacity for greyed out effect
-
   if (viewType === "customer") {
     if (btnCustDes) btnCustDes.className = activeClass;
     if (btnCustMob) btnCustMob.className = activeClass;
     if (btnProvDes) btnProvDes.className = inactiveClass;
     if (btnProvMob) btnProvMob.className = inactiveClass;
 
-    profileName.innerText = fullName;
-    profileRoleTag.innerText = "Customer";
-    profileRoleTag.className = customerRoleTagClass;
-    profileRating.innerHTML =
-      '100% <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>';
-    profileAvatar.src = EdelModules.api.buildUrl(
-      currentUser.profilePhoto || "/assets/images/avatar.jpg",
-    );
+    if (profileName) profileName.innerText = fullName;
+    if (profileRoleTag) {
+      profileRoleTag.innerText = "Customer";
+      profileRoleTag.className = customerRoleTagClass;
+    }
+    if (profileRating) {
+      profileRating.innerHTML =
+        '100% <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>';
+    }
+    if (profileAvatar) {
+      profileAvatar.src = EdelModules.api.buildUrl(
+        currentUser.profilePhoto || "/assets/images/avatar.jpg",
+      );
+    }
 
-    profileBadge.classList.add("hidden");
-    metricCompleted.classList.add("hidden");
-    providerSections.classList.add("hidden");
+    metricCompleted?.classList.add("hidden");
+    providerSections?.classList.add("hidden");
   } else {
     if (btnProvDes) btnProvDes.className = activeClass;
     if (btnProvMob) btnProvMob.className = activeClass;
     if (btnCustDes) btnCustDes.className = inactiveClass;
     if (btnCustMob) btnCustMob.className = inactiveClass;
 
-    profileName.innerText = fullName;
-    profileRoleTag.innerText = "Rookie Tier";
-    profileRoleTag.className = providerRoleTagClass;
+    if (profileName) profileName.innerText = fullName;
+    if (profileRoleTag) {
+      profileRoleTag.innerText = "Provider";
+      profileRoleTag.className = providerRoleTagClass;
+    }
+    if (profileRating) {
+      const rating = currentUser.rating || 50;
+      profileRating.innerHTML = `${rating}% <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>`;
+    }
+    if (profileAvatar) {
+      profileAvatar.src = EdelModules.api.buildUrl(
+        currentUser.profilePhoto || "/assets/images/avatar.jpg",
+      );
+    }
 
-    const rating = currentUser.rating || 50;
-    profileRating.innerHTML = `${rating}% <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>`;
-    profileAvatar.src = EdelModules.api.buildUrl(
-      currentUser.profilePhoto || "/assets/images/avatar.jpg",
-    );
-
-    profileBadge.classList.remove("hidden");
-    metricCompleted.classList.remove("hidden");
-    providerSections.classList.remove("hidden");
+    metricCompleted?.classList.remove("hidden");
+    providerSections?.classList.remove("hidden");
   }
 
   syncProfileInputs(currentUser);
+  updateVerifiedBadge(currentUser);
   Edel.initIcons();
 }
 
@@ -562,6 +674,7 @@ async function upgradeAccount(targetRole, payload = {}) {
     // Update local user session
     const currentUser = EdelModules.auth.getUser();
     currentUser.role = 'both';
+    currentUser.activeRole = targetRole;
     if (targetRole === 'provider') {
       currentUser.serviceCategory = payload.serviceCategory;
       currentUser.serviceTitle = payload.serviceTitle;
@@ -583,18 +696,51 @@ async function submitProviderUpgrade() {
   const serviceTitle = document.getElementById("upgrade-title").value;
   const basePrice = document.getElementById("upgrade-price").value;
   const serviceDescription = document.getElementById("upgrade-desc").value;
+  const photoInput = document.getElementById("upgrade-business-photo");
 
   if (!serviceCategory || !serviceTitle || !basePrice || !serviceDescription) {
     Ui.toast("warning", "Missing Fields", "Please fill all fields to upgrade.");
     return;
   }
 
-  await upgradeAccount('provider', {
-    serviceCategory,
-    serviceTitle,
-    basePrice,
-    serviceDescription
-  });
+  if (!photoInput.files[0]) {
+    Ui.toast("warning", "Photo Required", "Please upload a business photo for your service");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("targetRole", "provider");
+  formData.append("serviceCategory", serviceCategory);
+  formData.append("serviceTitle", serviceTitle);
+  formData.append("basePrice", Number(basePrice));
+  formData.append("serviceDescription", serviceDescription);
+  formData.append("businessPhoto", photoInput.files[0]);
+
+  try {
+    Ui.toast("info", "Upgrading Account", "Setting up your provider profile...");
+    const response = await EdelModules.api.post("/api/upgrade", formData, {
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true,
+    });
+
+    Ui.toast("success", "Account Upgraded", response.message);
+    
+    // Update local user session
+    const currentUser = EdelModules.auth.getUser();
+    currentUser.role = 'both';
+    currentUser.activeRole = 'provider';
+    currentUser.serviceCategory = serviceCategory;
+    currentUser.serviceTitle = serviceTitle;
+    currentUser.basePrice = basePrice;
+    currentUser.serviceDescription = serviceDescription;
+    EdelModules.auth.setUser(currentUser);
+
+    closeModals();
+    setView("provider");
+    await refreshDashboard();
+  } catch (error) {
+    Ui.toast("error", "Upgrade Failed", error.message);
+  }
 }
 
 async function updateProviderStatus(selectElement) {
@@ -662,26 +808,60 @@ function updateStatusUI(status) {
 }
 
 // Service Management
+// File Upload Label Helpers
+document.getElementById('new-business-photo')?.addEventListener('change', (e) => {
+  const label = document.getElementById('photo-upload-label');
+  if (!label) return;
+  if (e.target.files[0]) {
+    label.innerText = `Selected: ${e.target.files[0].name}`;
+    label.classList.add('text-brand-navy');
+  } else {
+    label.innerText = 'Upload Business Photo';
+    label.classList.remove('text-brand-navy');
+  }
+});
+
+document.getElementById('upgrade-business-photo')?.addEventListener('change', (e) => {
+  const label = document.getElementById('upgrade-photo-upload-label');
+  if (!label) return;
+  if (e.target.files[0]) {
+    label.innerText = `Selected: ${e.target.files[0].name}`;
+    label.classList.add('text-brand-navy');
+  } else {
+    label.innerText = 'Upload Business Photo';
+    label.classList.remove('text-brand-navy');
+  }
+});
+
 async function saveNewService() {
   const category = document.getElementById("new-category").value;
   const title = document.getElementById("new-title").value;
   const basePrice = document.getElementById("new-price").value;
   const description = document.getElementById("new-desc").value;
+  const photoInput = document.getElementById("new-business-photo");
 
   if (!category || !title || !basePrice || !description) {
     Ui.toast("warning", "Missing Info", "Please fill all fields");
     return;
   }
 
+  if (!photoInput.files[0]) {
+    Ui.toast("warning", "Photo Required", "Please upload a business photo for your service");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("category", category);
+  formData.append("title", title);
+  formData.append("basePrice", Number(basePrice));
+  formData.append("description", description);
+  formData.append("businessPhoto", photoInput.files[0]);
+
   try {
+    Ui.toast("info", "Adding Service", "Uploading your service details...");
     await EdelModules.api.post(
       "/api/services",
-      {
-        category,
-        title,
-        basePrice: Number(basePrice),
-        description,
-      },
+      formData,
       {
         headers: EdelModules.auth.getAuthHeaders(),
         silent: true,
@@ -697,6 +877,9 @@ async function saveNewService() {
     document.getElementById("new-title").value = "";
     document.getElementById("new-price").value = "";
     document.getElementById("new-desc").value = "";
+    if (photoInput) photoInput.value = "";
+    const photoLabel = document.getElementById("photo-upload-label");
+    if (photoLabel) photoLabel.innerText = "Upload Business Photo";
   } catch (error) {
     Ui.toast("error", "Failed to Add Service", error.message);
   }
@@ -727,6 +910,25 @@ async function deleteService(id) {
   }
 }
 
+// Service Menu Mobile Helper
+window.toggleServiceMenu = function(button) {
+  const menu = button.nextElementSibling;
+  const isHidden = menu.classList.contains('hidden');
+  
+  // Close all menus first
+  document.querySelectorAll('.service-dropdown-menu').forEach(m => m.classList.add('hidden'));
+  
+  if (isHidden) {
+    menu.classList.remove('hidden');
+  }
+};
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.service-menu-container')) {
+    document.querySelectorAll('.service-dropdown-menu').forEach(m => m.classList.add('hidden'));
+  }
+});
+
 function editService(id) {
   const user = EdelModules.auth.getUser();
   const service = user.services.find((s) => s.id === id);
@@ -738,11 +940,16 @@ function editService(id) {
   document.getElementById("new-title").value = service.title;
   document.getElementById("new-price").value = service.basePrice;
   document.getElementById("new-desc").value = service.description;
+  
+  // Reset photo field for edit
+  const photoInput = document.getElementById("new-business-photo");
+  if (photoInput) photoInput.value = "";
+  
+  const photoLabel = document.getElementById("photo-upload-label");
+  if (photoLabel) photoLabel.innerText = "Change Business Photo (Optional)";
 
   const modalTitle = document.querySelector("#modal-add-service h3");
-  const saveBtn = document.querySelector(
-    "#modal-add-service button:not([onclick='closeModals()'])",
-  );
+  const saveBtn = document.getElementById("btn-save-service");
 
   modalTitle.innerText = "Edit Service";
   saveBtn.innerText = "Update Service";
@@ -756,16 +963,23 @@ async function updateService(id) {
   const title = document.getElementById("new-title").value;
   const basePrice = document.getElementById("new-price").value;
   const description = document.getElementById("new-desc").value;
+  const photoInput = document.getElementById("new-business-photo");
+
+  const formData = new FormData();
+  formData.append("category", category);
+  formData.append("title", title);
+  formData.append("basePrice", Number(basePrice));
+  formData.append("description", description);
+  
+  if (photoInput.files[0]) {
+    formData.append("businessPhoto", photoInput.files[0]);
+  }
 
   try {
+    Ui.toast("info", "Updating", "Saving changes...");
     await EdelModules.api.put(
       `/api/services/${id}`,
-      {
-        category,
-        title,
-        basePrice: Number(basePrice),
-        description,
-      },
+      formData,
       {
         headers: EdelModules.auth.getAuthHeaders(),
         silent: true,
@@ -778,12 +992,12 @@ async function updateService(id) {
 
     // Reset modal
     const modalTitle = document.querySelector("#modal-add-service h3");
-    const saveBtn = document.querySelector(
-      "#modal-add-service button:not([onclick='closeModals()'])",
-    );
+    const saveBtn = document.getElementById("btn-save-service");
     modalTitle.innerText = "Add New Service";
     saveBtn.innerText = "Add Service";
     saveBtn.setAttribute("onclick", "saveNewService()");
+    const photoLabel = document.getElementById("photo-upload-label");
+    if (photoLabel) photoLabel.innerText = "Upload Business Photo";
   } catch (error) {
     Ui.toast("error", "Update Failed", error.message);
   }
@@ -795,10 +1009,13 @@ function viewServiceDetails(id) {
   if (!service) return;
 
   // Populate Details Modal
-  const icon = getIconForCategory(service.category);
   const isDisabled = service.serviceStatus === 'disabled';
   
-  document.getElementById("detail-icon").setAttribute("data-lucide", icon);
+  const detailPhoto = document.getElementById("detail-photo");
+  if (detailPhoto) {
+    detailPhoto.src = EdelModules.api.buildUrl(service.businessPhoto || "/assets/images/business-photo-default.jpg");
+  }
+
   document.getElementById("detail-category").innerText = service.category;
   document.getElementById("detail-title").innerText = service.title;
   document.getElementById("detail-price").innerText = `₦${Number(service.basePrice).toLocaleString()}`;

@@ -260,6 +260,11 @@ const Admin = (() => {
     state.settings = response.settings || [];
   }
 
+  async function fetchCategories() {
+    const response = await EdelModules.api.get("/api/admin/categories", getAuthOptions());
+    state.categories = response || [];
+  }
+
   async function loadCurrentModule() {
     state.loading = true;
     renderLoading();
@@ -270,6 +275,7 @@ const Admin = (() => {
       if (state.currentModule === "orders") await fetchOrders();
       if (state.currentModule === "reports") await fetchReports();
       if (state.currentModule === "settings") await fetchSettings();
+      if (state.currentModule === "categories") await fetchCategories();
 
       renderCurrentModule();
     } catch (error) {
@@ -709,6 +715,153 @@ const Admin = (() => {
     Edel.initIcons();
   }
 
+  const commonLucideIcons = [
+    'sparkles', 'wrench', 'scissors', 'book-open', 'shirt', 'laptop', 'home', 'truck',
+    'zap', 'briefcase', 'camera', 'music', 'video', 'coffee', 'pen-tool', 'paint-brush',
+    'hammer', 'droplet', 'leaf', 'sun', 'moon', 'star', 'heart', 'shield', 'key',
+    'lock', 'unlock', 'phone', 'mail', 'map-pin', 'navigation', 'compass', 'globe',
+    'shopping-bag', 'shopping-cart', 'gift', 'tag', 'credit-card', 'dollar-sign', 'percent',
+    'award', 'medal', 'thumbs-up', 'thumbs-down', 'smile', 'frown', 'user', 'users'
+  ];
+
+  function renderCategories() {
+    const categories = state.categories || [];
+    
+    els.moduleContainer.innerHTML = `
+      <div class="animate-fade-in space-y-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 class="text-2xl font-extrabold text-brand-navy">Service Categories</h2>
+            <p class="text-slate-500 text-sm mt-1">Manage platform service categories and icons</p>
+          </div>
+          <button onclick="Admin.openCategoryModal()" class="bg-brand-navy text-brand-accent px-4 py-2 rounded-xl font-bold hover:bg-brand-blue transition-colors flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Category
+          </button>
+        </div>
+
+        <div class="bg-white rounded-[28px] border border-slate-200 shadow-soft overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm whitespace-nowrap">
+              <thead class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
+                <tr>
+                  <th class="px-6 py-4 font-bold">Category</th>
+                  <th class="px-6 py-4 font-bold">Icon</th>
+                  <th class="px-6 py-4 font-bold">Status</th>
+                  <th class="px-6 py-4 font-bold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${categories.length === 0 ? `
+                  <tr><td colspan="4" class="px-6 py-8 text-center text-slate-400">No categories found.</td></tr>
+                ` : categories.map(cat => `
+                  <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-6 py-4 font-bold text-brand-navy capitalize">${escapeHtml(cat.name)}</td>
+                    <td class="px-6 py-4">
+                      <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-brand-light rounded-lg flex items-center justify-center">
+                          <i data-lucide="${cat.iconName}" class="w-4 h-4 text-brand-navy"></i>
+                        </div>
+                        <span class="text-xs text-slate-500">${cat.iconName}</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${cat.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                        ${cat.isActive ? 'Active' : 'Hidden'}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <button onclick="Admin.openCategoryModal(${cat.id})" class="text-brand-navy hover:text-brand-blue p-2">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                      </button>
+                      <button onclick="Admin.deleteCategory(${cat.id})" class="text-red-500 hover:text-red-600 p-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+    Edel.initIcons();
+  }
+
+  window.selectCategoryIcon = function(iconName) {
+    document.getElementById('cat-icon-input').value = iconName;
+    document.querySelectorAll('.icon-option').forEach(el => el.classList.remove('ring-2', 'ring-brand-accent', 'bg-brand-light'));
+    document.getElementById(`icon-opt-${iconName}`).classList.add('ring-2', 'ring-brand-accent', 'bg-brand-light');
+  };
+
+  async function openCategoryModal(id = null) {
+    const category = id ? state.categories.find(c => c.id === id) : null;
+    const title = category ? "Edit Category" : "Add Category";
+    const defaultIcon = category ? category.iconName : 'sparkles';
+    
+    openModal(title, `
+      <form onsubmit="event.preventDefault(); Admin.saveCategory(${id});" class="space-y-6">
+        <div>
+          <label class="block text-sm font-bold text-brand-navy mb-2">Category Name</label>
+          <input type="text" id="cat-name-input" value="${category ? escapeHtml(category.name) : ''}" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-accent focus:bg-white transition-all text-sm" placeholder="e.g. plumbing">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-bold text-brand-navy mb-2">Select Icon</label>
+          <input type="hidden" id="cat-icon-input" value="${defaultIcon}">
+          <div class="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-48 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
+            ${commonLucideIcons.map(icon => `
+              <div id="icon-opt-${icon}" onclick="selectCategoryIcon('${icon}')" class="icon-option w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-all ${defaultIcon === icon ? 'ring-2 ring-brand-accent bg-brand-light' : ''}" title="${icon}">
+                <i data-lucide="${icon}" class="w-5 h-5 text-brand-navy"></i>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <input type="checkbox" id="cat-active-input" ${!category || category.isActive ? 'checked' : ''} class="w-4 h-4 text-brand-accent rounded border-slate-300 focus:ring-brand-accent">
+          <label for="cat-active-input" class="text-sm font-bold text-brand-navy">Active (Visible to users)</label>
+        </div>
+
+        <button type="submit" class="w-full bg-brand-navy text-brand-accent py-4 rounded-xl font-bold hover:bg-brand-blue transition-colors">
+          ${category ? 'Save Changes' : 'Create Category'}
+        </button>
+      </form>
+    `);
+    setTimeout(() => Edel.initIcons(), 100);
+  }
+
+  async function saveCategory(id) {
+    const name = document.getElementById("cat-name-input").value;
+    const iconName = document.getElementById("cat-icon-input").value;
+    const isActive = document.getElementById("cat-active-input").checked;
+
+    try {
+      if (id) {
+        await EdelModules.api.put(`/api/admin/categories/${id}`, { name, iconName, isActive }, getAuthOptions());
+        Ui.toast("success", "Category Updated", "The category has been updated successfully.");
+      } else {
+        await EdelModules.api.post("/api/admin/categories", { name, iconName, isActive }, getAuthOptions());
+        Ui.toast("success", "Category Created", "New category has been added.");
+      }
+      closeModal();
+      await loadCurrentModule();
+    } catch (error) {
+      Ui.toast("error", "Error", error.message);
+    }
+  }
+
+  async function deleteCategory(id) {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+    try {
+      await EdelModules.api.delete(`/api/admin/categories/${id}`, getAuthOptions());
+      Ui.toast("success", "Deleted", "Category has been removed.");
+      await loadCurrentModule();
+    } catch (error) {
+      Ui.toast("error", "Error", error.message);
+    }
+  }
+
   function renderEmails() {
     const composer = state.emailComposer;
     const emailSendFeedback = state.emailSendFeedback;
@@ -844,6 +997,7 @@ const Admin = (() => {
     if (state.currentModule === "reports") renderReports();
     if (state.currentModule === "settings") renderSettings();
     if (state.currentModule === "emails") renderEmails();
+    if (state.currentModule === "categories") renderCategories();
   }
 
   async function switchModule(moduleName) {
@@ -1368,6 +1522,11 @@ const Admin = (() => {
     restoreService,
     submitReportReview,
     saveSettings,
+    clearEmailComposer,
+    sendCustomEmail,
+    openCategoryModal,
+    saveCategory,
+    deleteCategory
   };
 })();
 

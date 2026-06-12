@@ -23,7 +23,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/lib/lucide.min.js"></script>
 
     <!-- Tailwind Config -->
     <script src="../js/config/tailwind.js"></script>
@@ -44,7 +44,7 @@
       >
         <!-- Mobile Background (visible only on mobile) -->
         <div
-          class="absolute inset-0 lg:hidden pointer-events-none z-0"
+          class="fixed inset-0 lg:hidden pointer-events-none z-0"
           style="
             background-image: url(../assets/images/hero-2.jpg);
 
@@ -175,6 +175,144 @@
             </div>
 
             <!-- ============================== -->
+            <!-- ACCOUNT TYPE SELECTION -->
+            <!-- ============================== -->
+            <div
+              id="view-account-choice"
+              class="hidden fade-enter absolute inset-0 z-20 bg-white/95 backdrop-blur-sm rounded-[2rem] p-6 sm:p-8 flex-col justify-center"
+            >
+              <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto bg-brand-light rounded-[2rem] flex items-center justify-center mb-5 shadow-sm border border-brand-accent/20">
+                  <i data-lucide="layers-3" class="w-10 h-10 text-brand-navy"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-brand-navy mb-3 tracking-tight">
+                  Choose how to continue
+                </h2>
+                <p class="text-slate-500 font-medium max-w-sm mx-auto">
+                  This account has both customer and provider access. Pick the role you want active for this session.
+                </p>
+              </div>
+
+              <div class="space-y-3">
+                <button
+                  type="button"
+                  onclick="chooseLoginRole('customer')"
+                  class="w-full text-left bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-brand-accent hover:shadow-sm transition-all"
+                >
+                  <div class="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-navy shrink-0">
+                    <i data-lucide="search" class="w-6 h-6"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-bold text-brand-navy">Continue as Customer</p>
+                    <p class="text-sm text-slate-500">Browse services, request jobs, and track activity.</p>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-5 h-5 text-slate-300"></i>
+                </button>
+
+                <button
+                  type="button"
+                  onclick="chooseLoginRole('provider')"
+                  class="w-full text-left bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-brand-accent hover:shadow-sm transition-all"
+                >
+                  <div class="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-navy shrink-0">
+                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-bold text-brand-navy">Continue as Provider</p>
+                    <p class="text-sm text-slate-500">Manage services, view requests, and handle orders.</p>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-5 h-5 text-slate-300"></i>
+                </button>
+              </div>
+
+              <p class="text-xs text-slate-400 text-center mt-6">
+                You can switch this later from your profile page.
+              </p>
+            </div>
+
+            <!-- ============================== -->
+            <!-- EMAIL VERIFICATION VIEW -->
+            <!-- ============================== -->
+            <div
+              id="view-email-verification"
+              class="hidden fade-enter absolute inset-0 z-20 bg-white/95 backdrop-blur-sm rounded-[2rem] p-6 sm:p-8 flex-col justify-center"
+            >
+              <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto bg-brand-light rounded-[2rem] flex items-center justify-center mb-5 shadow-sm border border-brand-accent/20">
+                  <i data-lucide="mail-check" class="w-10 h-10 text-brand-navy"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-brand-navy mb-3 tracking-tight">
+                  Verify your email
+                </h2>
+                <p id="verification-message-text" class="text-slate-500 font-medium max-w-sm mx-auto">
+                  Please check your inbox. We've sent a verification link to your email address. You need to verify it before you can log in.
+                </p>
+                <p class="text-sm font-bold text-brand-navy mt-4 break-all" id="verification-email-text"></p>
+              </div>
+
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-2">
+                    Email Address
+                  </label>
+                  <div class="relative input-focus-lift">
+                    <i
+                      data-lucide="mail"
+                      class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                    ></i>
+                    <input
+                      type="email"
+                      id="verification-email-input"
+                      placeholder="name@example.com"
+                      class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  id="btn-resend-verification"
+                  class="w-full bg-brand-navy text-brand-accent font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 hover:bg-brand-blue"
+                >
+                  Resend verification link
+                </button>
+                <button
+                  type="button"
+                  id="btn-open-change-email"
+                  onclick="switchAuthView('signup')"
+                  class="w-full text-left bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-brand-accent hover:shadow-sm transition-all"
+                >
+                  <div class="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-navy shrink-0">
+                    <i data-lucide="edit-3" class="w-6 h-6"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-bold text-brand-navy">Change email</p>
+                    <p class="text-sm text-slate-500">Use a different email address for this account.</p>
+                  </div>
+                  <i data-lucide="arrow-right" class="w-5 h-5 text-slate-300"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center justify-center gap-4 mt-6 text-sm">
+                <button
+                  type="button"
+                  onclick="switchAuthView('login')"
+                  class="font-bold text-brand-navy hover:underline"
+                >
+                  Back to login
+                </button>
+                <span class="text-slate-300">|</span>
+                <a href="/forgot-password/" class="font-bold text-brand-navy hover:underline">
+                  Forgot password?
+                </a>
+              </div>
+
+              <p class="text-xs text-slate-400 text-center mt-6">
+                Check your inbox and spam folder. Verification links expire after a short time.
+              </p>
+            </div>
+
+            <!-- ============================== -->
             <!-- SIGN UP VIEW -->
             <!-- ============================== -->
             <div id="view-signup" class="hidden fade-enter">
@@ -194,329 +332,215 @@
                 class="space-y-5"
                 id="signup-form"
               >
-                <!-- STEP 1: Basic Information -->
-                <div
-                  id="signup-step-1"
-                  class="space-y-5 fade-enter fade-enter-active"
-                >
-                  <!-- Role Selection -->
-                  <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-3"
-                      >How do you want to use E-del?</label
-                    >
-                    <div class="grid grid-cols-2 gap-3">
-                      <label class="cursor-pointer group">
-                        <input
-                          type="radio"
-                          name="user_role"
-                          value="customer"
-                          class="peer sr-only"
-                          checked
-                          onchange="updateRoleUI()"
-                        />
-                        <div
-                          class="border-2 border-slate-200 rounded-xl p-4 transition-all peer-checked:border-brand-accent peer-checked:bg-brand-accent/5 peer-checked:shadow-sm opacity-70 peer-checked:opacity-100 hover:opacity-100 h-full flex flex-col items-center text-center"
-                        >
-                          <div
-                            class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center mb-2 text-brand-navy group-hover:scale-110 transition-transform"
-                          >
-                            <i data-lucide="search" class="w-5 h-5"></i>
-                          </div>
-                          <h4 class="font-bold text-brand-navy text-sm mb-1">
-                            Customer
-                          </h4>
-                          <p class="text-[10px] text-slate-500 font-medium">
-                            Find and hire local pros.
-                          </p>
-                        </div>
-                      </label>
-
-                      <label class="cursor-pointer group">
-                        <input
-                          type="radio"
-                          name="user_role"
-                          value="provider"
-                          class="peer sr-only"
-                          onchange="updateRoleUI()"
-                        />
-                        <div
-                          class="border-2 border-slate-200 rounded-xl p-4 transition-all peer-checked:border-brand-accent peer-checked:bg-brand-accent/5 peer-checked:shadow-sm opacity-70 peer-checked:opacity-100 hover:opacity-100 h-full flex flex-col items-center text-center"
-                        >
-                          <div
-                            class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center mb-2 text-brand-navy group-hover:scale-110 transition-transform"
-                          >
-                            <i data-lucide="briefcase" class="w-5 h-5"></i>
-                          </div>
-                          <h4 class="font-bold text-brand-navy text-sm mb-1">
-                            Provider
-                          </h4>
-                          <p class="text-[10px] text-slate-500 font-medium">
-                            Offer services & earn.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="md:col-span-2">
-                      <label class="block text-sm font-bold text-slate-700 mb-2"
-                        >Full Name</label
-                      >
-                      <div class="relative input-focus-lift">
-                        <i
-                          data-lucide="user"
-                          class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                        ></i>
-                        <input
-                          type="text"
-                          name="signup_full_name"
-                          required
-                          placeholder="John Doe"
-                          class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div class="md:col-span-2">
-                      <label class="block text-sm font-bold text-slate-700 mb-2"
-                        >Email Address</label
-                      >
-                      <div class="relative input-focus-lift">
-                        <i
-                          data-lucide="mail"
-                          class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                        ></i>
-                        <input
-                          type="email"
-                          name="signup_email"
-                          required
-                          placeholder="name@example.com"
-                          class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div class="md:col-span-2">
-                      <label class="block text-sm font-bold text-slate-700 mb-2"
-                        >Profile Photo (Optional)</label
-                      >
-                      <div class="relative input-focus-lift">
-                        <i
-                          data-lucide="image"
-                          class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                        ></i>
-                        <input
-                          type="file"
-                          name="profilePhoto"
-                          accept="image/*"
-                          class="w-full pl-11 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-brand-light file:text-brand-navy hover:file:bg-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label class="block text-sm font-bold text-slate-700 mb-2"
-                        >Phone</label
-                      >
-                      <div class="relative input-focus-lift">
-                        <i
-                          data-lucide="phone"
-                          class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
-                        ></i>
-                        <input
-                          type="tel"
-                          name="signup_phone"
-                          required
-                          placeholder="+234..."
-                          class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label class="block text-sm font-bold text-slate-700 mb-2"
-                        >Password</label
-                      >
-                      <div class="relative input-focus-lift">
-                        <i
-                          data-lucide="lock"
-                          class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
-                        ></i>
-                        <input
-                          type="password"
-                          name="signup_password"
-                          required
-                          placeholder="••••••••"
-                          class="w-full pl-10 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
-                        />
-                        <button
-                          type="button"
-                          class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-navy transition-colors"
-                        >
-                          <i data-lucide="eye" class="w-5 h-5"></i>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div class="md:col-span-2">
+                <!-- Role Selection -->
+                <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-3"
+                    >How do you want to use E-del?</label
+                  >
+                  <div class="grid grid-cols-2 gap-3">
+                    <label class="cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="user_role"
+                        value="customer"
+                        class="peer sr-only"
+                        checked
+                        onchange="updateRoleUI()"
+                      />
                       <div
-                        class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4"
+                        class="border-2 border-slate-200 rounded-xl p-4 transition-all peer-checked:border-brand-accent peer-checked:bg-brand-accent/5 peer-checked:shadow-sm opacity-70 peer-checked:opacity-100 hover:opacity-100 h-full flex flex-col items-center text-center"
                       >
-                        <div class="flex items-start justify-between gap-4">
-                          <div>
-                            <p class="text-sm font-bold text-brand-navy">
-                              Location
-                            </p>
-                            <p
-                              id="signup-location-status"
-                              class="text-xs text-slate-500 mt-1"
-                            >
-                              We use this to show nearby services and providers.
-                              If location detection fails, enter your area and
-                              city like "Yaba, Lagos" or "Wuse 2, Abuja".
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            id="btn-detect-location"
-                            class="shrink-0 bg-brand-navy text-brand-accent px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-brand-blue transition-colors"
-                          >
-                            <i data-lucide="locate-fixed" class="w-4 h-4"></i>
-                            Use My Location
-                          </button>
+                        <div
+                          class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center mb-2 text-brand-navy group-hover:scale-110 transition-transform"
+                        >
+                          <i data-lucide="search" class="w-5 h-5"></i>
                         </div>
-
-                        <div class="relative input-focus-lift">
-                          <i
-                            data-lucide="map-pin"
-                            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                          ></i>
-                          <input
-                            type="text"
-                            name="signup_location_label"
-                            required
-                            placeholder="Enter area and city e.g. Yaba, Lagos"
-                            class="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent shadow-sm transition-all text-sm"
-                          />
-                        </div>
-
-                        <input type="hidden" name="signup_latitude" />
-                        <input type="hidden" name="signup_longitude" />
+                        <h4 class="font-bold text-brand-navy text-sm mb-1">
+                          Customer
+                        </h4>
+                        <p class="text-[10px] text-slate-500 font-medium">
+                          Find and hire local pros.
+                        </p>
                       </div>
-                    </div>
+                    </label>
+
+                    <label class="cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="user_role"
+                        value="provider"
+                        class="peer sr-only"
+                        onchange="updateRoleUI()"
+                      />
+                      <div
+                        class="border-2 border-slate-200 rounded-xl p-4 transition-all peer-checked:border-brand-accent peer-checked:bg-brand-accent/5 peer-checked:shadow-sm opacity-70 peer-checked:opacity-100 hover:opacity-100 h-full flex flex-col items-center text-center"
+                      >
+                        <div
+                          class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center mb-2 text-brand-navy group-hover:scale-110 transition-transform"
+                        >
+                          <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-brand-navy text-sm mb-1">
+                          Provider
+                        </h4>
+                        <p class="text-[10px] text-slate-500 font-medium">
+                          Offer services & earn.
+                        </p>
+                      </div>
+                    </label>
                   </div>
                 </div>
 
-                <!-- STEP 2: Provider Details (Hidden by default) -->
-                <div id="signup-step-2" class="hidden space-y-5 fade-enter">
-                  <div class="flex items-center gap-3 mb-6">
-                    <button
-                      type="button"
-                      onclick="goToStep(1)"
-                      class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 hover:text-brand-navy transition-colors shrink-0"
-                    >
-                      <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    </button>
-                    <h3 class="text-xl font-bold text-brand-navy">
-                      Service Profile
-                    </h3>
-                  </div>
-
-                  <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="md:col-span-2">
                     <label class="block text-sm font-bold text-slate-700 mb-2"
-                      >Service Category</label
+                      >Full Name</label
                     >
                     <div class="relative input-focus-lift">
                       <i
-                        data-lucide="grid"
-                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                      ></i>
-                      <select
-                        id="provider-category"
-                        name="provider_service_category"
-                        class="w-full pl-11 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm appearance-none cursor-pointer"
-                      >
-                        <option value="" disabled selected>
-                          Select a category
-                        </option>
-                        <option value="cleaning">Cleaning</option>
-                        <option value="repairs">Repairs</option>
-                        <option value="beauty">Beauty</option>
-                        <option value="tutoring">Tutoring</option>
-                        <option value="tech">Tech Help</option>
-                      </select>
-                      <i
-                        data-lucide="chevron-down"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
-                      ></i>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2"
-                      >Service Title</label
-                    >
-                    <div class="relative input-focus-lift">
-                      <i
-                        data-lucide="tag"
+                        data-lucide="user"
                         class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
                       ></i>
                       <input
                         type="text"
-                        id="provider-title"
-                        name="provider_service_title"
-                        placeholder="e.g. Premium Home Deep Clean"
+                        name="signup_full_name"
+                        required
+                        placeholder="John Doe"
                         class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
                       />
                     </div>
                   </div>
 
-                  <div>
+                  <div class="md:col-span-2">
                     <label class="block text-sm font-bold text-slate-700 mb-2"
-                      >Base Pricing (₦)</label
+                      >Email Address</label
                     >
                     <div class="relative input-focus-lift">
-                      <span
-                        class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold"
-                        >₦</span
-                      >
+                      <i
+                        data-lucide="mail"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                      ></i>
                       <input
-                        type="number"
-                        id="provider-price"
-                        name="provider_base_price"
-                        min="0"
-                        step="0.01"
-                        placeholder="15000"
-                        class="w-full pl-9 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
+                        type="email"
+                        name="signup_email"
+                        required
+                        placeholder="name@example.com"
+                        class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2"
+                      >Profile Photo (Optional)</label
+                    >
+                    <div class="relative input-focus-lift">
+                      <i
+                        data-lucide="image"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                      ></i>
+                      <input
+                        type="file"
+                        name="profilePhoto"
+                        accept="image/*"
+                        class="w-full pl-11 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-brand-light file:text-brand-navy hover:file:bg-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
                       />
                     </div>
                   </div>
 
                   <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2"
-                      >Short Description</label
+                      >Phone</label
                     >
-                    <textarea
-                      id="provider-desc"
-                      name="provider_service_description"
-                      rows="3"
-                      placeholder="Briefly describe what your service includes..."
-                      class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm no-scrollbar resize-none"
-                    ></textarea>
+                    <div class="relative input-focus-lift">
+                      <i
+                        data-lucide="phone"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                      ></i>
+                      <input
+                        type="tel"
+                        name="signup_phone"
+                        required
+                        placeholder="+234..."
+                        class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2"
+                      >Password</label
+                    >
+                    <div class="relative input-focus-lift">
+                      <i
+                        data-lucide="lock"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                      ></i>
+                      <input
+                        type="password"
+                        name="signup_password"
+                        required
+                        placeholder="••••••••"
+                        class="w-full pl-10 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:bg-white shadow-sm transition-all text-sm"
+                      />
+                      <button
+                        type="button"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-navy transition-colors"
+                      >
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="md:col-span-2">
+                    <div
+                      class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4"
+                    >
+                      <div class="flex items-start justify-between gap-4">
+                        <div>
+                          <p class="text-sm font-bold text-brand-navy">
+                            Location
+                          </p>
+                          <p
+                            id="signup-location-status"
+                            class="text-xs text-slate-500 mt-1"
+                          >
+                            We use this to show nearby services and providers.
+                            If location detection fails, enter your area and
+                            city like "Yaba, Lagos" or "Wuse 2, Abuja".
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          id="btn-detect-location"
+                          class="shrink-0 bg-brand-navy text-brand-accent px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-brand-blue transition-colors"
+                        >
+                          <i data-lucide="locate-fixed" class="w-4 h-4"></i>
+                          Use My Location
+                        </button>
+                      </div>
+
+                      <div class="relative input-focus-lift">
+                        <i
+                          data-lucide="map-pin"
+                          class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                        ></i>
+                        <input
+                          type="text"
+                          name="signup_location_label"
+                          required
+                          placeholder="Enter area and city e.g. Yaba, Lagos"
+                          class="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent shadow-sm transition-all text-sm"
+                        />
+                      </div>
+
+                      <input type="hidden" name="signup_latitude" />
+                      <input type="hidden" name="signup_longitude" />
+                    </div>
                   </div>
                 </div>
 
                 <!-- Form Action Buttons -->
-                <button
-                  type="button"
-                  id="btn-next"
-                  onclick="goToStep(2)"
-                  class="hidden w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95 items-center justify-center gap-2 mt-6"
-                >
-                  Next <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </button>
-
                 <button
                   type="submit"
                   id="btn-submit"

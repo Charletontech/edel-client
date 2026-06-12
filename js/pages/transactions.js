@@ -14,10 +14,23 @@ let billingState = {
   currentView: "customer"
 };
 
+function getSessionRole(user = EdelModules.auth.getUser()) {
+  if (!user) return "customer";
+  if (user.role === "both") {
+    return EdelModules.auth.getSessionRole(user) || "customer";
+  }
+  return user.role || "customer";
+}
+
+function getRoleLabel(user = EdelModules.auth.getUser()) {
+  return EdelModules.auth.getRoleLabel(user);
+}
+
 async function loadBillingData() {
   try {
     const user = EdelModules.auth.getUser();
-    if (user.role === 'provider' || user.role === 'both') {
+    const sessionRole = getSessionRole(user);
+    if (sessionRole === 'provider' || user.role === 'admin') {
       const [statusRes, txRes] = await Promise.all([
         EdelModules.api.get('/api/billing/status', { headers: EdelModules.auth.getAuthHeaders() }),
         EdelModules.api.get('/api/billing/transactions', { headers: EdelModules.auth.getAuthHeaders() })
@@ -26,8 +39,8 @@ async function loadBillingData() {
       billingState.transactions = txRes;
       renderProviderView();
       
-      // If user is a provider, automatically switch to provider view
-      if (user.role === 'provider' || (user.role === 'both' && billingState.currentView === 'customer')) {
+      // If the active session is provider, automatically switch to provider view
+      if (sessionRole === 'provider' || user.role === 'admin') {
           setView('provider');
       }
     } else {
@@ -320,10 +333,17 @@ function populateUserProfile() {
 
   if (sidebarName) sidebarName.textContent = user.fullName || "User";
   if (sidebarRole) {
-    if (user.role === "both") sidebarRole.textContent = "Customer + Provider";
-    else if (user.role === "provider")
-      sidebarRole.textContent = "Provider Account";
-    else sidebarRole.textContent = "Customer Account";
+    sidebarRole.textContent = getRoleLabel(user);
+  }
+
+  const btnCustomer = document.getElementById("btn-view-customer");
+  const btnProvider = document.getElementById("btn-view-provider");
+  const toggleWrapper = btnCustomer?.parentElement;
+  if (toggleWrapper) {
+    toggleWrapper.classList.toggle("hidden", user.role !== "admin");
+  } else {
+    btnCustomer?.classList.toggle("hidden", user.role !== "admin");
+    btnProvider?.classList.toggle("hidden", user.role !== "admin");
   }
 
   const profilePhoto = EdelModules.api.buildUrl(
@@ -340,6 +360,11 @@ function setView(viewType) {
         const btnCustomer = document.getElementById("btn-view-customer");
         const btnProvider = document.getElementById("btn-view-provider");
         const sidebarRole = document.getElementById("sidebar-role");
+        const currentUser = EdelModules.auth.getUser() || {};
+
+        if (currentUser.role === "both") {
+          EdelModules.auth.setSessionRole(viewType);
+        }
 
         if (viewType === "customer") {
           btnCustomer.className =

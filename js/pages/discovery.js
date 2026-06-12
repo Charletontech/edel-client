@@ -67,21 +67,11 @@ const state = {
   viewMode: "list", // 'list' or 'categories'
 };
 
-const categoryIcons = {
-  Cleaning: "sparkles",
-  Repairs: "wrench",
-  Beauty: "scissors",
-  Tutoring: "book-open",
-  "Tech Help": "laptop",
-  Laundry: "droplets",
-  Health: "activity",
-  Transport: "car",
-  Food: "utensils",
-  Default: "briefcase",
-};
-
-function getCategoryIcon(category) {
-  return categoryIcons[category] || categoryIcons["Default"];
+function getViewerRole(user = EdelModules.auth.getUser()) {
+  if (!user) return "customer";
+  if (user.role === "admin") return "admin";
+  if (user.role === "both") return EdelModules.auth.getSessionRole(user) || "customer";
+  return user.role || "customer";
 }
 
 function setActiveTab(activeTab) {
@@ -108,8 +98,17 @@ function formatCurrency(amount) {
   return `₦${Number(amount || 0).toLocaleString()}`;
 }
 
-function getTierBadgeIcon(tier) {
-  return tier === "rookie" ? "leaf" : "check";
+function getVerifiedBadgeMarkup(provider, sizeClass = "w-3.5 h-3.5") {
+  if (!provider?.hasPaidAccessFee) return "";
+
+  return `
+    <div
+      class="absolute -bottom-0.5 -right-0.5 ${sizeClass} verified-badge rounded-full flex items-center justify-center border border-white shadow-sm"
+      title="Verified provider"
+    >
+      <i data-lucide="check" class="w-1.5 h-1.5 text-white"></i>
+    </div>
+  `;
 }
 
 function getStatusBadge(status) {
@@ -156,6 +155,9 @@ function getProviderBrowseBanner() {
 }
 
 function buildCardMarkup(item) {
+  const businessPhoto = EdelModules.api.buildUrl(
+    item.businessPhoto || "/assets/images/business-photo-default.jpg",
+  );
   const profilePhoto = EdelModules.api.buildUrl(
     item.provider.profilePhoto || "/assets/images/avatar.jpg",
   );
@@ -172,32 +174,36 @@ function buildCardMarkup(item) {
           View Only
         </div>
       ` : ''}
-      <div class="flex justify-between items-start mb-4">
-        <div class="flex gap-3 items-center">
+      
+      <!-- Business Photo Banner -->
+      <div class="relative w-full h-32 mb-4 overflow-hidden rounded-2xl">
+        <img
+          src="${businessPhoto}"
+          alt="${item.title}"
+          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div class="absolute bottom-3 left-3 flex items-center gap-2">
           <div class="relative">
             <img
               src="${profilePhoto}"
               alt="${item.provider.fullName}"
-              class="w-14 h-14 rounded-2xl object-cover shadow-sm"
+              class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
             />
-            <div
-              class="absolute -bottom-1 -right-1 w-5 h-5 verified-badge rounded-full flex items-center justify-center border-2 border-white shadow-sm"
-              title="${item.provider.tier || "rookie"} tier"
-            >
-              <i data-lucide="${getTierBadgeIcon(item.provider.tier)}" class="w-3 h-3 text-white"></i>
-            </div>
+            ${getVerifiedBadgeMarkup(item.provider)}
           </div>
-          <div>
-            <h4 class="font-bold text-brand-navy">${item.provider.fullName}</h4>
-            <p class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md inline-block mt-1">
-              ${item.category}
-            </p>
-          </div>
+          <span class="text-white text-xs font-bold shadow-sm">${item.provider.fullName}</span>
         </div>
+      </div>
+
+      <div class="flex justify-between items-start mb-2">
+        <p class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded uppercase tracking-wider">
+          ${item.category}
+        </p>
         ${getStatusBadge(item.provider.availabilityStatus)}
       </div>
 
-      <h3 class="text-lg font-bold text-brand-navy mb-2 ${providerBrowseMode ? "" : "group-hover:text-brand-blue"} transition-colors">
+      <h3 class="text-lg font-bold text-brand-navy mb-2 ${providerBrowseMode ? "" : "group-hover:text-brand-blue"} transition-colors line-clamp-1">
         ${item.title}
       </h3>
       <p class="text-sm text-slate-500 mb-5 line-clamp-2">
@@ -320,19 +326,19 @@ function updateHeaderForRole() {
   const roleHeaderText = document.getElementById("role-header-text");
   const backBtn = document.getElementById("category-back-btn");
 
-  const isDualRole = user.role === "both" || user.role === "admin";
+  const effectiveRole = getViewerRole(user);
+  const isAdmin = user.role === "admin";
 
-  if (!isDualRole) {
+  if (!isAdmin) {
     if (tabContainer) tabContainer.classList.add("hidden");
     if (singleRoleHeader) {
       singleRoleHeader.classList.remove("hidden");
 
-      if (user.role === "customer") {
+      if (effectiveRole === "customer") {
         roleHeaderText.textContent = "Trending Services";
         backBtn.classList.add("hidden");
       } else {
-        // Provider role
-        if (state.viewMode === "categories") {
+        if (effectiveRole === "provider" && state.viewMode === "categories") {
           roleHeaderText.textContent = "Trending Categories";
           backBtn.classList.add("hidden");
         } else {
@@ -342,10 +348,8 @@ function updateHeaderForRole() {
       }
     }
   } else {
-    // Dual Role (Both or Admin) - Show Tabs
     if (tabContainer) tabContainer.classList.remove("hidden");
 
-    // Show header only if in provider category view
     if (singleRoleHeader) {
       if (state.activeTab === "provider" && state.viewMode === "list") {
         singleRoleHeader.classList.remove("hidden");
@@ -376,13 +380,13 @@ function renderCategoryGrid(categories) {
         .map(
           (category) => `
         <div 
-          data-category-card="${category}"
+          data-category-card="${category.name}"
           class="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center group ${state.activeTab === "provider" ? "ring-1 ring-amber-100" : "hover:shadow-glow hover:-translate-y-1"}"
         >
           <div class="w-16 h-16 ${state.activeTab === "provider" ? "bg-amber-50" : "bg-brand-light"} rounded-2xl flex items-center justify-center mb-4 ${state.activeTab === "provider" ? "" : "group-hover:bg-brand-accent"} transition-colors">
-            <i data-lucide="${getCategoryIcon(category)}" class="w-8 h-8 text-brand-navy"></i>
+            <i data-lucide="${category.iconName || 'package'}" class="w-8 h-8 text-brand-navy"></i>
           </div>
-          <h4 class="font-bold text-brand-navy text-sm ${state.activeTab === "provider" ? "" : "group-hover:text-brand-blue"} transition-colors">${category}</h4>
+          <h4 class="font-bold text-brand-navy text-sm capitalize ${state.activeTab === "provider" ? "" : "group-hover:text-brand-blue"} transition-colors">${category.name}</h4>
         </div>
       `,
         )
@@ -403,10 +407,7 @@ function populateUserProfile() {
 
   if (sidebarName) sidebarName.textContent = user.fullName || "User";
   if (sidebarRole) {
-    if (user.role === "both") sidebarRole.textContent = "Customer + Provider";
-    else if (user.role === "provider")
-      sidebarRole.textContent = "Provider Account";
-    else sidebarRole.textContent = "Customer Account";
+    sidebarRole.textContent = EdelModules.auth.getRoleLabel(user);
   }
 
   // Use a default avatar if none provided
@@ -422,18 +423,22 @@ function populateUserProfile() {
 function renderCategories(categories = []) {
   if (!categoryList) return;
 
-  const values = ["all", ...categories];
+  const allOption = { name: "all", iconName: "compass" };
+  const values = [allOption, ...categories];
   categoryList.innerHTML = values
     .map((category) => {
-      const active = state.selectedCategory === category;
-      const label = category === "all" ? "All Near Me" : category;
+      const active = state.selectedCategory === category.name;
+      const label = category.name === "all" ? "All Near Me" : category.name;
       const className = active
-        ? "px-5 py-2 bg-brand-navy text-white rounded-full text-sm font-bold whitespace-nowrap shadow-md"
-        : "px-5 py-2 bg-white text-slate-600 border border-slate-200 rounded-full text-sm font-medium whitespace-nowrap hover:bg-slate-50 transition-colors";
+        ? "px-5 py-2 bg-brand-navy text-white rounded-full text-sm font-bold whitespace-nowrap shadow-md flex items-center gap-2"
+        : "px-5 py-2 bg-white text-slate-600 border border-slate-200 rounded-full text-sm font-medium whitespace-nowrap hover:bg-slate-50 transition-colors flex items-center gap-2";
 
-      return `<button data-category="${category}" class="${className}">${label}</button>`;
+      return `<button data-category="${category.name}" class="${className}">
+        <i data-lucide="${category.iconName || 'package'}" class="w-4 h-4"></i> <span class="capitalize">${label}</span>
+      </button>`;
     })
     .join("");
+  Edel.initIcons();
 }
 
 function openDiscoveryModal(serviceId) {
@@ -452,8 +457,18 @@ function openDiscoveryModal(serviceId) {
   modalCategory.innerText = item.category;
   if (modalImg) {
     modalImg.src = EdelModules.api.buildUrl(
+      item.businessPhoto || "/assets/images/business-photo-default.jpg",
+    );
+  }
+  const modalProviderImg = document.getElementById("modal-provider-img");
+  if (modalProviderImg) {
+    modalProviderImg.src = EdelModules.api.buildUrl(
       item.provider.profilePhoto || "/assets/images/avatar.jpg",
     );
+  }
+  const modalProviderBadge = document.getElementById("modal-provider-badge");
+  if (modalProviderBadge) {
+    modalProviderBadge.classList.toggle("hidden", !item.provider.hasPaidAccessFee);
   }
   if (modalProviderName) modalProviderName.innerText = item.provider.fullName;
   if (modalDescription) modalDescription.innerText = item.description;
@@ -693,8 +708,8 @@ async function loadDiscoveryFeed() {
   if (state.activeTab === "provider" && state.viewMode === "categories") {
     renderLoadingState();
     try {
-      const response = await EdelModules.api.get(
-        "/api/services/discovery?limit=1",
+    const response = await EdelModules.api.get(
+      "/api/services/discovery?limit=1",
         {
           headers: EdelModules.auth.getAuthHeaders(),
           silent: true,
@@ -721,8 +736,13 @@ async function loadDiscoveryFeed() {
       state.location = await resolveViewerLocation();
     }
 
+    const requestedRole =
+      state.activeTab === "provider" && state.viewMode === "categories"
+        ? "provider"
+        : "customer";
+
     const params = new URLSearchParams({
-      role: "customer",
+      role: requestedRole,
       lat: state.location.latitude,
       lng: state.location.longitude,
       limit: 24,
@@ -862,9 +882,14 @@ window.closeModal = () =>
 
 window.addEventListener("load", () => {
   const user = EdelModules.auth.getUser();
-  if (user && user.role === "provider") {
+  const viewerRole = getViewerRole(user);
+
+  if (user && viewerRole === "provider") {
     state.activeTab = "provider";
     state.viewMode = "categories";
+  } else if (user && viewerRole === "customer") {
+    state.activeTab = "customer";
+    state.viewMode = "list";
   } else {
     state.activeTab = "customer";
     state.viewMode = "list";

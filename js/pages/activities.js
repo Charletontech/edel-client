@@ -88,6 +88,14 @@ const state = {
   pollTimer: null,
 };
 
+function getSessionRole(user = state.user) {
+  if (!user) return "customer";
+  if (user.role === "both") {
+    return EdelModules.auth.getSessionRole(user) || "customer";
+  }
+  return user.role || "customer";
+}
+
 function formatCurrency(amount) {
   return `₦${Number(amount || 0).toLocaleString()}`;
 }
@@ -117,9 +125,7 @@ function estimateEta(distanceKm) {
 }
 
 function getUserRoleLabel(role) {
-  if (role === "both") return "Customer + Provider";
-  if (role === "provider") return "Provider Account";
-  return "Customer Account";
+  return EdelModules.auth.getRoleLabel({ role, activeRole: getSessionRole(state.user) });
 }
 
 function populateUserProfile() {
@@ -128,7 +134,7 @@ function populateUserProfile() {
 
   if (sidebarUserName)
     sidebarUserName.textContent = state.user.fullName || "User";
-  if (sidebarRole) sidebarRole.textContent = getUserRoleLabel(state.user.role);
+  if (sidebarRole) sidebarRole.textContent = EdelModules.auth.getRoleLabel(state.user);
 
   const profilePhoto = EdelModules.api.buildUrl(
     state.user.profilePhoto || "/assets/images/avatar.jpg",
@@ -138,11 +144,11 @@ function populateUserProfile() {
 }
 
 function canUseCustomerView() {
-  return ["customer", "both"].includes(state.user.role);
+  return getSessionRole(state.user) === "customer" || state.user.role === "admin";
 }
 
 function canUseProviderView() {
-  return ["provider", "both"].includes(state.user.role);
+  return getSessionRole(state.user) === "provider" || state.user.role === "admin";
 }
 
 function updateStatusBadge(text, isPulse = false) {
@@ -760,14 +766,11 @@ function closeModal() {
 }
 
 sidebarUserName.textContent = state.user.fullName || "E-del User";
-sidebarRole.textContent = getUserRoleLabel(state.user.role);
+sidebarRole.textContent = EdelModules.auth.getRoleLabel(state.user);
 
-if (!canUseCustomerView()) {
-  btnCustomer?.classList.add("hidden");
-}
-
-if (!canUseProviderView()) {
-  btnProvider?.classList.add("hidden");
+const viewToggle = document.getElementById("view-toggle");
+if (viewToggle && state.user.role !== "admin") {
+  viewToggle.classList.add("hidden");
 }
 
 btnCustomer?.addEventListener("click", () => {
