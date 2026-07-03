@@ -161,6 +161,7 @@ window.EdelModules.auth = {
       const signupView = document.getElementById("view-signup");
       const accountChoiceView = document.getElementById("view-account-choice");
       const verificationView = document.getElementById("view-email-verification");
+      const faceCaptureView = document.getElementById("view-face-capture");
       const toggleLogin = document.getElementById("btn-toggle-login");
       const toggleSignup = document.getElementById("btn-toggle-signup");
 
@@ -173,6 +174,8 @@ window.EdelModules.auth = {
         accountChoiceView?.classList.remove("fade-enter-active", "flex");
         verificationView?.classList.add("hidden");
         verificationView?.classList.remove("fade-enter-active", "flex");
+        faceCaptureView?.classList.add("hidden");
+        faceCaptureView?.classList.remove("fade-enter-active");
         
         // Update toggle buttons if they exist
         if (toggleLogin && toggleSignup) {
@@ -190,6 +193,8 @@ window.EdelModules.auth = {
         accountChoiceView?.classList.remove("fade-enter-active", "flex");
         verificationView?.classList.add("hidden");
         verificationView?.classList.remove("fade-enter-active", "flex");
+        faceCaptureView?.classList.add("hidden");
+        faceCaptureView?.classList.remove("fade-enter-active");
 
         // Update toggle buttons if they exist
         if (toggleLogin && toggleSignup) {
@@ -257,7 +262,7 @@ window.EdelModules.auth = {
             }
             window.dispatchEvent(
               new CustomEvent("edel:verification-required", {
-                detail: { email: response.email, message: response.message },
+                detail: { email: response.email, message: response.message, type: 'signup' },
               }),
             );
             return;

@@ -179,6 +179,7 @@
         background-color: #fffbeb;
         border-color: #fde68a;
       }
+      .status-away,
       .status-unavailable {
         color: #dc2626;
         background-color: #fef2f2;

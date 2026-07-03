@@ -1,3 +1,5 @@
+let _settingsLoaded = false;
+let _enableCategoriesViewForProviders = false;
 Edel.initIcons();
 Edel.applySafeArea();
 
@@ -31,6 +33,11 @@ const notificationsBtnDesktop = document.getElementById("notifications-btn-deskt
 const notificationDotMobile = document.getElementById("notification-dot-mobile");
 const notificationDotDesktop = document.getElementById("notification-dot-desktop");
 
+const faceModal = document.getElementById("face-verification-modal");
+const faceModalContent = document.getElementById("face-modal-content");
+const closeFaceModalBtn = document.getElementById("close-face-modal-btn");
+const disclaimerContainer = document.getElementById("verification-disclaimer-container");
+
 const modalController = EdelModules.ui.createOverlayModal({
   overlay: modal,
   defaultPanelClass: "flex",
@@ -38,6 +45,11 @@ const modalController = EdelModules.ui.createOverlayModal({
 
 const reportsModalController = EdelModules.ui.createOverlayModal({
   overlay: reportsModal,
+  defaultPanelClass: "flex",
+});
+
+const faceModalController = EdelModules.ui.createOverlayModal({
+  overlay: faceModal,
   defaultPanelClass: "flex",
 });
 
@@ -120,10 +132,10 @@ function getStatusBadge(status) {
     `;
   }
 
-  if (status === "unavailable") {
+  if (status === "away" || status === "unavailable") {
     return `
       <span class="bg-slate-100 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-        <i data-lucide="moon" class="w-3 h-3"></i> Unavailable
+        <i data-lucide="moon" class="w-3 h-3"></i> Away
       </span>
     `;
   }
@@ -258,6 +270,22 @@ function renderLoadingState() {
 }
 
 function renderEmptyState(message) {
+  const isSearchEmpty = state.search && state.search.trim().length > 0;
+  let extraHtml = '';
+  
+  if (isSearchEmpty) {
+    extraHtml = `
+      <div class="mt-6 p-6 bg-brand-light/50 rounded-2xl border border-brand-light">
+        <h4 class="font-bold text-brand-navy mb-2">Oops! No provider found in your area.</h4>
+        <p class="text-sm text-slate-500 mb-4">Why not invite one? Sharing your invite link helps build the community.</p>
+        <button onclick="handleInviteProvider()" class="w-full bg-brand-navy text-brand-accent px-6 py-3 rounded-xl font-bold hover:bg-brand-blue transition-colors flex items-center justify-center gap-2 shadow-md">
+          <i data-lucide="share-2" class="w-5 h-5"></i> Invite a Provider
+        </button>
+      </div>
+    `;
+    message = "We couldn't find any exact matches for your search.";
+  }
+
   listingsContainer.innerHTML = `
     <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-soft text-center col-span-1 md:col-span-2 xl:col-span-3">
       <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4">
@@ -265,9 +293,40 @@ function renderEmptyState(message) {
       </div>
       <h3 class="text-xl font-bold text-brand-navy mb-2">No nearby services found</h3>
       <p class="text-slate-500 max-w-md mx-auto">${message}</p>
+      ${extraHtml}
     </div>
   `;
   Edel.initIcons();
+}
+
+window.handleInviteProvider = async () => {
+  const signupLink = window.location.origin + "/auth/?tab=signup";
+  const shareData = {
+    title: 'Join E-del as a Provider',
+    text: "Hey! I couldn't find a provider for a service I need. Join E-del and offer your services!",
+    url: signupLink
+  };
+
+  if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    try {
+      await navigator.share(shareData);
+      Ui.toast('success', 'Shared', 'Thanks for sharing E-del!');
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        copyInviteLink(signupLink);
+      }
+    }
+  } else {
+    copyInviteLink(signupLink);
+  }
+};
+
+function copyInviteLink(link) {
+  navigator.clipboard.writeText(link).then(() => {
+    Ui.alert('success', 'Link Copied', 'Invite link copied to clipboard! Paste it wherever you want to share.', true, false);
+  }).catch(() => {
+    Ui.alert('error', 'Action Required', 'Could not copy automatically. Please copy this link: ' + link, true, false);
+  });
 }
 
 function renderLocationPermissionState() {
@@ -321,6 +380,8 @@ function updateHeaderForRole() {
   const user = EdelModules.auth.getUser();
   if (!user) return;
 
+  checkVerificationDisclaimer();
+
   const tabContainer = document.getElementById("tab-container");
   const singleRoleHeader = document.getElementById("single-role-header");
   const roleHeaderText = document.getElementById("role-header-text");
@@ -334,12 +395,16 @@ function updateHeaderForRole() {
     if (singleRoleHeader) {
       singleRoleHeader.classList.remove("hidden");
 
-      if (effectiveRole === "customer") {
-        roleHeaderText.textContent = "Trending Services";
+      if (effectiveRole === "customer" || (effectiveRole === "provider" && !_enableCategoriesViewForProviders)) {
+        roleHeaderText.textContent = "";
+        const line = document.getElementById("role-header-line");
+        if (line) line.classList.add("hidden");
         backBtn.classList.add("hidden");
       } else {
+        const line = document.getElementById("role-header-line");
+        if (line) line.classList.remove("hidden");
         if (effectiveRole === "provider" && state.viewMode === "categories") {
-          roleHeaderText.textContent = "Trending Categories";
+          // roleHeaderText.textContent = "Trending Categories";
           backBtn.classList.add("hidden");
         } else {
           roleHeaderText.textContent = `Trending ${state.selectedCategory}`;
@@ -351,9 +416,11 @@ function updateHeaderForRole() {
     if (tabContainer) tabContainer.classList.remove("hidden");
 
     if (singleRoleHeader) {
+      const line = document.getElementById("role-header-line");
       if (state.activeTab === "provider" && state.viewMode === "list") {
         singleRoleHeader.classList.remove("hidden");
         roleHeaderText.textContent = `Trending ${state.selectedCategory}`;
+        if (line) line.classList.remove("hidden");
         backBtn.classList.remove("hidden");
       } else {
         singleRoleHeader.classList.add("hidden");
@@ -498,7 +565,7 @@ function openDiscoveryModal(serviceId) {
     modalActionBtn.classList.remove("bg-brand-navy", "text-brand-accent", "hover:bg-brand-blue");
     modalActionBtn.classList.add("bg-slate-200", "text-slate-500", "cursor-not-allowed");
     modalActionBtn.innerText =
-      item.provider.availabilityStatus === "busy" ? "Provider Busy" : "Currently Unavailable";
+      item.provider.availabilityStatus === "busy" ? "Provider Busy" : "Currently Away";
     modalActionBtn.disabled = true;
     modalWarning.classList.remove("hidden");
     return;
@@ -705,11 +772,31 @@ async function resolveViewerLocation() {
 }
 
 async function loadDiscoveryFeed() {
-  if (state.activeTab === "provider" && state.viewMode === "categories") {
+  const user = EdelModules.auth.getUser();
+  const viewerRole = getViewerRole(user);
+
+  if (user && viewerRole === "provider" && !_settingsLoaded) {
+    try {
+      const response = await EdelModules.api.get(
+        "/api/services/discovery?limit=1",
+        {
+          headers: EdelModules.auth.getAuthHeaders(),
+          silent: true,
+        }
+      );
+      _enableCategoriesViewForProviders = !!response.enableCategoriesViewForProviders;
+      _settingsLoaded = true;
+      state.viewMode = _enableCategoriesViewForProviders ? "categories" : "list";
+    } catch (e) {
+      console.warn("Could not fetch discovery settings:", e);
+    }
+  }
+
+  if (state.activeTab === "provider" && state.viewMode === "categories" && _enableCategoriesViewForProviders) {
     renderLoadingState();
     try {
-    const response = await EdelModules.api.get(
-      "/api/services/discovery?limit=1",
+      const response = await EdelModules.api.get(
+        "/api/services/discovery?limit=1",
         {
           headers: EdelModules.auth.getAuthHeaders(),
           silent: true,
@@ -812,7 +899,7 @@ tabCustomer?.addEventListener("click", () => {
 });
 
 tabProvider?.addEventListener("click", () => {
-  state.viewMode = "categories";
+  state.viewMode = _enableCategoriesViewForProviders ? "categories" : "list";
   state.selectedCategory = "all";
   setActiveTab("provider");
   loadDiscoveryFeed().catch(() => {});
@@ -874,11 +961,301 @@ reportsModal?.addEventListener("click", (event) => {
   if (event.target === reportsModal) closeReportsModal();
 });
 
-window.closeModal = () =>
-  modalController.close({
+// ==========================================
+// Face Verification Modal & Disclaimer Logic
+// ==========================================
+
+let _faceStream = null;
+let _faceDetectionInterval = null;
+let _faceModelsLoaded = false;
+let _faceDetected = false;
+let _capturedBlob = null;
+const FACE_MODELS_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+
+async function loadFaceModels() {
+  if (_faceModelsLoaded) return;
+  try {
+    await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODELS_URL);
+    _faceModelsLoaded = true;
+  } catch (e) {
+    console.warn('[Face Capture] Could not load face detection model:', e);
+  }
+}
+
+function stopFaceCamera() {
+  if (_faceDetectionInterval) {
+    clearInterval(_faceDetectionInterval);
+    _faceDetectionInterval = null;
+  }
+  if (_faceStream) {
+    _faceStream.getTracks().forEach(t => t.stop());
+    _faceStream = null;
+  }
+}
+
+function setFaceStatus(text, type = 'neutral') {
+  const el = document.getElementById('face-status-text');
+  const ring = document.getElementById('face-detect-ring');
+  if (!el || !ring) return;
+  el.textContent = text;
+  if (type === 'good') {
+    el.className = 'text-center text-sm font-semibold text-green-600 mb-4';
+    ring.style.boxShadow = '0 0 0 4px #16a34a';
+  } else if (type === 'warn') {
+    el.className = 'text-center text-sm font-semibold text-amber-500 mb-4';
+    ring.style.boxShadow = '0 0 0 4px #f59e0b';
+  } else if (type === 'error') {
+    el.className = 'text-center text-sm font-semibold text-red-500 mb-4';
+    ring.style.boxShadow = '0 0 0 0 transparent';
+  } else {
+    el.className = 'text-center text-sm font-semibold text-slate-500 mb-4';
+    ring.style.boxShadow = '0 0 0 0 transparent';
+  }
+}
+
+async function startFaceDetectionLoop(video) {
+  if (!_faceModelsLoaded) {
+    setFaceStatus('Face detection unavailable. You can still capture a photo.', 'warn');
+    const captureBtn = document.getElementById('btn-capture-face');
+    if (captureBtn) captureBtn.disabled = false;
+    return;
+  }
+
+  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
+
+  _faceDetectionInterval = setInterval(async () => {
+    if (!video || video.readyState < 2) return;
+    try {
+      const result = await faceapi.detectSingleFace(video, options);
+      const captureBtn = document.getElementById('btn-capture-face');
+      if (result) {
+        _faceDetected = true;
+        setFaceStatus('Face detected! Ready to capture.', 'good');
+        if (captureBtn) captureBtn.disabled = false;
+      } else {
+        _faceDetected = false;
+        setFaceStatus('Position your face inside the circle.', 'warn');
+        if (captureBtn) captureBtn.disabled = true;
+      }
+    } catch (e) {
+      // Silent
+    }
+  }, 400);
+}
+
+async function openFaceModal() {
+  _capturedBlob = null;
+
+  // Reset Modal Elements
+  const video = document.getElementById('face-capture-video');
+  const snapshotCanvas = document.getElementById('face-capture-snapshot');
+  const captureBtn = document.getElementById('btn-capture-face');
+  const retakeBtn = document.getElementById('btn-retake-face');
+  const confirmBtn = document.getElementById('btn-confirm-face');
+
+  if (captureBtn) { captureBtn.classList.remove('hidden'); captureBtn.disabled = true; }
+  if (retakeBtn) retakeBtn.classList.add('hidden');
+  if (confirmBtn) confirmBtn.classList.add('hidden');
+  if (snapshotCanvas) snapshotCanvas.classList.add('hidden');
+  if (video) video.classList.remove('hidden');
+
+  faceModalController.open(faceModalContent, {
+    panelClass: "flex",
     hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
     visiblePanelClasses: ["translate-y-0"],
   });
+
+  setFaceStatus('Starting camera...', 'neutral');
+  loadFaceModels().catch(() => {});
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 480 }, height: { ideal: 480 } },
+      audio: false
+    });
+    _faceStream = stream;
+    if (video) {
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play();
+        setFaceStatus('Position your face inside the circle.', 'warn');
+        loadFaceModels().then(() => startFaceDetectionLoop(video)).catch(() => {
+          setFaceStatus('Detection unavailable — you can still capture.', 'warn');
+          if (captureBtn) captureBtn.disabled = false;
+        });
+      };
+    }
+  } catch (err) {
+    setFaceStatus('Camera access denied. Please enable camera permissions.', 'error');
+    if (captureBtn) captureBtn.disabled = true;
+  }
+}
+
+function closeFaceModal() {
+  stopFaceCamera();
+  faceModalController.close({
+    hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
+    visiblePanelClasses: ["translate-y-0"],
+  });
+}
+
+// Capture selfie
+document.getElementById('btn-capture-face')?.addEventListener('click', () => {
+  const video = document.getElementById('face-capture-video');
+  const snapshotCanvas = document.getElementById('face-capture-snapshot');
+  const captureBtn = document.getElementById('btn-capture-face');
+  const retakeBtn = document.getElementById('btn-retake-face');
+  const confirmBtn = document.getElementById('btn-confirm-face');
+  if (!video || !snapshotCanvas) return;
+
+  snapshotCanvas.width = video.videoWidth || 240;
+  snapshotCanvas.height = video.videoHeight || 240;
+  const ctx = snapshotCanvas.getContext('2d');
+  ctx.save();
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, -snapshotCanvas.width, 0, snapshotCanvas.width, snapshotCanvas.height);
+  ctx.restore();
+
+  snapshotCanvas.toBlob(blob => {
+    _capturedBlob = blob;
+  }, 'image/jpeg', 0.9);
+
+  video.classList.add('hidden');
+  snapshotCanvas.classList.remove('hidden');
+  captureBtn.classList.add('hidden');
+  retakeBtn.classList.remove('hidden');
+  confirmBtn.classList.remove('hidden');
+
+  if (_faceDetectionInterval) { clearInterval(_faceDetectionInterval); _faceDetectionInterval = null; }
+  setFaceStatus('Looking good! Confirm or retake.', 'good');
+  Edel.initIcons();
+});
+
+// Retake photo
+document.getElementById('btn-retake-face')?.addEventListener('click', () => {
+  const video = document.getElementById('face-capture-video');
+  const snapshotCanvas = document.getElementById('face-capture-snapshot');
+  const captureBtn = document.getElementById('btn-capture-face');
+  const retakeBtn = document.getElementById('btn-retake-face');
+  const confirmBtn = document.getElementById('btn-confirm-face');
+
+  _capturedBlob = null;
+  video?.classList.remove('hidden');
+  snapshotCanvas?.classList.add('hidden');
+  captureBtn?.classList.remove('hidden');
+  if (captureBtn) captureBtn.disabled = true;
+  retakeBtn?.classList.add('hidden');
+  confirmBtn?.classList.add('hidden');
+
+  setFaceStatus('Position your face inside the circle.', 'warn');
+  if (video) startFaceDetectionLoop(video);
+  Edel.initIcons();
+});
+
+// Confirm and Upload
+document.getElementById('btn-confirm-face')?.addEventListener('click', async () => {
+  const user = EdelModules.auth.getUser();
+  if (!_capturedBlob || !user || !user.email) {
+    Ui.toast('error', 'Capture Error', 'No photo captured. Please try again.');
+    return;
+  }
+
+  const confirmBtn = document.getElementById('btn-confirm-face');
+  const retakeBtn = document.getElementById('btn-retake-face');
+  const originalHtml = confirmBtn.innerHTML;
+
+  confirmBtn.disabled = true;
+  confirmBtn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Uploading...';
+  if (retakeBtn) retakeBtn.disabled = true;
+  Edel.initIcons();
+
+  try {
+    const formData = new FormData();
+    formData.append('email', user.email);
+    formData.append('facePhoto', _capturedBlob, 'face.jpg');
+
+    await EdelModules.api.post('/api/auth/upload-face', formData, { silent: true });
+
+    // Update local user data
+    user.faceVerified = true;
+    EdelModules.auth.setUser(user);
+
+    Ui.toast('success', 'Face Verified', 'Your identity has been confirmed.');
+    closeFaceModal();
+    checkVerificationDisclaimer(); // Refresh disclaimer state
+  } catch (err) {
+    Ui.toast('error', 'Upload Failed', err.message || 'Could not upload face photo. Please try again.');
+    confirmBtn.innerHTML = originalHtml;
+    confirmBtn.disabled = false;
+    if (retakeBtn) retakeBtn.disabled = false;
+    Edel.initIcons();
+  }
+});
+
+// Close modal handlers
+closeFaceModalBtn?.addEventListener('click', closeFaceModal);
+faceModal?.addEventListener('click', (event) => {
+  if (event.target === faceModal) closeFaceModal();
+});
+
+function checkVerificationDisclaimer() {
+  const user = EdelModules.auth.getUser();
+  if (!user || user.faceVerified) {
+    if (disclaimerContainer) disclaimerContainer.classList.add("hidden");
+    return;
+  }
+
+  const effectiveRole = getViewerRole(user);
+  let message = "";
+  
+  if (effectiveRole === "provider") {
+    message = "Complete your digital shop setup and facial verification to unlock 3 free trial";
+  } else {
+    message = "Complete your KYC verification";
+  }
+
+  disclaimerContainer.innerHTML = `
+    <style>
+      @keyframes verifyGlow {
+        0%, 100% {
+          box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 25px rgba(251, 191, 36, 0.8);
+        }
+      }
+      .btn-verify-glow {
+        animation: verifyGlow 2s infinite ease-in-out;
+      }
+    </style>
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-navy via-brand-blue to-brand-navy p-5 text-white shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/10">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.15),transparent_45%)] pointer-events-none"></div>
+      <div class="flex items-center gap-4 relative z-10">
+        <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shrink-0">
+          <i data-lucide="shield-alert" class="w-6 h-6 text-brand-accent animate-pulse"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-base md:text-lg text-white">Action Required</h4>
+          <p class="text-xs md:text-sm text-slate-200 mt-1 max-w-xl">
+            ${message}
+          </p>
+        </div>
+      </div>
+      <button
+        id="btn-trigger-face-verification"
+        class="btn-verify-glow relative z-10 shrink-0 bg-brand-accent hover:bg-brand-accentHover text-brand-navy font-extrabold px-6 py-3 rounded-2xl transition-all duration-300 active:scale-95 flex items-center gap-2 text-sm uppercase tracking-wider"
+      >
+        <i data-lucide="scan-face" class="w-4 h-4"></i>
+        Verify
+      </button>
+    </div>
+  `;
+
+  disclaimerContainer.classList.remove("hidden");
+  Edel.initIcons();
+
+  document.getElementById("btn-trigger-face-verification")?.addEventListener("click", openFaceModal);
+}
 
 window.addEventListener("load", () => {
   const user = EdelModules.auth.getUser();
@@ -886,7 +1263,7 @@ window.addEventListener("load", () => {
 
   if (user && viewerRole === "provider") {
     state.activeTab = "provider";
-    state.viewMode = "categories";
+    state.viewMode = _enableCategoriesViewForProviders ? "categories" : "list";
   } else if (user && viewerRole === "customer") {
     state.activeTab = "customer";
     state.viewMode = "list";

@@ -102,6 +102,7 @@ const Admin = (() => {
       case "cancelled":
       case "disabled":
       case "unavailable":
+      case "away":
         return "bg-slate-100 text-slate-700";
       case "declined":
       case "suspended":
@@ -472,7 +473,7 @@ const Admin = (() => {
                       <td>${renderBadge(capitalize(user.role), user.role)}</td>
                       <td>${Number(user.rating || 0)}%</td>
                       <td>${renderBadge(capitalize(user.accountStatus), user.accountStatus)}</td>
-                      <td>${renderBadge(capitalize(user.availabilityStatus || "—"), user.availabilityStatus || "unavailable")}</td>
+                      <td>${renderBadge(capitalize(user.availabilityStatus || "—"), user.availabilityStatus || "away")}</td>
                       <td>${formatDate(user.createdAt)}</td>
                       <td>
                         <div class="flex items-center gap-2">
@@ -630,7 +631,14 @@ const Admin = (() => {
             <div>
               <label class="block text-sm font-bold text-brand-navy mb-1" for="setting-${setting.key}">${escapeHtml(capitalize(setting.key))}</label>
               <p class="text-xs text-slate-400 mb-2">${escapeHtml(setting.description || "")}</p>
-              <input type="number" step="0.01" id="setting-${setting.key}" data-setting-key="${setting.key}" value="${escapeHtml(setting.value)}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm">
+              ${setting.key === 'enable_categories_view_for_providers' ? `
+                <select id="setting-${setting.key}" data-setting-key="${setting.key}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm">
+                  <option value="1" ${Number(setting.value) === 1 ? 'selected' : ''}>Yes (Group into Categories)</option>
+                  <option value="0" ${Number(setting.value) === 0 ? 'selected' : ''}>No (Show Direct Services List)</option>
+                </select>
+              ` : `
+                <input type="number" step="0.01" id="setting-${setting.key}" data-setting-key="${setting.key}" value="${escapeHtml(setting.value)}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm">
+              `}
               <p class="text-[10px] text-slate-400 mt-2">Last updated: ${formatDate(setting.updatedAt)}</p>
             </div>
           `).join("")}
@@ -1045,6 +1053,38 @@ const Admin = (() => {
             </div>
           </div>
 
+
+          <!-- Face Verification -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <p class="text-[10px] font-bold text-slate-400 uppercase mb-3">Face Verification</p>
+            <div class="flex items-center gap-4">
+              ${user.facePhoto
+                ? `<img
+                    src="${EdelModules.api.buildUrl(user.facePhoto)}"
+                    alt="Face capture"
+                    class="w-16 h-16 rounded-full object-cover border-2 border-brand-navy shadow-sm shrink-0"
+                    onerror="this.outerHTML='<div class=\\'w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center shrink-0 border-2 border-slate-300\\'><i data-lucide=\\'user\\' class=\\'w-7 h-7 text-slate-400\\'></i></div>'"
+                  />`
+                : `<div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center shrink-0 border-2 border-slate-300">
+                    <i data-lucide="user" class="w-7 h-7 text-slate-400"></i>
+                  </div>`
+              }
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  ${user.faceVerified
+                    ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Face Verified</span>`
+                    : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Not Verified</span>`
+                  }
+                </div>
+                <p class="text-xs text-slate-500">
+                  ${user.faceVerified
+                    ? 'This user has completed face capture. They can place and accept orders.'
+                    : 'This user has not submitted a face photo. They cannot place or accept orders until they do.'
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
           <div class="space-y-3">
             <h5 class="text-sm font-bold text-brand-navy">Services</h5>
             ${user.services?.length ? `

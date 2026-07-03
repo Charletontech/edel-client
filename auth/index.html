@@ -33,6 +33,9 @@
 
     <!-- CoolAlert.js -->
     <script src="https://cdn.jsdelivr.net/npm/coolalertjs@latest/dist/coolalert.min.js"></script>
+
+    <!-- face-api.js for in-browser face detection -->
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
   </head>
   <body
     class="bg-brand-light text-slate-800 antialiased h-screen h-[100dvh] overflow-hidden selection:bg-brand-accent selection:text-brand-navy"
@@ -227,6 +230,117 @@
 
               <p class="text-xs text-slate-400 text-center mt-6">
                 You can switch this later from your profile page.
+              </p>
+            </div>
+
+            <!-- ============================== -->
+            <!-- FACE CAPTURE VIEW              -->
+            <!-- ============================== -->
+            <div
+              id="view-face-capture"
+              class="hidden fade-enter"
+            >
+              <!-- Header -->
+              <div class="flex items-center gap-4 mb-5">
+                <div class="w-12 h-12 shrink-0 bg-brand-light rounded-2xl flex items-center justify-center shadow-sm border border-brand-accent/20">
+                  <i data-lucide="scan-face" class="w-6 h-6 text-brand-navy"></i>
+                </div>
+                <div>
+                  <h2 class="text-xl font-extrabold text-brand-navy tracking-tight">Verify Your Identity</h2>
+                  <p class="text-slate-500 font-medium text-xs mt-0.5">
+                    Take a quick selfie so we know who you are.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Camera + Buttons side by side on wider screens, stacked on mobile -->
+              <div class="flex flex-col sm:flex-row items-center gap-5">
+
+                <!-- Camera Preview Area -->
+                <div class="relative shrink-0" style="width:200px;height:200px;">
+                  <!-- Circular mask -->
+                  <div class="absolute inset-0 rounded-full overflow-hidden border-4 border-brand-navy shadow-lg z-10">
+                    <video
+                      id="face-capture-video"
+                      autoplay
+                      muted
+                      playsinline
+                      class="w-full h-full object-cover"
+                      style="transform:scaleX(-1);"
+                    ></video>
+                    <!-- Frozen capture frame -->
+                    <canvas
+                      id="face-capture-snapshot"
+                      class="hidden absolute inset-0 w-full h-full object-cover"
+                      style="transform:scaleX(-1);"
+                    ></canvas>
+                  </div>
+                  <!-- Detection overlay canvas -->
+                  <canvas
+                    id="face-detect-overlay"
+                    class="absolute inset-0 rounded-full z-20 pointer-events-none"
+                    style="width:200px;height:200px;"
+                  ></canvas>
+                  <!-- Face status ring -->
+                  <div
+                    id="face-detect-ring"
+                    class="absolute inset-0 rounded-full z-30 pointer-events-none transition-all duration-500"
+                    style="box-shadow: 0 0 0 4px transparent;"
+                  ></div>
+                </div>
+
+                <!-- Status + Buttons -->
+                <div class="flex-1 w-full space-y-3">
+                  <!-- Status text -->
+                  <p id="face-status-text" class="text-sm font-semibold text-slate-500 text-center sm:text-left">
+                    Starting camera...
+                  </p>
+
+                  <!-- Capture button (shown during live preview) -->
+                  <button
+                    type="button"
+                    id="btn-capture-face"
+                    disabled
+                    class="w-full bg-brand-navy text-brand-accent font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 hover:bg-brand-blue disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <i data-lucide="camera" class="w-5 h-5"></i>
+                    Capture Photo
+                  </button>
+
+                  <!-- Retake button (shown after capture) -->
+                  <button
+                    type="button"
+                    id="btn-retake-face"
+                    class="hidden w-full bg-brand-navy text-brand-accent font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 hover:bg-brand-blue"
+                  >
+                    <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
+                    Retake
+                  </button>
+
+                  <!-- Confirm button (shown after capture) -->
+                  <button
+                    type="button"
+                    id="btn-confirm-face"
+                    class="hidden w-full bg-green-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 hover:bg-green-700"
+                  >
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    Use This Photo
+                  </button>
+
+                  <!-- Skip link -->
+                  <button
+                    type="button"
+                    id="btn-skip-face"
+                    class="w-full text-slate-400 text-sm font-medium hover:text-slate-600 transition-colors py-1 text-center"
+                  >
+                    Skip for now — verify later
+                  </button>
+                </div>
+              </div>
+
+              <!-- Bottom note -->
+              <p class="text-[11px] text-slate-400 text-center mt-4 border-t border-slate-100 pt-4">
+                ⚠️ You won't be able to place or accept orders without face verification.
               </p>
             </div>
 

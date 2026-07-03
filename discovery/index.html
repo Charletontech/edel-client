@@ -31,6 +31,8 @@
     <link rel="stylesheet" href="../css/utilities.css" />
     <link rel="stylesheet" href="../css/pages/discovery.css" />
     <script src="https://cdn.jsdelivr.net/npm/coolalertjs@latest/dist/coolalert.min.js"></script>
+    <!-- face-api.js for facial recognition -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   </head>
   <body
     class="bg-brand-light text-slate-800 antialiased overflow-hidden flex h-screen h-[100dvh]"
@@ -201,7 +203,7 @@
               >
                 Trending Services
               </h3>
-              <div class="h-1 w-12 bg-brand-accent rounded-full mt-2"></div>
+              <div id="role-header-line" class="h-1 w-12 bg-brand-accent rounded-full mt-2"></div>
             </div>
           </div>
         </div>
@@ -273,6 +275,9 @@
       <!-- Scrollable Content -->
       <div class="flex-1 overflow-y-auto p-4 lg:p-8 discovery-scroll-area">
         <div class="max-w-6xl mx-auto">
+          <!-- Verification Disclaimer Banner -->
+          <div id="verification-disclaimer-container" class="hidden mb-6"></div>
+
           <div class="flex justify-between items-end mb-6">
             <div>
               <h3 class="text-xl font-bold text-brand-navy">
@@ -800,6 +805,121 @@
             </div>
             <h3 class="font-bold text-brand-navy">No notifications</h3>
             <p class="text-sm text-slate-500">You're all caught up!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Face Verification Modal Overlay (Hidden by default) -->
+    <div
+      id="face-verification-modal"
+      class="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-[120] hidden flex-col justify-end lg:justify-center items-center opacity-0 transition-opacity duration-300"
+    >
+      <!-- Modal Content -->
+      <div
+        class="bg-white w-full lg:w-[500px] lg:rounded-3xl rounded-t-3xl max-h-[90vh] flex flex-col transform translate-y-full lg:translate-y-8 transition-transform duration-300"
+        id="face-modal-content"
+      >
+        <!-- Handle for mobile -->
+        <div
+          class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-4 mb-2 lg:hidden"
+        ></div>
+
+        <div class="p-6 overflow-y-auto">
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 shrink-0 bg-brand-light rounded-2xl flex items-center justify-center shadow-sm border border-brand-accent/20">
+                <i data-lucide="scan-face" class="w-6 h-6 text-brand-navy"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-extrabold text-brand-navy tracking-tight">Verify Your Identity</h2>
+                <p class="text-slate-500 font-medium text-xs mt-0.5">
+                  Take a quick selfie to verify your profile.
+                </p>
+              </div>
+            </div>
+            <button
+              id="close-face-modal-btn"
+              class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
+            >
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <!-- Camera + Buttons stacked -->
+          <div class="flex flex-col items-center gap-5">
+            <!-- Camera Preview Area -->
+            <div class="relative shrink-0 select-none" style="width:220px;height:220px;">
+              <!-- Circular mask -->
+              <div class="absolute inset-0 rounded-full overflow-hidden border-4 border-brand-navy shadow-lg z-10">
+                <video
+                  id="face-capture-video"
+                  autoplay
+                  muted
+                  playsinline
+                  class="w-full h-full object-cover"
+                  style="transform:scaleX(-1);"
+                ></video>
+                <!-- Frozen capture frame -->
+                <canvas
+                  id="face-capture-snapshot"
+                  class="hidden absolute inset-0 w-full h-full object-cover"
+                  style="transform:scaleX(-1);"
+                ></canvas>
+              </div>
+              <!-- Detection overlay canvas -->
+              <canvas
+                id="face-detect-overlay"
+                class="absolute inset-0 rounded-full z-20 pointer-events-none"
+                style="width:220px;height:220px;"
+              ></canvas>
+              <!-- Face status ring -->
+              <div
+                id="face-detect-ring"
+                class="absolute inset-0 rounded-full z-30 pointer-events-none transition-all duration-500"
+                style="box-shadow: 0 0 0 4px transparent;"
+              ></div>
+            </div>
+
+            <!-- Status + Buttons -->
+            <div class="w-full space-y-3">
+              <!-- Status text -->
+              <p id="face-status-text" class="text-sm font-semibold text-slate-500 text-center">
+                Starting camera...
+              </p>
+
+              <!-- Capture button (shown during live preview) -->
+              <button
+                type="button"
+                id="btn-capture-face"
+                disabled
+                class="w-full bg-brand-navy text-brand-accent font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 hover:bg-brand-blue disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <i data-lucide="camera" class="w-5 h-5"></i>
+                Capture Photo
+              </button>
+
+              <!-- Retake button (shown after capture) -->
+              <button
+                type="button"
+                id="btn-retake-face"
+                class="hidden w-full bg-brand-navy text-brand-accent font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 hover:bg-brand-blue"
+              >
+                <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
+                Retake
+              </button>
+
+              <!-- Confirm button (shown after capture) -->
+              <button
+                type="button"
+                id="btn-confirm-face"
+                class="hidden w-full bg-green-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 hover:bg-green-700"
+              >
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                Use This Photo
+              </button>
+            </div>
           </div>
         </div>
       </div>
