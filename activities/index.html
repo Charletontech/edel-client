@@ -39,14 +39,9 @@
       <div class="p-6">
         <a
           href="/"
-          class="text-2xl font-bold tracking-tight flex items-center gap-3"
+          class="flex items-center group"
         >
-          <div
-            class="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center text-brand-navy shadow-glow"
-          >
-            <i data-lucide="sparkles" class="w-6 h-6"></i>
-          </div>
-          E-del
+          <img src="../assets/images/edel-logo-inverse.png" alt="E-del Logo" class="h-20 w-auto object-contain transition-transform group-hover:scale-105" />
         </a>
       </div>
 
@@ -81,16 +76,18 @@
         <div class="flex items-center gap-3">
           <img
             id="sidebar-user-img"
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover"
+            src="../assets/images/avatar.jpg"
+            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover bg-white/10"
           />
-          <div>
-            <p class="text-sm font-bold text-white" id="sidebar-user-name">
-              E-del User
-            </p>
-            <p class="text-xs text-slate-400" id="sidebar-role">
-              Activity Center
-            </p>
+          <div class="flex-1 min-w-0">
+            <p
+              class="text-sm font-bold text-white empty:w-28 empty:h-4 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block"
+              id="sidebar-user-name"
+            ></p>
+            <p
+              class="text-xs text-slate-400 empty:w-20 empty:h-3.5 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block empty:mt-1.5"
+              id="sidebar-role"
+            ></p>
           </div>
         </div>
       </div>

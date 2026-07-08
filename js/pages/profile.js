@@ -775,9 +775,7 @@ function updateStatusUI(status) {
 
   selectElement.classList.remove(
     "status-available",
-    "status-busy",
-    "status-away",
-    "status-unavailable",
+    "status-away"
   );
 
   iconContainer.className =
@@ -791,14 +789,7 @@ function updateStatusUI(status) {
         '<i data-lucide="activity" class="w-6 h-6"></i>';
       description.innerText = "Currently receiving service requests.";
       break;
-    case "busy":
-      selectElement.classList.add("status-busy");
-      iconContainer.classList.add("bg-orange-50", "text-orange-600");
-      iconContainer.innerHTML = '<i data-lucide="clock" class="w-6 h-6"></i>';
-      description.innerText = "On a job. Might be slow to respond.";
-      break;
     case "away":
-    case "unavailable":
       selectElement.classList.add("status-away");
       iconContainer.classList.add("bg-red-50", "text-red-600");
       iconContainer.innerHTML = '<i data-lucide="moon" class="w-6 h-6"></i>';

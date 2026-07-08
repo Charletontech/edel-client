@@ -9,7 +9,11 @@
     <title>E-del App | Discovery</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/images/edel-logo-main.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="../assets/images/edel-logo-main.png"
+    />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,14 +48,9 @@
       <div class="p-6">
         <a
           href="/"
-          class="text-2xl font-bold tracking-tight flex items-center gap-3"
+          class="flex items-center group"
         >
-          <div
-            class="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center text-brand-navy shadow-glow"
-          >
-            <i data-lucide="sparkles" class="w-6 h-6"></i>
-          </div>
-          E-del
+          <img src="../assets/images/edel-logo-inverse.png" alt="E-del Logo" class="h-20 w-auto object-contain transition-transform group-hover:scale-105" />
         </a>
       </div>
 
@@ -86,16 +85,18 @@
         <div class="flex items-center gap-3">
           <img
             id="sidebar-user-img"
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover"
+            src="../assets/images/avatar.jpg"
+            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover bg-white/10"
           />
-          <div>
-            <p class="text-sm font-bold text-white" id="sidebar-user-name">
-              Sarah Jenkins
-            </p>
-            <p class="text-xs text-slate-400" id="sidebar-role">
-              Customer Account
-            </p>
+          <div class="flex-1 min-w-0">
+            <p
+              class="text-sm font-bold text-white empty:w-28 empty:h-4 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block"
+              id="sidebar-user-name"
+            ></p>
+            <p
+              class="text-xs text-slate-400 empty:w-20 empty:h-3.5 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block empty:mt-1.5"
+              id="sidebar-role"
+            ></p>
           </div>
           <i
             data-lucide="chevron-right"
@@ -139,8 +140,8 @@
             </div>
             <img
               id="mobile-user-img"
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-              class="w-10 h-10 rounded-full border-2 border-brand-accent shadow-sm"
+              src="../assets/images/avatar.jpg"
+              class="w-10 h-10 rounded-full border-2 border-brand-accent shadow-sm bg-slate-200"
             />
           </div>
           <div class="hidden lg:flex items-center gap-3">
@@ -194,7 +195,10 @@
               id="category-back-btn"
               class="hidden p-2.5 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all shadow-sm active:scale-95 group"
             >
-              <i data-lucide="chevron-left" class="w-6 h-6 text-brand-navy group-hover:text-brand-blue"></i>
+              <i
+                data-lucide="chevron-left"
+                class="w-6 h-6 text-brand-navy group-hover:text-brand-blue"
+              ></i>
             </button>
             <div class="flex flex-col">
               <h3
@@ -203,7 +207,10 @@
               >
                 Trending Services
               </h3>
-              <div id="role-header-line" class="h-1 w-12 bg-brand-accent rounded-full mt-2"></div>
+              <div
+                id="role-header-line"
+                class="h-1 w-12 bg-brand-accent rounded-full mt-2"
+              ></div>
             </div>
           </div>
         </div>
@@ -294,284 +301,64 @@
             class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
             id="listings-container"
           >
-            <!-- Card 1: Available (Premium Tier) -->
-            <div
-              class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
-              onclick="openModal('modal-1')"
-            >
+            <!-- Card Loading Placeholder 1 -->
+            <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft animate-pulse">
               <div class="flex justify-between items-start mb-4">
-                <!-- Provider Info -->
                 <div class="flex gap-3 items-center">
-                  <div class="relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=100&q=80"
-                      class="w-14 h-14 rounded-2xl object-cover shadow-sm"
-                    />
-                    <div
-                      class="hidden absolute -bottom-1 -right-1 w-5 h-5 verified-badge rounded-full items-center justify-center border-2 border-white shadow-sm"
-                      title="Pro Tier"
-                    >
-                      <i data-lucide="check" class="w-3 h-3 text-white"></i>
-                    </div>
-                  </div>
+                  <div class="w-14 h-14 rounded-2xl bg-slate-200"></div>
                   <div>
-                    <h4
-                      class="font-bold text-brand-navy flex items-center gap-1"
-                    >
-                      Maria Silva
-                    </h4>
-                    <p
-                      class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md inline-block mt-1"
-                    >
-                      Deep Cleaning
-                    </p>
+                    <div class="h-4 w-28 bg-slate-200 rounded mb-2"></div>
+                    <div class="h-3 w-20 bg-slate-100 rounded"></div>
                   </div>
                 </div>
-                <!-- Status Badge -->
-                <span
-                  class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
-                >
-                  <span
-                    class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"
-                  ></span>
-                  Available
-                </span>
+                <div class="h-6 w-20 bg-slate-100 rounded-full"></div>
               </div>
-
-              <h3
-                class="text-lg font-bold text-brand-navy mb-2 group-hover:text-brand-blue transition-colors"
-              >
-                Premium Home Deep Clean
-              </h3>
-              <p class="text-sm text-slate-500 mb-5 line-clamp-2">
-                Complete sanitization of living spaces, kitchen, and bathrooms
-                using eco-friendly products.
-              </p>
-
-              <div
-                class="pt-4 border-t border-slate-100 flex items-center justify-between"
-              >
-                <div>
-                  <p class="text-xs text-slate-400 mb-0.5">Starting from</p>
-                  <p class="text-lg font-extrabold text-brand-navy">₦15,000</p>
-                </div>
-                <div class="text-right">
-                  <div
-                    class="flex items-center gap-1 text-brand-navy font-bold text-sm justify-end mb-1"
-                  >
-                    <i
-                      data-lucide="star"
-                      class="w-3.5 h-3.5 fill-brand-accent text-brand-accent"
-                    ></i>
-                    4.9 <span class="text-slate-400 font-normal">(124)</span>
-                  </div>
-                  <p
-                    class="text-xs font-semibold text-slate-500 flex items-center gap-1 justify-end"
-                  >
-                    <i data-lucide="map-pin" class="w-3 h-3"></i> 0.8 km away
-                  </p>
-                </div>
+              <div class="h-5 w-3/4 bg-slate-200 rounded mb-3"></div>
+              <div class="h-4 w-full bg-slate-100 rounded mb-2"></div>
+              <div class="h-4 w-2/3 bg-slate-100 rounded mb-6"></div>
+              <div class="pt-4 border-t border-slate-100 flex justify-between">
+                <div class="h-10 w-24 bg-slate-100 rounded"></div>
+                <div class="h-10 w-24 bg-slate-100 rounded"></div>
               </div>
             </div>
-
-            <!-- Card 2: Busy -->
-            <div
-              class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
-              onclick="openModal('modal-2')"
-            >
+            <!-- Card Loading Placeholder 2 -->
+            <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft animate-pulse">
               <div class="flex justify-between items-start mb-4">
                 <div class="flex gap-3 items-center">
-                  <div class="relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=100&q=80"
-                      class="w-14 h-14 rounded-2xl object-cover shadow-sm grayscale-[30%]"
-                    />
-                  </div>
+                  <div class="w-14 h-14 rounded-2xl bg-slate-200"></div>
                   <div>
-                    <h4 class="font-bold text-brand-navy">David Okafor</h4>
-                    <p
-                      class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md inline-block mt-1"
-                    >
-                      Plumbing
-                    </p>
+                    <div class="h-4 w-28 bg-slate-200 rounded mb-2"></div>
+                    <div class="h-3 w-20 bg-slate-100 rounded"></div>
                   </div>
                 </div>
-                <span
-                  class="bg-orange-100 text-orange-700 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
-                >
-                  <i data-lucide="clock" class="w-3 h-3"></i> Busy
-                </span>
+                <div class="h-6 w-20 bg-slate-100 rounded-full"></div>
               </div>
-
-              <h3
-                class="text-lg font-bold text-brand-navy mb-2 group-hover:text-brand-blue transition-colors"
-              >
-                Emergency Pipe Repair
-              </h3>
-              <p class="text-sm text-slate-500 mb-5 line-clamp-2">
-                Fast response for leaks, blockages, and pipe replacements in
-                residential buildings.
-              </p>
-
-              <div
-                class="pt-4 border-t border-slate-100 flex items-center justify-between"
-              >
-                <div>
-                  <p class="text-xs text-slate-400 mb-0.5">Flat rate</p>
-                  <p class="text-lg font-extrabold text-brand-navy">₦8,500</p>
-                </div>
-                <div class="text-right">
-                  <div
-                    class="flex items-center gap-1 text-brand-navy font-bold text-sm justify-end mb-1"
-                  >
-                    <i
-                      data-lucide="star"
-                      class="w-3.5 h-3.5 fill-brand-accent text-brand-accent"
-                    ></i>
-                    4.7 <span class="text-slate-400 font-normal">(89)</span>
-                  </div>
-                  <p
-                    class="text-xs font-semibold text-slate-500 flex items-center gap-1 justify-end"
-                  >
-                    <i data-lucide="map-pin" class="w-3 h-3"></i> 1.2 km away
-                  </p>
-                </div>
+              <div class="h-5 w-3/4 bg-slate-200 rounded mb-3"></div>
+              <div class="h-4 w-full bg-slate-100 rounded mb-2"></div>
+              <div class="h-4 w-2/3 bg-slate-100 rounded mb-6"></div>
+              <div class="pt-4 border-t border-slate-100 flex justify-between">
+                <div class="h-10 w-24 bg-slate-100 rounded"></div>
+                <div class="h-10 w-24 bg-slate-100 rounded"></div>
               </div>
             </div>
-
-            <!-- Card 3: Available (Rookie) -->
-            <div
-              class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
-            >
+            <!-- Card Loading Placeholder 3 -->
+            <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft animate-pulse">
               <div class="flex justify-between items-start mb-4">
                 <div class="flex gap-3 items-center">
-                  <div class="relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80"
-                      class="w-14 h-14 rounded-2xl object-cover shadow-sm"
-                    />
-                    <!-- Rookie Badge -->
-                    <div
-                      class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white shadow-sm"
-                      title="Rookie Tier"
-                    >
-                      <i data-lucide="leaf" class="w-2.5 h-2.5 text-white"></i>
-                    </div>
-                  </div>
+                  <div class="w-14 h-14 rounded-2xl bg-slate-200"></div>
                   <div>
-                    <h4 class="font-bold text-brand-navy">Samuel T.</h4>
-                    <p
-                      class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md inline-block mt-1"
-                    >
-                      Tech Help
-                    </p>
+                    <div class="h-4 w-28 bg-slate-200 rounded mb-2"></div>
+                    <div class="h-3 w-20 bg-slate-100 rounded"></div>
                   </div>
                 </div>
-                <span
-                  class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
-                >
-                  <span
-                    class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"
-                  ></span>
-                  Available
-                </span>
+                <div class="h-6 w-20 bg-slate-100 rounded-full"></div>
               </div>
-
-              <h3
-                class="text-lg font-bold text-brand-navy mb-2 group-hover:text-brand-blue transition-colors"
-              >
-                PC Repair & Virus Removal
-              </h3>
-              <p class="text-sm text-slate-500 mb-5 line-clamp-2">
-                Hardware diagnostics, software installation, and network setup
-                for homes.
-              </p>
-
-              <div
-                class="pt-4 border-t border-slate-100 flex items-center justify-between"
-              >
-                <div>
-                  <p class="text-xs text-slate-400 mb-0.5">Starting from</p>
-                  <p class="text-lg font-extrabold text-brand-navy">₦10,000</p>
-                </div>
-                <div class="text-right">
-                  <div
-                    class="flex items-center gap-1 text-brand-navy font-bold text-sm justify-end mb-1"
-                  >
-                    <i
-                      data-lucide="star"
-                      class="w-3.5 h-3.5 fill-brand-accent text-brand-accent"
-                    ></i>
-                    4.5 <span class="text-slate-400 font-normal">(12)</span>
-                  </div>
-                  <p
-                    class="text-xs font-semibold text-slate-500 flex items-center gap-1 justify-end"
-                  >
-                    <i data-lucide="map-pin" class="w-3 h-3"></i> 2.4 km away
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 4: Unavailable -->
-            <div
-              class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm opacity-75 cursor-not-allowed"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div class="flex gap-3 items-center">
-                  <div class="relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"
-                      class="w-14 h-14 rounded-2xl object-cover shadow-sm grayscale"
-                    />
-                  </div>
-                  <div>
-                    <h4 class="font-bold text-slate-600">Amina Yusuf</h4>
-                    <p
-                      class="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md inline-block mt-1"
-                    >
-                      Beauty
-                    </p>
-                  </div>
-                </div>
-                <span
-                  class="bg-slate-100 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
-                >
-                  <i data-lucide="moon" class="w-3 h-3"></i> Offline
-                </span>
-              </div>
-
-              <h3 class="text-lg font-bold text-slate-600 mb-2">
-                Mobile Hair Styling
-              </h3>
-              <p class="text-sm text-slate-400 mb-5 line-clamp-2">
-                Professional braiding and styling in the comfort of your own
-                home.
-              </p>
-
-              <div
-                class="pt-4 border-t border-slate-100 flex items-center justify-between"
-              >
-                <div>
-                  <p class="text-xs text-slate-400 mb-0.5">Starting from</p>
-                  <p class="text-lg font-extrabold text-slate-500">₦20,000</p>
-                </div>
-                <div class="text-right">
-                  <div
-                    class="flex items-center gap-1 text-slate-500 font-bold text-sm justify-end mb-1"
-                  >
-                    <i
-                      data-lucide="star"
-                      class="w-3.5 h-3.5 fill-slate-300 text-slate-300"
-                    ></i>
-                    4.9 <span class="text-slate-400 font-normal">(210)</span>
-                  </div>
-                  <p
-                    class="text-xs font-semibold text-slate-400 flex items-center gap-1 justify-end"
-                  >
-                    <i data-lucide="map-pin" class="w-3 h-3"></i> 3.1 km away
-                  </p>
-                </div>
+              <div class="h-5 w-3/4 bg-slate-200 rounded mb-3"></div>
+              <div class="h-4 w-full bg-slate-100 rounded mb-2"></div>
+              <div class="h-4 w-2/3 bg-slate-100 rounded mb-6"></div>
+              <div class="pt-4 border-t border-slate-100 flex justify-between">
+                <div class="h-10 w-24 bg-slate-100 rounded"></div>
+                <div class="h-10 w-24 bg-slate-100 rounded"></div>
               </div>
             </div>
           </div>
@@ -699,7 +486,7 @@
                   4.9 (124)</span
                 >
                 <span>•</span>
-                <span>142 Jobs done</span>
+                <span id="modal-jobs-done">0 Jobs done</span>
               </div>
             </div>
           </div>
@@ -733,17 +520,8 @@
                   0.8 km
                 </p>
               </div>
-              <div>
-                <p class="text-xs text-slate-400 mb-0.5">Estimated Time</p>
-                <p
-                  class="font-bold text-brand-navy text-sm flex items-center gap-1"
-                >
-                  <i data-lucide="clock" class="w-4 h-4 text-brand-accent"></i>
-                  3-4 Hours
-                </p>
-              </div>
               <div class="text-right">
-                <p class="text-xs text-slate-400 mb-0.5">Price</p>
+                <p class="text-xs text-slate-400 mb-0.5">Starting Price</p>
                 <p
                   id="modal-price"
                   class="font-extrabold text-brand-navy text-lg text-brand-accent"
@@ -763,7 +541,7 @@
             id="modal-action-btn"
             class="w-full bg-brand-navy text-brand-accent hover:bg-brand-blue font-bold text-lg py-4 rounded-xl shadow-lg transition-all active:scale-95"
           >
-            Request Service Now
+            Request
           </button>
           <p
             id="modal-warning"
@@ -784,10 +562,16 @@
         class="bg-white w-full lg:w-[600px] lg:rounded-3xl rounded-t-3xl max-h-[85vh] flex flex-col transform translate-y-full lg:translate-y-8 transition-transform duration-300"
         id="reports-modal-content"
       >
-        <div class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center shrink-0"
+        >
           <div>
-            <h2 class="text-xl font-bold text-brand-navy">Reports & Notifications</h2>
-            <p class="text-xs text-slate-500">Updates on your reported issues and account status</p>
+            <h2 class="text-xl font-bold text-brand-navy">
+              Reports & Notifications
+            </h2>
+            <p class="text-xs text-slate-500">
+              Updates on your reported issues and account status
+            </p>
           </div>
           <button
             id="close-reports-btn"
@@ -799,8 +583,12 @@
 
         <div class="p-6 overflow-y-auto" id="reports-list-container">
           <!-- Reports will be injected here -->
-          <div class="flex flex-col items-center justify-center py-12 text-center">
-            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+          <div
+            class="flex flex-col items-center justify-center py-12 text-center"
+          >
+            <div
+              class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4"
+            >
               <i data-lucide="bell-off" class="w-8 h-8 text-slate-300"></i>
             </div>
             <h3 class="font-bold text-brand-navy">No notifications</h3>
@@ -829,11 +617,17 @@
           <!-- Header -->
           <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 shrink-0 bg-brand-light rounded-2xl flex items-center justify-center shadow-sm border border-brand-accent/20">
+              <div
+                class="w-12 h-12 shrink-0 bg-brand-light rounded-2xl flex items-center justify-center shadow-sm border border-brand-accent/20"
+              >
                 <i data-lucide="scan-face" class="w-6 h-6 text-brand-navy"></i>
               </div>
               <div>
-                <h2 class="text-xl font-extrabold text-brand-navy tracking-tight">Verify Your Identity</h2>
+                <h2
+                  class="text-xl font-extrabold text-brand-navy tracking-tight"
+                >
+                  Verify Your Identity
+                </h2>
                 <p class="text-slate-500 font-medium text-xs mt-0.5">
                   Take a quick selfie to verify your profile.
                 </p>
@@ -850,42 +644,50 @@
           <!-- Camera + Buttons stacked -->
           <div class="flex flex-col items-center gap-5">
             <!-- Camera Preview Area -->
-            <div class="relative shrink-0 select-none" style="width:220px;height:220px;">
+            <div
+              class="relative shrink-0 select-none"
+              style="width: 220px; height: 220px"
+            >
               <!-- Circular mask -->
-              <div class="absolute inset-0 rounded-full overflow-hidden border-4 border-brand-navy shadow-lg z-10">
+              <div
+                class="absolute inset-0 rounded-full overflow-hidden border-4 border-brand-navy shadow-lg z-10"
+              >
                 <video
                   id="face-capture-video"
                   autoplay
                   muted
                   playsinline
                   class="w-full h-full object-cover"
-                  style="transform:scaleX(-1);"
+                  style="transform: scaleX(-1)"
                 ></video>
                 <!-- Frozen capture frame -->
                 <canvas
                   id="face-capture-snapshot"
                   class="hidden absolute inset-0 w-full h-full object-cover"
-                  style="transform:scaleX(-1);"
+                  style="transform: scaleX(-1)"
                 ></canvas>
               </div>
               <!-- Detection overlay canvas -->
               <canvas
                 id="face-detect-overlay"
                 class="absolute inset-0 rounded-full z-20 pointer-events-none"
-                style="width:220px;height:220px;"
+                style="width: 220px; height: 220px"
               ></canvas>
               <!-- Face status ring -->
               <div
                 id="face-detect-ring"
                 class="absolute inset-0 rounded-full z-30 pointer-events-none transition-all duration-500"
-                style="box-shadow: 0 0 0 4px transparent;"
+                style="box-shadow: 0 0 0 4px transparent"
               ></div>
             </div>
 
             <!-- Status + Buttons -->
             <div class="w-full space-y-3">
               <!-- Status text -->
-              <p id="face-status-text" class="text-sm font-semibold text-slate-500 text-center">
+              <p
+                id="face-status-text"
+                class="text-sm font-semibold text-slate-500 text-center"
+              >
                 Starting camera...
               </p>
 

@@ -25,6 +25,7 @@ const modalDescription = document.getElementById("modal-description");
 const modalDistance = document.getElementById("modal-distance");
 const modalPrice = document.getElementById("modal-price");
 const modalImg = document.getElementById("modal-img");
+const modalJobsDone = document.getElementById("modal-jobs-done");
 
 const reportsModal = document.getElementById("reports-modal");
 const reportsListContainer = document.getElementById("reports-list-container");
@@ -271,20 +272,24 @@ function renderLoadingState() {
 
 function renderEmptyState(message) {
   const isSearchEmpty = state.search && state.search.trim().length > 0;
-  let extraHtml = '';
   
   if (isSearchEmpty) {
-    extraHtml = `
-      <div class="mt-6 p-6 bg-brand-light/50 rounded-2xl border border-brand-light">
-        <h4 class="font-bold text-brand-navy mb-2">Oops! No provider found in your area.</h4>
-        <p class="text-sm text-slate-500 mb-4">Why not invite one? Sharing your invite link helps build the community.</p>
-        <button onclick="handleInviteProvider()" class="w-full bg-brand-navy text-brand-accent px-6 py-3 rounded-xl font-bold hover:bg-brand-blue transition-colors flex items-center justify-center gap-2 shadow-md">
-          <i data-lucide="share-2" class="w-5 h-5"></i> Invite a Provider
-        </button>
-      </div>
-    `;
     message = "We couldn't find any exact matches for your search.";
   }
+
+  const extraHtml = `
+    <div class="mt-6 p-6 bg-brand-light/50 rounded-2xl border border-brand-light">
+      <h4 class="font-bold text-brand-navy mb-2">Or invite someone in this area to join E-del</h4>
+      <p class="text-sm text-slate-500 mb-4">Sharing your invite link helps build the community in your local area.</p>
+      <button onclick="handleInviteProvider()" class="group relative w-full bg-brand-navy text-brand-accent px-6 py-3.5 rounded-xl font-bold transition-all duration-300 hover:bg-brand-blue hover:shadow-lg hover:shadow-brand-navy/30 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 overflow-hidden border border-brand-navy/20">
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+        <div class="p-1.5 bg-white/10 rounded-lg group-hover:scale-110 group-hover:bg-white/20 transition-all duration-300">
+          <i data-lucide="link" class="w-4 h-4 text-brand-accent"></i>
+        </div>
+        <span class="relative z-10 tracking-wide text-[15px]">Copy Invite Link</span>
+      </button>
+    </div>
+  `;
 
   listingsContainer.innerHTML = `
     <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-soft text-center col-span-1 md:col-span-2 xl:col-span-3">
@@ -323,7 +328,7 @@ window.handleInviteProvider = async () => {
 
 function copyInviteLink(link) {
   navigator.clipboard.writeText(link).then(() => {
-    Ui.alert('success', 'Link Copied', 'Invite link copied to clipboard! Paste it wherever you want to share.', true, false);
+    Ui.alert('success', 'Link Copied', 'A link to sign up has been copied! Share it with someone in the area to join E-del.', true, false);
   }).catch(() => {
     Ui.alert('error', 'Action Required', 'Could not copy automatically. Please copy this link: ' + link, true, false);
   });
@@ -538,6 +543,7 @@ function openDiscoveryModal(serviceId) {
     modalProviderBadge.classList.toggle("hidden", !item.provider.hasPaidAccessFee);
   }
   if (modalProviderName) modalProviderName.innerText = item.provider.fullName;
+  if (modalJobsDone) modalJobsDone.innerText = `${item.provider.jobsCompleted || 0} Jobs done`;
   if (modalDescription) modalDescription.innerText = item.description;
   if (modalDistance) modalDistance.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4 text-brand-accent"></i> ${formatDistance(item.distanceKm)}`;
   if (modalPrice) modalPrice.innerText = formatCurrency(item.basePrice);
@@ -572,7 +578,7 @@ function openDiscoveryModal(serviceId) {
   }
 
   modalActionBtn.classList.add("bg-brand-navy", "text-brand-accent", "hover:bg-brand-blue");
-  modalActionBtn.innerText = "Request Service Now";
+  modalActionBtn.innerText = "Request";
   modalActionBtn.disabled = false;
   modalWarning.classList.add("hidden");
 }
@@ -607,7 +613,7 @@ async function requestSelectedService() {
   } catch (error) {
     if (modalActionBtn) {
       modalActionBtn.disabled = false;
-      modalActionBtn.innerText = "Request Service Now";
+      modalActionBtn.innerText = "Request";
       Edel.initIcons();
     }
 

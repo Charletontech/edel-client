@@ -46,7 +46,7 @@
           href="/"
           class="flex items-center group"
         >
-          <img src="../assets/images/edel-logo-inverse.png" alt="E-del Logo" class="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+          <img src="../assets/images/edel-logo-inverse.png" alt="E-del Logo" class="h-20 w-auto object-contain transition-transform group-hover:scale-105" />
         </a>
       </div>
 
@@ -81,14 +81,18 @@
         <div class="flex items-center gap-3">
           <img
             id="sidebar-user-img"
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover"
+            src="../assets/images/avatar.jpg"
+            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover bg-white/10"
           />
-          <div>
-            <p class="text-sm font-bold text-white" id="sidebar-user-name">Sarah Jenkins</p>
-            <p class="text-xs text-slate-400" id="sidebar-role">
-              Customer Account
-            </p>
+          <div class="flex-1 min-w-0">
+            <p
+              class="text-sm font-bold text-white empty:w-28 empty:h-4 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block"
+              id="sidebar-user-name"
+            ></p>
+            <p
+              class="text-xs text-slate-400 empty:w-20 empty:h-3.5 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block empty:mt-1.5"
+              id="sidebar-role"
+            ></p>
           </div>
         </div>
       </div>
@@ -201,15 +205,12 @@
               >
                 <h2
                   id="profile-name"
-                  class="text-2xl font-bold text-brand-navy"
-                >
-                  Sarah Jenkins
-                </h2>
+                  class="text-2xl font-bold text-brand-navy empty:w-36 empty:h-7 empty:bg-slate-200 empty:rounded empty:animate-pulse empty:block"
+                ></h2>
                 <span
                   id="profile-role-tag"
-                  class="bg-slate-100 text-slate-500 text-xs font-bold px-3 py-1 rounded-full self-center md:self-auto uppercase tracking-wide"
-                  >Customer</span
-                >
+                  class="bg-slate-100 text-slate-500 text-xs font-bold px-3 py-1 rounded-full self-center md:self-auto uppercase tracking-wide empty:w-20 empty:h-6 empty:bg-slate-200 empty:animate-pulse empty:inline-block"
+                ></span>
               </div>
               <p
                 class="text-slate-500 text-sm mb-4 flex items-center justify-center md:justify-start gap-2"
@@ -300,9 +301,8 @@
                   <option value="available" class="text-slate-800">
                     Available
                   </option>
-                  <option value="busy" class="text-slate-800">Busy</option>
-                  <option value="unavailable" class="text-slate-800">
-                    Unavailable
+                  <option value="away" class="text-slate-800">
+                    Away
                   </option>
                 </select>
               </div>
@@ -569,7 +569,7 @@
             <label
               for="new-desc"
               class="float-label absolute left-4 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left transition-all duration-300"
-              >Short Description</label
+              >Description</label
             >
           </div>
 
@@ -956,7 +956,7 @@
             <input
               type="text"
               id="info-name"
-              value="Sarah Jenkins"
+              value=""
               required
               placeholder=" "
               class="float-input w-full pl-11 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
