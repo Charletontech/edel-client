@@ -340,17 +340,28 @@ function renderLocationPermissionState() {
       <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4">
         <i data-lucide="map-pinned" class="w-8 h-8 text-brand-navy"></i>
       </div>
-      <h3 class="text-xl font-bold text-brand-navy mb-2">Enable location access</h3>
+      <h3 class="text-xl font-bold text-brand-navy mb-2">Set your location</h3>
       <p class="text-slate-500 max-w-lg mx-auto mb-6">
-        You need to enable browser location access for the full E-del experience and to see nearby services around you.
+        We couldn't detect your location automatically. Allow location access or enter your area manually below.
       </p>
-      <button
-        type="button"
-        id="retry-location-access"
-        class="bg-brand-navy text-brand-accent px-6 py-3 rounded-xl font-bold hover:bg-brand-blue transition-colors"
-      >
-        Try Location Again
-      </button>
+      <div class="flex flex-col items-center gap-3 max-w-sm mx-auto">
+        <button
+          type="button"
+          id="retry-location-access"
+          class="w-full bg-brand-navy text-brand-accent px-6 py-3 rounded-xl font-bold hover:bg-brand-blue transition-colors"
+        >
+          Try Location Again
+        </button>
+        <div class="w-full">
+          <input
+            id="discovery-manual-location-input"
+            type="text"
+            placeholder="Or type your city (e.g. Yaba, Lagos)"
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy"
+          />
+          <p id="discovery-manual-location-status" class="text-xs text-slate-400 mt-2"></p>
+        </div>
+      </div>
     </div>
   `;
   Edel.initIcons();
@@ -361,6 +372,56 @@ function renderLocationPermissionState() {
       state.location = null;
       loadDiscoveryFeed().catch(() => {});
     });
+
+  // Wire manual location input
+  const manualInput  = document.getElementById('discovery-manual-location-input');
+  const manualStatus = document.getElementById('discovery-manual-location-status');
+  if (!manualInput) return;
+
+  const updateStatus = (html) => {
+    if (manualStatus) {
+      manualStatus.innerHTML = html;
+      if (window.lucide) window.lucide.createIcons({ root: manualStatus });
+    }
+  };
+
+  let debounceTimer;
+  manualInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const query = manualInput.value.trim();
+    if (!query) { updateStatus(''); return; }
+
+    debounceTimer = setTimeout(async () => {
+      updateStatus('<span class="flex items-center gap-1 text-brand-navy"><i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Searching...</span>');
+      try {
+        const data = await EdelModules.location.geocodeQuery(query);
+        if (!data.success || !data.location) {
+          updateStatus(`<span class="flex items-center gap-1 text-red-500"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Could not find "${query}". Try a nearby city.</span>`);
+          return;
+        }
+        const loc = data.location;
+        const confirmed = await Ui.alert('question', 'Location Found', `📍 ${loc.label || loc.city}. Use this location?`, true, true);
+        if (confirmed && confirmed.isConfirmed) {
+          state.location = { latitude: loc.lat, longitude: loc.lng, city: loc.city, source: 'manual' };
+          if (locationText) locationText.innerText = loc.city || loc.label;
+          // Silently save to profile
+          EdelModules.api.put('/api/location', { locationLabel: loc.city || loc.label, latitude: loc.lat, longitude: loc.lng }, { headers: EdelModules.auth.getAuthHeaders(), silent: true }).catch(() => {});
+          const user = EdelModules.auth.getUser() || {};
+          user.locationLabel = loc.city || loc.label;
+          user.latitude = loc.lat;
+          user.longitude = loc.lng;
+          EdelModules.auth.setUser(user);
+          loadDiscoveryFeed().catch(() => {});
+          updateStatus('<span class="flex items-center gap-1 text-green-600"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Location saved.</span>');
+        } else {
+          updateStatus('<span class="flex items-center gap-1 text-amber-600"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Try a different search term.</span>');
+          manualInput.value = '';
+        }
+      } catch (err) {
+        updateStatus('<span class="flex items-center gap-1 text-red-500"><i data-lucide="wifi-off" class="w-3.5 h-3.5"></i> Search failed. Check your connection.</span>');
+      }
+    }, 1200); // 1.2s typing debounce to match auth.js
+  });
 }
 
 function renderListings(items) {
@@ -706,75 +767,154 @@ function getSavedLocationLabel() {
   );
 }
 
-async function syncUserLocation(position) {
-  try {
-    let currentLabel = getSavedLocationLabel();
+// ─── Stale location threshold ─────────────────────────────────────────────────
+// Using 15km to reduce false positives from IP-based location approximation
+const STALE_LOCATION_THRESHOLD_KM = 15;
 
-    // If the label is generic or placeholder, try to resolve a real address
-    if (EdelModules.location.isGenericLabel(currentLabel)) {
-      const realAddress = await EdelModules.location.reverseGeocode(
-        position.latitude,
-        position.longitude,
-      );
+async function syncUserLocation(lat, lng, city) {
+  try {
+    let label = city || getSavedLocationLabel();
+
+    // If the label is still generic, try reverse geocoding
+    if (EdelModules.location.isGenericLabel(label) && lat && lng) {
+      const realAddress = await EdelModules.location.reverseGeocode(lat, lng);
       if (realAddress) {
-        currentLabel = realAddress;
-        if (locationText) locationText.innerText = currentLabel;
+        label = realAddress;
+        if (locationText) locationText.innerText = label;
       }
     }
 
     await EdelModules.api.put(
       "/api/location",
-      {
-        locationLabel: currentLabel,
-        latitude: position.latitude,
-        longitude: position.longitude,
-      },
-      {
-        headers: EdelModules.auth.getAuthHeaders(),
-        silent: true,
-      },
+      { locationLabel: label, latitude: lat, longitude: lng },
+      { headers: EdelModules.auth.getAuthHeaders(), silent: true },
     );
 
     const user = EdelModules.auth.getUser() || {};
-    user.locationLabel = currentLabel;
-    user.latitude = position.latitude;
-    user.longitude = position.longitude;
+    user.locationLabel = label;
+    user.latitude = lat;
+    user.longitude = lng;
     EdelModules.auth.setUser(user);
   } catch (error) {
     console.warn("Location sync skipped:", error.message);
   }
 }
 
+/**
+ * Resolve the viewer's current location.
+ * Flow: 
+ * 1. Has saved location? -> Silent IP staleness check -> Prompt to update if far.
+ * 2. No saved location? -> Master getLocation() flow (GPS → IP fallback).
+ */
 async function resolveViewerLocation() {
-  try {
-    const browserLocation = await EdelModules.location.getBestBrowserLocation({
-      maxAcceptedAccuracy: EdelModules.location.minAcceptedAccuracy,
-      timeout: 7000,
-      maximumAge: 15000,
-    });
-    locationText.innerText = getSavedLocationLabel();
-    await syncUserLocation(browserLocation);
-    return browserLocation;
-  } catch (error) {
-    const cachedUser = EdelModules.auth.getUser();
-    if (cachedUser?.latitude != null && cachedUser?.longitude != null) {
-      locationText.innerText = EdelModules.location.formatLocationLabel(
-        cachedUser.locationLabel,
-        "Saved location",
+  const cachedUser = EdelModules.auth.getUser();
+  const hasSavedLocation = cachedUser?.latitude != null && cachedUser?.longitude != null;
+
+  if (hasSavedLocation) {
+    if (locationText) {
+      locationText.innerText = getSavedLocationLabel();
+    }
+
+    // Perform a silent staleness check using IP geolocation
+    try {
+      const ipLocation = await EdelModules.location.getLocationFromIP();
+      if (ipLocation && ipLocation.lat && ipLocation.lng) {
+        const distanceKm = EdelModules.location.calculateDistance(
+          ipLocation.lat, ipLocation.lng,
+          Number(cachedUser.latitude), Number(cachedUser.longitude),
+        );
+
+        const threshold = ipLocation.staleThresholdKm || STALE_LOCATION_THRESHOLD_KM;
+        if (distanceKm > threshold) {
+          let confirmed;
+          if (typeof CoolAlert !== "undefined" && typeof CoolAlert.show === "function") {
+            confirmed = await CoolAlert.show({
+              icon: 'question',
+              title: '🌍 New area detected',
+              text: `Did you move far from your previous location? You should update your location now to get accurate feeds on your discovery page. If you didn't move, simply ignore.`,
+              showConfirmButton: true,
+              showCancelButton: true,
+              confirmButtonText: 'Update my location',
+              cancelButtonText: 'Ignore',
+              confirmButtonColor: "#fbbf24",
+              cancelButtonColor: "#1B3358",
+              background: "#2D1157",
+              color: "#ffffff",
+            });
+          } else {
+            const res = confirm(`🌍 New area detected\n\nDid you move far from your previous location? You should update your location now to get accurate feeds on your discovery page.\n\nClick OK to update, or Cancel to ignore.`);
+            confirmed = { isConfirmed: res };
+          }
+
+          if (confirmed && confirmed.isConfirmed) {
+            // User chose to update their location. Trigger the master location flow.
+            const newLocationResult = await EdelModules.location.getLocation();
+            
+            if (newLocationResult.success && newLocationResult.location) {
+              const loc = newLocationResult.location;
+              if (locationText) locationText.innerText = loc.city || 'your approximate area';
+              await syncUserLocation(loc.lat, loc.lng, loc.city);
+              return { latitude: loc.lat, longitude: loc.lng };
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore IP lookup failure for staleness check
+    }
+
+    // Return saved location if staleness check didn't trigger, failed, or user ignored it
+    return {
+      latitude: Number(cachedUser.latitude),
+      longitude: Number(cachedUser.longitude),
+    };
+  }
+
+  // =========================================================================
+  // User has NO saved location — trigger the master location flow from scratch
+  // =========================================================================
+  const locationResult = await EdelModules.location.getLocation();
+
+  if (locationResult.success && locationResult.location) {
+    const loc = locationResult.location;
+    const lat = loc.lat;
+    const lng = loc.lng;
+    const city = loc.city;
+
+    if (locationText) {
+      locationText.innerText = city || 'your approximate area';
+    }
+
+    // If the location came from IP, confirm it with the user first
+    if (loc.source === 'ip') {
+      const confirmed = await Ui.alert(
+        'question',
+        'Location Approximated',
+        `📍 We detected your area as: ${city || 'your approximate area'}. Is this correct?`,
+        true,
+        true,
       );
 
-      return {
-        latitude: Number(cachedUser.latitude),
-        longitude: Number(cachedUser.longitude),
-      };
+      if (confirmed && confirmed.isConfirmed) {
+        await syncUserLocation(lat, lng, city);
+      } else {
+        // User rejected the IP location — treat as failure so they enter manually
+        const rejectedError = new Error('IP location rejected by user');
+        rejectedError.isLocationUnavailable = true;
+        throw rejectedError;
+      }
+    } else {
+      // Precise GPS location — save automatically
+      await syncUserLocation(lat, lng, city);
     }
 
-    if (error?.code === 1) {
-      error.isLocationPermissionDenied = true;
-    }
-
-    throw error;
+    return { latitude: lat, longitude: lng };
   }
+
+  // Absolute failure — no location available at all
+  const noLocationError = new Error('No location available');
+  noLocationError.isLocationUnavailable = true;
+  throw noLocationError;
 }
 
 async function loadDiscoveryFeed() {
@@ -866,7 +1006,8 @@ async function loadDiscoveryFeed() {
       return;
     }
 
-    if (error.isLocationPermissionDenied) {
+    // Any location failure (permission denied, IP failed, no cached coords) → show location UI
+    if (error.isLocationPermissionDenied || error.isLocationUnavailable) {
       renderLocationPermissionState();
       return;
     }

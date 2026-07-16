@@ -2,9 +2,14 @@ window.EdelModules = window.EdelModules || {};
 
 window.EdelModules.location = {
   get minAcceptedAccuracy() {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent,
+      );
     return isMobile ? 100 : 500;
   },
+
+  // ─── Core Browser GPS Helpers ──────────────────────────────────────────────
 
   getCurrentPosition(options) {
     return new Promise((resolve, reject) => {
@@ -12,7 +17,6 @@ window.EdelModules.location = {
         reject(new Error("Geolocation is not supported"));
         return;
       }
-
       navigator.geolocation.getCurrentPosition(resolve, reject, options);
     });
   },
@@ -83,6 +87,107 @@ window.EdelModules.location = {
     return location;
   },
 
+  // ─── Permission Check (without triggering prompt) ─────────────────────────
+
+  /**
+   * Check browser permission state without triggering the prompt.
+   * Returns: 'granted' | 'denied' | 'prompt' | 'unsupported'
+   */
+  async checkGeolocationPermission() {
+    if (!navigator.permissions || !navigator.permissions.query) {
+      return "prompt"; // Fallback for older browsers
+    }
+    try {
+      const result = await navigator.permissions.query({ name: "geolocation" });
+      return result.state; // 'granted' | 'denied' | 'prompt'
+    } catch (error) {
+      return "prompt";
+    }
+  },
+
+  // ─── IP Geolocation Fallback ───────────────────────────────────────────────
+
+  /**
+   * Get approximate location from the user's IP address (server-side call).
+   * Returns location object or null.
+   */
+  async getLocationFromIP() {
+    try {
+      const response = await EdelModules.api.get("/api/location/from-ip", {
+        silent: true,
+      });
+      return response.success ? response.location : null;
+    } catch (error) {
+      console.error("[Location] IP location failed:", error);
+      return null;
+    }
+  },
+
+  // ─── Reverse Geocoding (BigDataCloud client API — free, keyless) ───────────
+
+  /**
+   * Reverse geocode GPS coordinates using BigDataCloud client API.
+   * This is called with GPS coords from the user's device.
+   */
+  async reverseGeocode(lat, lng) {
+    try {
+      const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Reverse geocoding failed");
+      const data = await response.json();
+
+      // Build a concise label from BigDataCloud response
+      const area =
+        data.locality || data.city || data.principalSubdivision || "";
+      const state = data.principalSubdivision || "";
+      const country = data.countryName || "";
+
+      if (area && state && area !== state) return `${area}, ${state}`;
+      if (area) return area;
+      if (state) return state;
+      return data.localityInfo?.administrative?.[2]?.name || null;
+    } catch (error) {
+      console.warn("[Location] Reverse geocoding failed:", error.message);
+      return null;
+    }
+  },
+
+  // ─── Server-side Text Geocoding ────────────────────────────────────────────
+
+  /**
+   * Geocode a text query (city name, area, postcode) via the backend.
+   * Returns { success, location, results } or throws.
+   */
+  async geocodeQuery(query) {
+    return await EdelModules.api.post(
+      "/api/location/geocode",
+      { query },
+      { silent: true },
+    );
+  },
+
+  // ─── Haversine Distance ────────────────────────────────────────────────────
+
+  /**
+   * Calculate distance in km between two coordinates using the Haversine formula.
+   */
+  calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371; // Earth radius in km
+    const toRad = (deg) => (deg * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  },
+
+  // ─── Utility Helpers ───────────────────────────────────────────────────────
+
   formatLocationLabel(locationLabel, fallback = "Current location") {
     const value = (locationLabel || "").trim();
     return value || fallback;
@@ -104,41 +209,151 @@ window.EdelModules.location = {
 
   simulateLocationText(target, value = "Lagos, Nigeria", delay = 1200) {
     if (!target) return;
-
     target.innerHTML = '<span class="animate-pulse">Locating...</span>';
     window.setTimeout(() => {
       target.innerText = value;
     }, delay);
   },
 
-  async reverseGeocode(latitude, longitude) {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-        {
-          headers: {
-            "Accept-Language": "en",
-            "User-Agent": "E-del-App",
+  // ─── MASTER LOCATION FUNCTION ─────────────────────────────────────────────
+  //
+  // This is the single source of truth for ALL location logic.
+  // Every page that needs a location calls this function.
+  //
+  // Returns: { success: boolean, location: { lat, lng, city, source, accuracy }, error?: string }
+  //
+  /**
+   * Master location function — handles all location scenarios.
+   * Flow: GPS (if permitted) → IP geolocation (silent fallback) → failure (UI shows manual input)
+   */
+  async getLocation() {
+    // 1. Check browser permission state without triggering prompt
+    const permissionStatus = await this.checkGeolocationPermission();
+
+    // 2. If granted, use GPS
+    if (permissionStatus === "granted") {
+      try {
+        if (window.Ui)
+          Ui.toast(
+            "info",
+            "Detecting Location",
+            "Getting your precise location...",
+            { timer: 2500 },
+          );
+
+        const gpsCoords = await this.getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout: 10000,
+        });
+
+        const lat = gpsCoords.coords.latitude;
+        const lng = gpsCoords.coords.longitude;
+
+        const cityData = await this.reverseGeocode(lat, lng);
+        const city = cityData || "Your area";
+
+        if (window.Ui) Ui.toast("success", "Location Detected", `📍 ${city}`);
+
+        return {
+          success: true,
+          location: {
+            lat,
+            lng,
+            city,
+            source: "gps",
+            accuracy: "high",
           },
-        },
-      );
-
-      if (!response.ok) throw new Error("Geocoding failed");
-
-      const data = await response.json();
-      const addr = data.address;
-
-      // Prioritize area-specific fields for a concise label
-      const area = addr.suburb || addr.neighbourhood || addr.city_district || addr.town || addr.village;
-      const city = addr.city || addr.state || "";
-
-      if (area && city) return `${area}, ${city}`;
-      if (area || city) return area || city;
-
-      return data.display_name.split(",")[0] || "Unknown Location";
-    } catch (error) {
-      console.warn("Reverse geocoding failed:", error.message);
-      return null;
+        };
+      } catch (error) {
+        console.error("[Location] GPS failed:", error);
+        if (window.Ui)
+          Ui.toast(
+            "warning",
+            "GPS Unavailable",
+            "⚠️ Could not get precise location. Trying approximate...",
+            { timer: 3000 },
+          );
+      }
     }
+
+    // 3. If prompt, show primer message then trigger browser prompt
+    else if (permissionStatus === "prompt") {
+      if (window.Ui) {
+        await window.Ui.alert(
+          "info",
+          "Location Access",
+          "Your browser will now ask if you want to grant us access. Please click 'Allow' so we can show you nearby services.",
+          true,
+          false,
+        );
+      }
+
+      try {
+        if (window.Ui)
+          Ui.toast(
+            "info",
+            "Detecting Location",
+            "Getting your precise location...",
+            { timer: 2500 },
+          );
+        const gpsCoords = await this.getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout: 10000,
+        });
+
+        const lat = gpsCoords.coords.latitude;
+        const lng = gpsCoords.coords.longitude;
+
+        const cityData = await this.reverseGeocode(lat, lng);
+        const city = cityData || "Your area";
+
+        if (window.Ui) Ui.toast("success", "Location Detected", `📍 ${city}`);
+
+        return {
+          success: true,
+          location: {
+            lat,
+            lng,
+            city,
+            source: "gps",
+            accuracy: "high",
+          },
+        };
+      } catch (error) {
+        console.error("[Location] GPS failed or denied:", error);
+        // if (window.Ui) Ui.toast("warning", "Location Denied", "⚠️ You denied location access. We'll try to approximate your location instead.", { timer: 4000 });
+      }
+    }
+
+    // 4 & 5. If denied or unsupported (or prompt failed/denied), skip directly to IP fallback
+
+    // 3. If denied OR prompt/unknown, try IP geolocation (silent fallback)
+    const ipLocation = await this.getLocationFromIP();
+    if (ipLocation && (ipLocation.city || (ipLocation.lat && ipLocation.lng))) {
+      const city = ipLocation.city || "Your area";
+      return {
+        success: true,
+        location: {
+          lat: ipLocation.lat,
+          lng: ipLocation.lng,
+          city,
+          source: "ip",
+          accuracy: "medium",
+        },
+      };
+    }
+
+    // 4. All automated methods failed — return failure (caller will handle UI)
+    return {
+      success: false,
+      error: "location_required",
+      location: null,
+    };
   },
+};
+
+// ─── Global shorthand ─────────────────────────────────────────────────────────
+// Expose getLocation() as a top-level function as specified in location-fix.md
+window.getLocation = function () {
+  return window.EdelModules.location.getLocation();
 };

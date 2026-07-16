@@ -215,7 +215,14 @@ function hydrateProfile(user) {
 
   const switchButton = document.getElementById("btn-switch-account");
   if (switchButton) {
-    switchButton.classList.toggle("hidden", user.role !== "both");
+    switchButton.classList.remove("hidden");
+    if (user.role === "both") {
+      switchButton.title = "Switch Account";
+    } else if (user.role === "customer") {
+      switchButton.title = "Become a Provider";
+    } else if (user.role === "provider") {
+      switchButton.title = "Add Customer Account";
+    }
   }
 
   const currentView = document.getElementById("provider-sections")?.classList.contains("hidden") ? "customer" : "provider";
@@ -487,8 +494,14 @@ document.getElementById("notifications-btn-profile")?.addEventListener("click", 
 
 document.getElementById("btn-switch-account")?.addEventListener("click", () => {
   const user = EdelModules.auth.getUser();
-  if (user?.role !== "both") return;
-  openModal("modal-switch-account");
+  if (!user) return;
+  if (user.role === "both") {
+    openModal("modal-switch-account");
+  } else if (user.role === "customer") {
+    setView("provider");
+  } else if (user.role === "provider") {
+    setView("customer");
+  }
 });
 
 profileElements.logoutButton?.addEventListener("click", () => {
@@ -775,7 +788,9 @@ function updateStatusUI(status) {
 
   selectElement.classList.remove(
     "status-available",
-    "status-away"
+    "status-busy",
+    "status-away",
+    "status-unavailable",
   );
 
   iconContainer.className =
@@ -789,7 +804,14 @@ function updateStatusUI(status) {
         '<i data-lucide="activity" class="w-6 h-6"></i>';
       description.innerText = "Currently receiving service requests.";
       break;
+    case "busy":
+      selectElement.classList.add("status-busy");
+      iconContainer.classList.add("bg-orange-50", "text-orange-600");
+      iconContainer.innerHTML = '<i data-lucide="clock" class="w-6 h-6"></i>';
+      description.innerText = "On a job. Might be slow to respond.";
+      break;
     case "away":
+    case "unavailable":
       selectElement.classList.add("status-away");
       iconContainer.classList.add("bg-red-50", "text-red-600");
       iconContainer.innerHTML = '<i data-lucide="moon" class="w-6 h-6"></i>';
@@ -1101,7 +1123,6 @@ document.getElementById("modal-overlay").addEventListener("click", function (e) 
   }
 });
 
-// Expose functions for onclick attributes
 window.updateProviderStatus = updateProviderStatus;
 window.saveNewService = saveNewService;
 window.deleteService = deleteService;
@@ -1116,6 +1137,124 @@ window.updatePreferences = updatePreferences;
 window.updatePassword = updatePassword;
 window.deleteAccount = deleteAccount;
 window.submitProviderUpgrade = submitProviderUpgrade;
+
+// ─── Update My Location (Profile Page) ────────────────────────────────────────
+/**
+ * Triggered by the "Update My Location" button on the profile page.
+ * Runs the full getLocation() flow (GPS → IP → manual) with appropriate notifications.
+ */
+async function saveProfileLocation(label, lat, lng) {
+  try {
+    await EdelModules.api.put(
+      '/api/location',
+      { locationLabel: label, latitude: lat, longitude: lng },
+      { headers: EdelModules.auth.getAuthHeaders(), silent: true },
+    );
+
+    // Update local user data
+    const user = EdelModules.auth.getUser() || {};
+    user.locationLabel = label;
+    user.latitude = lat;
+    user.longitude = lng;
+    EdelModules.auth.setUser(user);
+
+    // Update the location label on screen
+    const locationElement = document.getElementById('profile-location');
+    if (locationElement) locationElement.innerText = label;
+
+    Ui.toast('success', 'Location Updated', `✅ Location updated to ${label}`);
+    return true;
+  } catch (err) {
+    Ui.toast('error', 'Update Failed', '❌ Could not save location. Please try again.');
+    return false;
+  }
+}
+
+function openManualLocationModal() {
+  openModal('modal-manual-location');
+  const manualInput = document.getElementById('profile-manual-location-input');
+  const manualStatus = document.getElementById('profile-manual-location-status');
+  if (manualInput) manualInput.value = '';
+  if (manualStatus) manualStatus.innerHTML = '';
+}
+
+async function updateMyLocation() {
+  Ui.toast('info', 'Checking Location', '🔄 Checking your current location...', { timer: 2000 });
+
+  const result = await EdelModules.location.getLocation();
+
+  if (result.success && result.location) {
+    const loc = result.location;
+
+    // If result came from IP, confirm with user first
+    if (loc.source === 'ip') {
+      const confirmed = await Ui.alert(
+        'question',
+        'Location Approximated',
+        `📍 We detected your area as: ${loc.city}. Is this correct?`,
+        true,
+        true,
+      );
+      if (!confirmed || !confirmed.isConfirmed) {
+        openManualLocationModal();
+        return;
+      }
+    }
+
+    await saveProfileLocation(loc.city, loc.lat, loc.lng);
+  } else {
+    // GPS/IP failed/denied/blocked — prompt manual location modal
+    openManualLocationModal();
+  }
+}
+
+function initProfileManualLocation() {
+  const manualInput = document.getElementById('profile-manual-location-input');
+  const manualStatus = document.getElementById('profile-manual-location-status');
+  if (!manualInput) return;
+
+  const updateStatus = (html) => {
+    if (manualStatus) {
+      manualStatus.innerHTML = html;
+      if (window.lucide) window.lucide.createIcons({ root: manualStatus });
+    }
+  };
+
+  let debounceTimer;
+  manualInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const query = manualInput.value.trim();
+    if (!query) { updateStatus(''); return; }
+
+    debounceTimer = setTimeout(async () => {
+      updateStatus('<span class="flex items-center gap-1 text-brand-navy"><i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Searching...</span>');
+      try {
+        const data = await EdelModules.location.geocodeQuery(query);
+        if (!data.success || !data.location) {
+          updateStatus(`<span class="flex items-center gap-1 text-red-500"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Could not find "${query}". Try a nearby city.</span>`);
+          return;
+        }
+        const loc = data.location;
+        const confirmed = await Ui.alert('question', 'Location Found', `📍 ${loc.label || loc.city}. Use this location?`, true, true);
+        if (confirmed && confirmed.isConfirmed) {
+          const saved = await saveProfileLocation(loc.city || loc.label, loc.lat, loc.lng);
+          if (saved) {
+            closeModals();
+          }
+        } else {
+          updateStatus('<span class="flex items-center gap-1 text-amber-600"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Try a different search term.</span>');
+          manualInput.value = '';
+        }
+      } catch (err) {
+        updateStatus('<span class="flex items-center gap-1 text-red-500"><i data-lucide="wifi-off" class="w-3.5 h-3.5"></i> Search failed. Check your connection.</span>');
+      }
+    }, 1200);
+  });
+}
+
+window.updateMyLocation = updateMyLocation;
+document.getElementById('btn-update-location')?.addEventListener('click', updateMyLocation);
+initProfileManualLocation();
 
 // Profile Photo Update
 const photoInput = document.createElement("input");

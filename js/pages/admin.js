@@ -629,7 +629,11 @@ const Admin = (() => {
         <div class="space-y-6">
           ${items.map((setting) => `
             <div>
-              <label class="block text-sm font-bold text-brand-navy mb-1" for="setting-${setting.key}">${escapeHtml(capitalize(setting.key))}</label>
+              <label class="block text-sm font-bold text-brand-navy mb-1" for="setting-${setting.key}">
+                ${setting.key === 'location_stale_threshold_km'
+                  ? 'Location Shift Alert Threshold (KM)'
+                  : escapeHtml(capitalize(setting.key.replace(/_/g, ' ')))}
+              </label>
               <p class="text-xs text-slate-400 mb-2">${escapeHtml(setting.description || "")}</p>
               ${setting.key === 'enable_categories_view_for_providers' ? `
                 <select id="setting-${setting.key}" data-setting-key="${setting.key}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm">

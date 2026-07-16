@@ -270,70 +270,176 @@ document.getElementById('btn-skip-face')?.addEventListener('click', () => {
   showVerificationView(_faceCaptureEmail, null, 'signup');
 });
 
-// â”€â”€â”€ Location Detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Location Detection ──────────────────────────────────────────────────────
 
-async function captureSignupLocation() {
-  if (!locationButton || !locationStatus) return;
+/** Store the pending location result for form submission */
+let _pendingLocation = null;
 
-  const originalText = locationButton.innerHTML;
-  locationButton.disabled = true;
-  locationButton.innerHTML =
-    '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Detecting...';
-  locationStatus.textContent = "Trying to get your current location...";
-  Edel.initIcons();
+/** Track if primer has been shown this session */
+const _primerShownKey = 'edel_location_primer_shown';
 
-  try {
-    const isMobile =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
-      );
-    const signupMaxAccuracy = isMobile ? 100 : Infinity;
+/**
+ * Wire up the manual location input: debounced geocoding as user types.
+ */
+function initManualLocationInput() {
+  const manualSection = document.getElementById('signup-manual-location-section');
+  const manualInput   = document.getElementById('signup-manual-location-input');
+  const manualStatus  = document.getElementById('signup-manual-location-status');
+  if (!manualSection || !manualInput) return;
 
-    const coords = await EdelModules.location.getBestBrowserLocation({
-      maxAcceptedAccuracy: signupMaxAccuracy,
-      timeout: 7000,
-      maximumAge: 15000,
-    });
-    if (latitudeInput) latitudeInput.value = coords.latitude;
-    if (longitudeInput) longitudeInput.value = coords.longitude;
+  // Disable main input so user focuses on the search bar
+  if (locationLabelInput) {
+    locationLabelInput.value = "Location not detected";
+    locationLabelInput.disabled = true;
+    locationLabelInput.classList.add("bg-slate-100", "text-slate-400", "cursor-not-allowed");
+  }
 
-    // Suggest a real address instead of generic "Current location"
-    if (locationLabelInput && !locationLabelInput.value.trim()) {
-      const realAddress = await EdelModules.location.reverseGeocode(
-        coords.latitude,
-        coords.longitude,
-      );
-      locationLabelInput.value = realAddress || "Current location";
+  manualSection.classList.remove('hidden');
+
+  const updateStatus = (html) => {
+    if (manualStatus) {
+      manualStatus.innerHTML = html;
+      if (window.lucide) window.lucide.createIcons({ root: manualStatus });
     }
+  };
 
-    locationStatus.textContent = `Location captured (${Math.round(coords.accuracy)}m accuracy). Feel free to rename it if needed.`;
-    Ui.toast(
-      "success",
-      "Location Ready",
-      "Your coordinates have been captured.",
-    );
-  } catch (error) {
-    if (error.isLowAccuracy) {
-      locationStatus.textContent =
-        'Your location signal is too weak right now. Move to a clearer area and try again, or enter your area and city manually like "Yaba, Lagos".';
-    } else {
-      locationStatus.textContent =
-        'We could not get your location. Please allow location access and try again, or enter your area and city manually like "Yaba, Lagos".';
-    }
+  updateStatus('<span class="flex items-center gap-1"><i data-lucide="lightbulb" class="w-3.5 h-3.5"></i> Enter your city or area to find local services.</span>');
 
-    Ui.toast(
-      "error",
-      "Location Required",
-      error.message || "Location access failed.",
-    );
-  } finally {
-    locationButton.disabled = false;
-    locationButton.innerHTML = originalText;
-    Edel.initIcons();
+  let debounceTimer;
+  manualInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const query = manualInput.value.trim();
+    if (!query) return;
+
+    debounceTimer = setTimeout(async () => {
+      updateStatus('<span class="flex items-center gap-1 text-brand-accent"><i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Searching for location...</span>');
+
+      try {
+        const data = await EdelModules.location.geocodeQuery(query);
+
+        if (!data.success || !data.location) {
+          updateStatus(`<span class="flex items-center gap-1 text-red-500"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Could not find "${query}". Check spelling.</span>`);
+          return;
+        }
+
+        // Confirm with user
+        const loc = data.location;
+        const result = await Ui.alert(
+          'question',
+          'Location Found',
+          `📍 ${loc.label || loc.city}. Is this correct?`,
+          true,
+          true,
+        );
+
+        if (result && result.isConfirmed) {
+          _pendingLocation = {
+            lat: loc.lat,
+            lng: loc.lng,
+            city: loc.city || loc.label,
+            source: 'manual',
+            accuracy: 'medium',
+          };
+          if (latitudeInput)  latitudeInput.value = loc.lat;
+          if (longitudeInput) longitudeInput.value = loc.lng;
+          
+          if (locationLabelInput) {
+            locationLabelInput.value = loc.city || loc.label;
+            locationLabelInput.disabled = false;
+            locationLabelInput.classList.remove("bg-slate-100", "text-slate-400", "cursor-not-allowed");
+          }
+          if (locationStatus) locationStatus.textContent = `Location saved: ${loc.city || loc.label}`;
+          Ui.toast('success', 'Location Saved', `✅ ${loc.city || loc.label}`);
+          updateStatus('<span class="flex items-center gap-1 text-green-600"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Location confirmed.</span>');
+        } else {
+          updateStatus('<span class="flex items-center gap-1 text-amber-600"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Please try a different search term.</span>');
+          manualInput.value = '';
+          manualInput.focus();
+        }
+      } catch (err) {
+        updateStatus('<span class="flex items-center gap-1 text-red-500"><i data-lucide="wifi-off" class="w-3.5 h-3.5"></i> Search failed. Check your internet.</span>');
+      }
+    }, 1500);
+  });
+}
+
+/**
+ * Apply a resolved location result to the signup form hidden fields.
+ */
+function applyLocationResult(locationResult) {
+  if (!locationResult || !locationResult.success || !locationResult.location) return;
+
+  const loc = locationResult.location;
+  _pendingLocation = loc;
+
+  if (latitudeInput)  latitudeInput.value  = loc.lat;
+  if (longitudeInput) longitudeInput.value = loc.lng;
+  if (locationLabelInput && !locationLabelInput.value.trim()) {
+    locationLabelInput.value = loc.city || 'My location';
+  }
+  if (locationStatus) {
+    const sourceNote = loc.source === 'ip' ? ' (approximate)' : '';
+    locationStatus.textContent = `Location captured: ${loc.city}${sourceNote}. Feel free to rename it if needed.`;
   }
 }
 
-// â”€â”€â”€ View Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/**
+ * Handle the "Allow Location" choice from the primer modal.
+ * Calls the master getLocation() function which handles GPS → IP fallback.
+ */
+async function handleAllowLocation() {
+  const spinner = document.getElementById("signup-location-spinner");
+  const icon = document.getElementById("signup-location-icon");
+
+  if (locationStatus) locationStatus.textContent = 'Detecting your location...';
+  
+  if (spinner) spinner.classList.remove('hidden');
+  if (icon) icon.classList.add('hidden');
+
+  const result = await EdelModules.location.getLocation();
+
+  if (spinner) spinner.classList.add('hidden');
+  if (icon) icon.classList.remove('hidden');
+
+  if (result.success) {
+    applyLocationResult(result);
+
+    // If the result came from IP, ask the user to confirm it's correct
+    if (result.location.source === 'ip') {
+      const confirmed = await Ui.alert(
+        'question',
+        'Location Approximated',
+        `📍 We detected your area as: ${result.location.city}. Is this correct?`,
+        true,
+        true,
+      );
+      if (!confirmed || !confirmed.isConfirmed) {
+        // User said no — clear and show manual input
+        _pendingLocation = null;
+        if (latitudeInput)  latitudeInput.value  = '';
+        if (longitudeInput) longitudeInput.value = '';
+        if (locationLabelInput) locationLabelInput.value = '';
+        if (locationStatus) locationStatus.textContent = '';
+        initManualLocationInput();
+      }
+    }
+  } else {
+    // All automated methods failed — show manual input
+    initManualLocationInput();
+  }
+}
+
+/**
+ * Main signup location flow.
+ * Calls handleAllowLocation() which uses the master getLocation() flow.
+ */
+async function captureSignupLocation() {
+  if (!locationButton && !locationStatus) return;
+  await handleAllowLocation();
+}
+
+
+// ─── View Helpers ──────────────────────────────────────────────────────────
 
 function showAccountChoiceView() {
   if (!accountChoiceView) return;
@@ -547,11 +653,7 @@ resendVerificationBtn?.addEventListener("click", async () => {
 
 locationButton?.addEventListener("click", captureSignupLocation);
 
-window.addEventListener("load", () => {
-  if (locationButton) {
-    captureSignupLocation();
-  }
-});
+// (Location is now strictly triggered only by the button click)
 
 window.switchAuthView = (view) => authPage.activateView(view);
 window.updateRoleUI = () => authPage.updateRoleUI();

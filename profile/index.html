@@ -46,7 +46,7 @@
           href="/"
           class="flex items-center group"
         >
-          <img src="../assets/images/edel-logo-inverse.png" alt="E-del Logo" class="h-20 w-auto object-contain transition-transform group-hover:scale-105" />
+          <img src="../assets/images/edel-logo-inverse.png" alt="E-del Logo" class="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
         </a>
       </div>
 
@@ -81,18 +81,14 @@
         <div class="flex items-center gap-3">
           <img
             id="sidebar-user-img"
-            src="../assets/images/avatar.jpg"
-            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover bg-white/10"
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+            class="w-10 h-10 rounded-full border-2 border-brand-accent object-cover"
           />
-          <div class="flex-1 min-w-0">
-            <p
-              class="text-sm font-bold text-white empty:w-28 empty:h-4 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block"
-              id="sidebar-user-name"
-            ></p>
-            <p
-              class="text-xs text-slate-400 empty:w-20 empty:h-3.5 empty:bg-white/10 empty:rounded empty:animate-pulse empty:block empty:mt-1.5"
-              id="sidebar-role"
-            ></p>
+          <div>
+            <p class="text-sm font-bold text-white" id="sidebar-user-name">Sarah Jenkins</p>
+            <p class="text-xs text-slate-400" id="sidebar-role">
+              Customer Account
+            </p>
           </div>
         </div>
       </div>
@@ -125,9 +121,10 @@
           </div>
           <button
             id="btn-switch-account"
-            class="hidden bg-brand-navy text-brand-accent px-4 py-2 rounded-xl font-bold text-sm hover:bg-brand-blue transition-colors shadow-sm"
+            class="hidden bg-brand-navy text-brand-accent p-2.5 sm:p-3 rounded-xl font-bold hover:bg-brand-blue transition-colors shadow-sm flex items-center justify-center"
+            title="Switch or Add Account"
           >
-            Switch Account
+            <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
           </button>
           <!-- Developer Toggle (Hidden) -->
           <div
@@ -205,12 +202,15 @@
               >
                 <h2
                   id="profile-name"
-                  class="text-2xl font-bold text-brand-navy empty:w-36 empty:h-7 empty:bg-slate-200 empty:rounded empty:animate-pulse empty:block"
-                ></h2>
+                  class="text-2xl font-bold text-brand-navy"
+                >
+                  Sarah Jenkins
+                </h2>
                 <span
                   id="profile-role-tag"
-                  class="bg-slate-100 text-slate-500 text-xs font-bold px-3 py-1 rounded-full self-center md:self-auto uppercase tracking-wide empty:w-20 empty:h-6 empty:bg-slate-200 empty:animate-pulse empty:inline-block"
-                ></span>
+                  class="bg-slate-100 text-slate-500 text-xs font-bold px-3 py-1 rounded-full self-center md:self-auto uppercase tracking-wide"
+                  >Customer</span
+                >
               </div>
               <p
                 class="text-slate-500 text-sm mb-4 flex items-center justify-center md:justify-start gap-2"
@@ -393,7 +393,7 @@
 
             <div
               onclick="openModal('modal-security')"
-              class="p-6 hover:bg-slate-50 transition-colors cursor-pointer flex items-center justify-between group"
+              class="p-6 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer flex items-center justify-between group"
             >
               <div class="flex items-center gap-4">
                 <div
@@ -406,13 +406,38 @@
                     Privacy & Security
                   </h4>
                   <p class="text-xs text-slate-500">
-                    Data, location tracking, and connected accounts
+                    Manage passwords and account data
                   </p>
                 </div>
               </div>
               <i
                 data-lucide="chevron-right"
                 class="w-5 h-5 text-slate-300 group-hover:text-brand-blue transition-colors"
+              ></i>
+            </div>
+
+            <div
+              id="btn-update-location"
+              class="p-6 hover:bg-slate-50 transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-10 h-10 rounded-xl bg-brand-accent/10 text-brand-accent flex items-center justify-center"
+                >
+                  <i data-lucide="map-pin" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-brand-navy text-sm">
+                    Update My Location
+                  </h4>
+                  <p class="text-xs text-slate-500">
+                    Recalculate precise GPS coordinates and region
+                  </p>
+                </div>
+              </div>
+              <i
+                data-lucide="chevron-right"
+                class="w-5 h-5 text-slate-300 group-hover:text-brand-accent transition-colors"
               ></i>
             </div>
           </div>
@@ -554,7 +579,7 @@
             <label
               for="new-price"
               class="float-label absolute left-9 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
-              >Base Pricing (₦)</label
+              >Starting Price (₦)</label
             >
           </div>
 
@@ -911,6 +936,7 @@
             </div>
           </div>
         </div>
+        </div>
 
         <div class="p-6 pt-0 mt-auto flex gap-3">
           <button
@@ -956,7 +982,7 @@
             <input
               type="text"
               id="info-name"
-              value=""
+              value="Sarah Jenkins"
               required
               placeholder=" "
               class="float-input w-full pl-11 pr-4 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
@@ -1332,6 +1358,48 @@
           >
             Update Password
           </button>
+        </div>
+      </div>
+
+      <!-- 6. Manual Location Modal -->
+      <div
+        id="modal-manual-location"
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden hidden scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex-col"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"
+        >
+          <h3 class="font-bold text-brand-navy text-xl">Search Location</h3>
+          <button
+            onclick="closeModals()"
+            class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-brand-navy hover:bg-slate-100 transition-colors border border-slate-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto no-scrollbar space-y-6">
+          <p class="text-xs text-slate-500">
+            GPS is currently blocked or inaccessible in your browser. Please search for your city or region manually below:
+          </p>
+          <div class="relative group z-0">
+            <i
+              data-lucide="search"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors duration-300 group-focus-within:text-brand-navy z-10"
+            ></i>
+            <input
+              type="text"
+              id="profile-manual-location-input"
+              placeholder=" "
+              class="float-input w-full pl-11 pr-12 py-4 bg-slate-50/50 border-2 border-slate-200 rounded-xl text-brand-navy font-medium focus:outline-none focus:border-brand-navy focus:bg-white shadow-sm transition-all duration-300 text-sm"
+            />
+            <label
+              for="profile-manual-location-input"
+              class="float-label absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none z-10 origin-left"
+              >Enter city or neighborhood...</label
+            >
+          </div>
+          <div id="profile-manual-location-status" class="text-xs font-semibold select-none min-h-[20px] pb-4"></div>
         </div>
       </div>
     </div>

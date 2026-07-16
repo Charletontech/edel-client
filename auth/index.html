@@ -257,15 +257,15 @@
               <div class="flex flex-col sm:flex-row items-center gap-5">
 
                 <!-- Camera Preview Area -->
-                <div class="relative shrink-0" style="width:200px;height:200px;">
-                  <!-- Circular mask -->
-                  <div class="absolute inset-0 rounded-full overflow-hidden border-4 border-brand-navy shadow-lg z-10">
+                <div class="relative shrink-0 w-full max-w-[280px]">
+                  <!-- Camera mask -->
+                  <div class="relative rounded-3xl overflow-hidden border-4 border-brand-navy shadow-lg z-10 bg-slate-900">
                     <video
                       id="face-capture-video"
                       autoplay
                       muted
                       playsinline
-                      class="w-full h-full object-cover"
+                      class="w-full aspect-[4/3] object-cover"
                       style="transform:scaleX(-1);"
                     ></video>
                     <!-- Frozen capture frame -->
@@ -278,14 +278,13 @@
                   <!-- Detection overlay canvas -->
                   <canvas
                     id="face-detect-overlay"
-                    class="absolute inset-0 rounded-full z-20 pointer-events-none"
-                    style="width:200px;height:200px;"
+                    class="absolute inset-0 z-20 pointer-events-none"
+                    style="width:100%;height:100%;"
                   ></canvas>
                   <!-- Face status ring -->
                   <div
-                    id="face-detect-ring"
-                    class="absolute inset-0 rounded-full z-30 pointer-events-none transition-all duration-500"
-                    style="box-shadow: 0 0 0 4px transparent;"
+                    id="face-status-ring"
+                    class="absolute inset-[-6px] rounded-[2rem] border-4 border-transparent transition-colors duration-300 z-0 pointer-events-none"
                   ></div>
                 </div>
 
@@ -608,6 +607,7 @@
 
                   <div class="md:col-span-2">
                     <div
+                      id="signup-location-container"
                       class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4"
                     >
                       <div class="flex items-start justify-between gap-4">
@@ -620,8 +620,6 @@
                             class="text-xs text-slate-500 mt-1"
                           >
                             We use this to show nearby services and providers.
-                            If location detection fails, enter your area and
-                            city like "Yaba, Lagos" or "Wuse 2, Abuja".
                           </p>
                         </div>
                         <button
@@ -635,17 +633,39 @@
                       </div>
 
                       <div class="relative input-focus-lift">
-                        <i
-                          data-lucide="map-pin"
-                          class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                        ></i>
+                        <div id="signup-location-icon" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400">
+                          <i data-lucide="map-pin" class="w-full h-full"></i>
+                        </div>
+                        <div id="signup-location-spinner" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-accent hidden">
+                          <i data-lucide="loader-2" class="w-full h-full animate-spin"></i>
+                        </div>
                         <input
                           type="text"
                           name="signup_location_label"
-                          required
-                          placeholder="Enter area and city e.g. Yaba, Lagos"
+                          placeholder="Your area will appear here, or type it in"
                           class="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent shadow-sm transition-all text-sm"
                         />
+                      </div>
+                      
+                      <p class="text-[11px] text-slate-500 mt-2 leading-tight">
+                        We only use your location to improve the quality of feeds we give you, we never share it with anyone. Please read our <a href="/legal/#privacy" class="text-brand-navy font-bold hover:underline" target="_blank">Privacy policy</a>.
+                      </p>
+
+                      <!-- Manual location fallback — shown by JS when auto-detection fails -->
+                      <div id="signup-manual-location-section" class="hidden space-y-2">
+                        <div class="relative">
+                          <i
+                            data-lucide="search"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                          ></i>
+                          <input
+                            id="signup-manual-location-input"
+                            type="text"
+                            placeholder="Search your city or area e.g. Bariga, Lagos"
+                            class="w-full pl-10 pr-4 py-3 bg-white border border-brand-accent/40 rounded-xl text-brand-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent shadow-sm transition-all text-sm"
+                          />
+                        </div>
+                        <p id="signup-manual-location-status" class="text-xs text-slate-400 min-h-[1rem]"></p>
                       </div>
 
                       <input type="hidden" name="signup_latitude" />

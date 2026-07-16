@@ -252,3 +252,20 @@
       body.bg-brand-light #reports-modal {
         background: rgba(29, 12, 56, 0.62);
       }
+
+      #modal-overlay.profile-overlay-open {
+        display: flex;
+      }
+
+      .profile-modal-panel {
+        opacity: 0;
+        transform: scale(0.95);
+        transition: transform 300ms ease, opacity 300ms ease;
+        pointer-events: none;
+      }
+
+      .profile-modal-panel.is-active {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }

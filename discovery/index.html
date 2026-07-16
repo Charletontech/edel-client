@@ -645,19 +645,18 @@
           <div class="flex flex-col items-center gap-5">
             <!-- Camera Preview Area -->
             <div
-              class="relative shrink-0 select-none"
-              style="width: 220px; height: 220px"
+              class="relative shrink-0 select-none w-full max-w-[280px]"
             >
-              <!-- Circular mask -->
+              <!-- Camera mask -->
               <div
-                class="absolute inset-0 rounded-full overflow-hidden border-4 border-brand-navy shadow-lg z-10"
+                class="relative rounded-3xl overflow-hidden border-4 border-brand-navy shadow-lg z-10 bg-slate-900"
               >
                 <video
                   id="face-capture-video"
                   autoplay
                   muted
                   playsinline
-                  class="w-full h-full object-cover"
+                  class="w-full aspect-[4/3] object-cover"
                   style="transform: scaleX(-1)"
                 ></video>
                 <!-- Frozen capture frame -->
@@ -670,14 +669,13 @@
               <!-- Detection overlay canvas -->
               <canvas
                 id="face-detect-overlay"
-                class="absolute inset-0 rounded-full z-20 pointer-events-none"
-                style="width: 220px; height: 220px"
+                class="absolute inset-0 z-20 pointer-events-none"
+                style="width: 100%; height: 100%"
               ></canvas>
               <!-- Face status ring -->
               <div
                 id="face-detect-ring"
-                class="absolute inset-0 rounded-full z-30 pointer-events-none transition-all duration-500"
-                style="box-shadow: 0 0 0 4px transparent"
+                class="absolute inset-[-6px] rounded-[2rem] border-4 border-transparent transition-colors duration-300 z-0 pointer-events-none"
               ></div>
             </div>
 
