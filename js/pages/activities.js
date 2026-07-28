@@ -444,15 +444,27 @@ function renderProviderOrder(order) {
       </div>
 
       <div class="bg-slate-50 rounded-2xl p-4 flex items-center gap-4 border border-slate-100">
-        <div class="relative">
+        <div class="relative shrink-0">
           <img
             src="${getPartyAvatar(order, "customer")}"
             class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
           />
+          ${customer.faceVerified ? `
+          <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-sky-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm" title="Verified Rookie Customer">
+            <i data-lucide="check" class="w-3 h-3 text-white stroke-[3]"></i>
+          </div>
+          ` : ''}
         </div>
-        <div class="flex-1">
-          <h4 class="font-bold text-brand-navy text-lg leading-tight">${customer.fullName || "Customer"}</h4>
-          <p class="text-sm text-slate-500">${customer.phoneNumber || "Phone not available"}</p>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h4 class="font-bold text-brand-navy text-lg leading-tight">${customer.fullName || "Customer"}</h4>
+            ${customer.faceVerified ? `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-800 border border-sky-300/60 shadow-2xs" title="KYC Face Verified">
+              <i data-lucide="shield-check" class="w-3 h-3 text-sky-600"></i> Rookie Verified
+            </span>
+            ` : ''}
+          </div>
+          <p class="text-sm text-slate-500 mt-0.5">${customer.phoneNumber || "Phone not available"}</p>
           ${!inProgress ? `<p class="text-xs text-slate-400 mt-1">${customerLocationLabel}</p>` : ''}
         </div>
       </div>
@@ -645,6 +657,8 @@ function chooseInitialView() {
 }
 
 async function loadActivities() {
+  const previousCustomerStatus = state.customerOrder?.status;
+  const previousProviderStatus = state.providerOrder?.status;
   state.isLoading = true;
   renderView();
 
@@ -659,6 +673,21 @@ async function loadActivities() {
     state.isLoading = false;
     chooseInitialView();
     renderView();
+
+    // Auto-close context modals when the order status advances via WebSocket
+    if (state.customerOrder?.status === "in_progress" && previousCustomerStatus !== "in_progress") {
+      closeModal();
+      Ui.toast("success", "Handshake Verified! 🎉", "Provider scanned your QR code. Service is now in progress.");
+    }
+    
+    if (state.customerOrder?.status === "completed" && previousCustomerStatus !== "completed") {
+      closeModal();
+      Ui.toast("success", "Service Completed! ✅", "Your provider has successfully completed the job.");
+    }
+
+    if (state.providerOrder?.status === "completed" && previousProviderStatus !== "completed") {
+      closeModal();
+    }
 
     // Join WebSocket rooms for real-time updates
     if (socket) {
@@ -910,6 +939,56 @@ document.getElementById("btn-regenerate-qr")?.addEventListener("click", () => {
   startQrSession();
 });
 
+// Pre-fetched Provider Location — persistent watcher that stays alive while scanner is open
+let prefetchedPosition = null;
+let prefetchingPromise = null;
+let locationWatchId = null;
+
+function prefetchProviderLocation() {
+  prefetchedPosition = null;
+
+  // Clear any existing watcher
+  if (locationWatchId !== null) {
+    navigator.geolocation.clearWatch(locationWatchId);
+    locationWatchId = null;
+  }
+
+  if (!navigator.geolocation) return;
+
+  // Start a persistent watcher that continuously updates position
+  locationWatchId = navigator.geolocation.watchPosition(
+    (position) => {
+      prefetchedPosition = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+      };
+    },
+    () => {
+      // Silently ignore errors — the watcher keeps trying automatically
+    },
+    {
+      enableHighAccuracy: false,
+      maximumAge: 300000, // Accept cached positions up to 5 minutes old
+    },
+  );
+
+  // Also fire a one-shot promise for code that awaits it
+  prefetchingPromise = EdelModules.location.getBrowserLocation({ timeout: 20000 })
+    .then((pos) => {
+      prefetchedPosition = pos;
+      return pos;
+    })
+    .catch(() => null);
+}
+
+function stopLocationWatch() {
+  if (locationWatchId !== null) {
+    navigator.geolocation.clearWatch(locationWatchId);
+    locationWatchId = null;
+  }
+}
+
 async function verifyQrSession(decodedText) {
   if (html5QrcodeScanner) {
     html5QrcodeScanner.pause(true);
@@ -933,11 +1012,28 @@ async function verifyQrSession(decodedText) {
       throw new Error("Invalid Handshake QR.");
     }
 
-    const position = await EdelModules.location.getBrowserLocation();
-    
-    // As per user request: explicitly add the disclaimer about accuracy
+    // Use pre-fetched position if already locked, or wait for the in-flight pre-fetch promise.
+    // If both are unavailable, fall back to acquiring position now.
+    let position = prefetchedPosition;
+    if (!position && prefetchingPromise) {
+      position = await prefetchingPromise;
+    }
+    if (!position) {
+      try {
+        position = await EdelModules.location.getBrowserLocation({ timeout: 15000 });
+      } catch (gpsErr) {
+        if (gpsErr?.code === 1) {
+          throw new Error("📍 Location access was denied. Please enable GPS in your browser settings and tap Retry.");
+        } else if (gpsErr?.code === 3) {
+          throw new Error("📍 Could not get your GPS in time. Step outside or away from heavy walls, then tap Retry.");
+        } else {
+          throw new Error("📍 GPS unavailable. Check your location settings and tap Retry.");
+        }
+      }
+    }
+
     if (position.accuracy > EdelModules.location.minAcceptedAccuracy) {
-      throw new Error(`Your GPS accuracy is poor (${Math.round(position.accuracy)}m). Try stepping outside or away from roofing.`);
+      throw new Error(`📍 GPS accuracy is too poor (${Math.round(position.accuracy)}m). Try stepping outside or away from roofing and tap Retry.`);
     }
 
     const verifyPayload = {
@@ -965,12 +1061,22 @@ async function verifyQrSession(decodedText) {
     }, 2000);
 
   } catch (error) {
-    statusEl.textContent = error.message;
     statusEl.className = "text-red-400 text-center text-xs mb-4 font-bold";
-    // Check if it's a distance error to give specific feedback
+
     if (error.message.toLowerCase().includes("close enough")) {
+      // Proximity failure — provider not near customer
       statusEl.innerHTML = `${error.message}<br><span class="text-[10px] text-slate-400 font-normal mt-1 block">GPS works best outdoors. Move closer to the customer and retry.</span>`;
+    } else if (error.message.toLowerCase().includes("expired")) {
+      // QR code genuinely expired
+      statusEl.innerHTML = `⏱️ QR Code has expired.<br><span class="text-[10px] text-slate-400 font-normal mt-1 block">Ask the customer to generate a new QR code.</span>`;
+    } else if (error.message.startsWith("📍")) {
+      // GPS-specific error (permission denied, timeout, unavailable)
+      statusEl.textContent = error.message;
+    } else {
+      // Generic / server error
+      statusEl.textContent = error.message;
     }
+
     btnRetry.classList.remove("hidden");
   }
 }
@@ -981,6 +1087,10 @@ document.getElementById("btn-retry-scan")?.addEventListener("click", () => {
   statusEl.textContent = "Align the customer's QR code within the frame.";
   statusEl.className = "text-slate-400 text-center text-sm mb-4";
   btnRetry.classList.add("hidden");
+  
+  // Refresh location on retry click
+  prefetchProviderLocation();
+
   if (html5QrcodeScanner) {
     html5QrcodeScanner.resume();
   }
@@ -1009,6 +1119,7 @@ openModal = function(modalId) {
   if (modalId === "display-qr-modal") {
     startQrSession();
   } else if (modalId === "scanner-modal") {
+    prefetchProviderLocation();
     initQrScanner();
   } else if (modalId === "generate-token-modal") {
     const btn = document.getElementById("btn-confirm-generate");
@@ -1032,6 +1143,7 @@ const originalCloseModal = closeModal;
 closeModal = function() {
   originalCloseModal();
   clearInterval(qrTimer);
+  stopLocationWatch();
   if (html5QrcodeScanner) {
     html5QrcodeScanner.stop().then(() => {
       html5QrcodeScanner = null;
@@ -1076,20 +1188,26 @@ document.getElementById("btn-confirm-generate")?.addEventListener("click", async
   }
 });
 
+let isSubmittingCompletion = false;
 document.getElementById("btn-submit-completion")?.addEventListener("click", async () => {
+  if (isSubmittingCompletion) return;
+
   const btn = document.getElementById("btn-submit-completion");
   const tokenInput = document.getElementById("input-completion-token");
   
   if (!state.providerOrder) return;
   
-  const token = tokenInput.value.trim();
+  const token = tokenInput?.value?.trim();
   if (!token || token.length < 6) {
     Ui.toast("warning", "Invalid Token", "Please enter the 6-digit token.");
     return;
   }
   
-  btn.disabled = true;
-  btn.textContent = "Verifying...";
+  isSubmittingCompletion = true;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Verifying...";
+  }
   
   try {
     await EdelModules.api.post(`/api/orders/${state.providerOrder.id}/complete`, { token }, {
@@ -1099,13 +1217,23 @@ document.getElementById("btn-submit-completion")?.addEventListener("click", asyn
     
     Ui.toast("success", "Service Completed", "The job has been marked as complete.");
     closeModal();
-    tokenInput.value = "";
-    loadActivities();
+    if (tokenInput) tokenInput.value = "";
+    await loadActivities();
   } catch (error) {
-    btn.disabled = false;
-    btn.textContent = "Verify & Complete";
-    tokenInput.value = "";
+    // If order was already completed, ignore error and update UI cleanly
+    if (error.message && error.message.includes("completed")) {
+      closeModal();
+      await loadActivities();
+      return;
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Verify & Complete";
+    }
+    if (tokenInput) tokenInput.value = "";
     Ui.toast("error", "Verification Failed", error.message);
+  } finally {
+    isSubmittingCompletion = false;
   }
 });
 

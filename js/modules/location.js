@@ -21,6 +21,59 @@ window.EdelModules.location = {
     });
   },
 
+  /**
+   * Uses watchPosition to stream location updates.
+   * Returns the first position received, then clears the watch.
+   * Far more reliable than getCurrentPosition on mobile browsers.
+   */
+  watchForPosition(options = {}) {
+    const { timeout = 20000, ...positionOptions } = options;
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported"));
+        return;
+      }
+
+      let resolved = false;
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          navigator.geolocation.clearWatch(watchId);
+          const err = new Error("Location request timed out. Please try again.");
+          err.code = 3;
+          reject(err);
+        }
+      }, timeout);
+
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          if (!resolved) {
+            resolved = true;
+            clearTimeout(timer);
+            navigator.geolocation.clearWatch(watchId);
+            resolve(position);
+          }
+        },
+        (error) => {
+          // Permission denied is fatal — stop immediately
+          if (error?.code === 1 && !resolved) {
+            resolved = true;
+            clearTimeout(timer);
+            navigator.geolocation.clearWatch(watchId);
+            reject(error);
+          }
+          // For other errors (POSITION_UNAVAILABLE), let watchPosition keep trying
+          // until the timeout expires
+        },
+        {
+          enableHighAccuracy: false,
+          maximumAge: 300000, // Accept cached positions up to 5 minutes old
+          ...positionOptions,
+        },
+      );
+    });
+  },
+
   normalizeLocationError(error, fallbackMessage) {
     if (error?.code === 1) {
       const permissionError = new Error(
@@ -47,17 +100,42 @@ window.EdelModules.location = {
   },
 
   async getBrowserLocation(options = {}) {
-    const position = await this.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 8000,
-      maximumAge: 60000,
-      ...options,
+    const { timeout = 20000, maximumAge = 300000, ...restOptions } = options;
+
+    // Strategy: Try a quick high-accuracy getCurrentPosition first (cached results).
+    // If that fails for any reason other than permission denied,
+    // fall back to watchPosition which streams updates and is far more reliable.
+    try {
+      const position = await this.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 3000,
+        maximumAge,
+        ...restOptions,
+      });
+
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+      };
+    } catch (err) {
+      // Permission denied — do not retry, surface immediately
+      if (err?.code === 1) throw err;
+    }
+
+    // Reliable fallback: watchPosition streams updates continuously
+    // and returns the first fix it gets. Almost never times out.
+    const watched = await this.watchForPosition({
+      timeout,
+      maximumAge,
+      enableHighAccuracy: false,
+      ...restOptions,
     });
 
     return {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      accuracy: position.coords.accuracy,
+      latitude: watched.coords.latitude,
+      longitude: watched.coords.longitude,
+      accuracy: watched.coords.accuracy,
     };
   },
 

@@ -246,6 +246,11 @@ window.EdelModules.auth = {
           formData.append("latitude", rawFormData.get("signup_latitude"));
           formData.append("longitude", rawFormData.get("signup_longitude"));
 
+          const refCode = sessionStorage.getItem("edel_ref_code") || rawFormData.get("referralCode") || rawFormData.get("ref");
+          if (refCode) {
+            formData.append("referralCode", refCode);
+          }
+
           const photoFile = rawFormData.get("profilePhoto");
           if (photoFile && photoFile.size > 0) {
             formData.append("profilePhoto", photoFile);

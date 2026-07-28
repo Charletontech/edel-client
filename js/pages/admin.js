@@ -114,13 +114,14 @@ const Admin = (() => {
     }
   }
 
-  function buildAvatar(name, photo) {
+  function buildAvatar(name, photo, sizeClass = "w-10 h-10") {
     if (photo) {
-      return `<img src="${EdelModules.api.buildUrl(photo)}" alt="${escapeHtml(name)}" class="w-10 h-10 rounded-full object-cover border border-slate-200" />`;
+      const fullUrl = EdelModules.api.buildUrl(photo);
+      return `<img src="${fullUrl}" alt="${escapeHtml(name)}" class="${sizeClass} rounded-full object-cover border border-slate-200 cursor-pointer hover:scale-105 hover:border-brand-navy transition-all duration-200" onclick="Admin.previewImage('${fullUrl}', '${escapeHtml(name)} Profile Photo')" />`;
     }
 
     return `
-      <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-brand-navy font-bold text-xs border border-slate-200">
+      <div class="${sizeClass} rounded-full bg-slate-100 flex items-center justify-center text-brand-navy font-bold text-xs border border-slate-200 select-none">
         ${escapeHtml((name || "U").charAt(0).toUpperCase())}
       </div>
     `;
@@ -206,6 +207,55 @@ const Admin = (() => {
   function closeModal() {
     els.modalContainer.classList.add("hidden");
     els.modalContainer.innerHTML = "";
+  }
+
+  function previewImage(src, altText = "Image Preview") {
+    if (!src) return;
+    const previewOverlay = document.createElement("div");
+    previewOverlay.className = "fixed inset-0 z-[70] flex flex-col items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md transition-all duration-300 ease-out opacity-0";
+    previewOverlay.innerHTML = `
+      <div class="relative max-w-4xl w-full max-h-[85vh] flex flex-col items-center justify-center gap-4">
+        <button class="absolute -top-14 right-2 p-2.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer" id="close-preview-btn">
+          <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+        <img src="${src}" alt="${escapeHtml(altText)}" class="max-w-full max-h-[75vh] rounded-3xl object-contain shadow-2xl border border-white/10 cursor-zoom-out" id="preview-image-content" />
+        <p class="text-white/80 text-sm font-semibold select-none bg-slate-900/60 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm mt-2">${escapeHtml(altText)}</p>
+      </div>
+    `;
+
+    function closePreview() {
+      previewOverlay.classList.remove("opacity-100");
+      previewOverlay.classList.add("opacity-0");
+      window.removeEventListener("keydown", handleKeyDown);
+      setTimeout(() => {
+        previewOverlay.remove();
+      }, 300);
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") closePreview();
+    }
+
+    previewOverlay.addEventListener("click", (e) => {
+      if (e.target === previewOverlay || e.target.id === "preview-image-content") {
+        closePreview();
+      }
+    });
+
+    window.addEventListener("keydown", handleKeyDown);
+    document.body.appendChild(previewOverlay);
+    Edel.initIcons();
+
+    const closeBtn = previewOverlay.querySelector("#close-preview-btn");
+    closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closePreview();
+    });
+
+    requestAnimationFrame(() => {
+      previewOverlay.classList.remove("opacity-0");
+      previewOverlay.classList.add("opacity-100");
+    });
   }
 
   function getAuthOptions() {
@@ -463,7 +513,7 @@ const Admin = (() => {
                       <td class="font-mono-data text-xs font-bold">${user.id}</td>
                       <td>
                         <div class="flex items-center gap-3">
-                          ${buildAvatar(user.fullName, user.profilePhoto)}
+                          ${buildAvatar(user.fullName, user.profilePhoto, "w-16 h-16 text-lg")}
                           <div>
                             <p class="font-bold text-sm">${escapeHtml(user.fullName)}</p>
                             <p class="text-[10px] text-slate-400">${escapeHtml(user.email)}</p>
@@ -629,11 +679,7 @@ const Admin = (() => {
         <div class="space-y-6">
           ${items.map((setting) => `
             <div>
-              <label class="block text-sm font-bold text-brand-navy mb-1" for="setting-${setting.key}">
-                ${setting.key === 'location_stale_threshold_km'
-                  ? 'Location Shift Alert Threshold (KM)'
-                  : escapeHtml(capitalize(setting.key.replace(/_/g, ' ')))}
-              </label>
+              <label class="block text-sm font-bold text-brand-navy mb-1" for="setting-${setting.key}">${escapeHtml(capitalize(setting.key))}</label>
               <p class="text-xs text-slate-400 mb-2">${escapeHtml(setting.description || "")}</p>
               ${setting.key === 'enable_categories_view_for_providers' ? `
                 <select id="setting-${setting.key}" data-setting-key="${setting.key}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm">
@@ -1027,7 +1073,7 @@ const Admin = (() => {
       openModal("User Details", `
         <div class="space-y-8">
           <div class="flex items-center gap-4">
-            ${buildAvatar(user.fullName, user.profilePhoto)}
+            ${buildAvatar(user.fullName, user.profilePhoto, "w-16 h-16 text-lg")}
             <div>
               <h4 class="text-2xl font-bold text-brand-navy">${escapeHtml(user.fullName)}</h4>
               <p class="text-slate-500">${escapeHtml(user.email)}</p>
@@ -1046,6 +1092,7 @@ const Admin = (() => {
               <p class="text-sm"><strong>Tier:</strong> ${escapeHtml(capitalize(user.tier))}</p>
               <p class="text-sm"><strong>Rating:</strong> ${Number(user.rating || 0)}%</p>
               <p class="text-sm"><strong>Jobs Completed:</strong> ${Number(user.jobsCompleted || 0)}</p>
+              <p class="text-sm"><strong>Referrals:</strong> <span class="font-extrabold text-amber-600">${Number(user.referralCount || 0)}</span> ${user.referralCode ? `<span class="text-xs font-mono text-slate-400">(${escapeHtml(user.referralCode)})</span>` : ''}</p>
               <p class="text-sm"><strong>Availability:</strong> ${escapeHtml(capitalize(user.availabilityStatus || "—"))}</p>
               <p class="text-sm"><strong>Joined:</strong> ${formatDate(user.createdAt)}</p>
             </div>
@@ -1066,10 +1113,10 @@ const Admin = (() => {
                 ? `<img
                     src="${EdelModules.api.buildUrl(user.facePhoto)}"
                     alt="Face capture"
-                    class="w-16 h-16 rounded-full object-cover border-2 border-brand-navy shadow-sm shrink-0"
-                    onerror="this.outerHTML='<div class=\\'w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center shrink-0 border-2 border-slate-300\\'><i data-lucide=\\'user\\' class=\\'w-7 h-7 text-slate-400\\'></i></div>'"
-                  />`
-                : `<div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center shrink-0 border-2 border-slate-300">
+                    class="w-16 h-16 rounded-full object-cover border-2 border-brand-navy shadow-sm shrink-0 cursor-pointer hover:scale-105 hover:border-brand-blue transition-all duration-200"
+                    onclick="Admin.previewImage('${EdelModules.api.buildUrl(user.facePhoto)}', '${escapeHtml(user.fullName)} Face Capture')"
+                    onerror="this.outerHTML='<div class=\\\'w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center shrink-0 border-2 border-slate-300\\\'><i data-lucide=\\\'user\\\' class=\\\'w-7 h-7 text-slate-400\\\'></i></div>'"
+                  />` : `<div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center shrink-0 border-2 border-slate-300">
                     <i data-lucide="user" class="w-7 h-7 text-slate-400"></i>
                   </div>`
               }
@@ -1554,6 +1601,7 @@ const Admin = (() => {
   return {
     init,
     closeModal,
+    previewImage,
     switchModule,
     reloadCurrentModule: loadCurrentModule,
     viewUser,

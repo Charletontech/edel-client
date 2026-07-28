@@ -604,6 +604,11 @@ function openDiscoveryModal(serviceId) {
     modalProviderBadge.classList.toggle("hidden", !item.provider.hasPaidAccessFee);
   }
   if (modalProviderName) modalProviderName.innerText = item.provider.fullName;
+  const modalProviderRating = document.getElementById("modal-provider-rating");
+  if (modalProviderRating) {
+    const ratingVal = item.provider.rating !== undefined ? Math.round(Number(item.provider.rating)) : 50;
+    modalProviderRating.innerHTML = `<i data-lucide="star" class="w-3 h-3 fill-brand-accent text-brand-accent"></i> ${ratingVal}%`;
+  }
   if (modalJobsDone) modalJobsDone.innerText = `${item.provider.jobsCompleted || 0} Jobs done`;
   if (modalDescription) modalDescription.innerText = item.description;
   if (modalDistance) modalDistance.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4 text-brand-accent"></i> ${formatDistance(item.distanceKm)}`;
@@ -1097,6 +1102,13 @@ modal?.addEventListener("click", (event) => {
   });
 });
 
+window.closeModal = () => {
+  modalController.close({
+    hiddenPanelClasses: ["translate-y-full", "lg:translate-y-8"],
+    visiblePanelClasses: ["translate-y-0"],
+  });
+};
+
 modalActionBtn?.addEventListener("click", () => {
   requestSelectedService().catch(() => {});
 });
@@ -1321,7 +1333,10 @@ document.getElementById('btn-confirm-face')?.addEventListener('click', async () 
     formData.append('email', user.email);
     formData.append('facePhoto', _capturedBlob, 'face.jpg');
 
-    await EdelModules.api.post('/api/auth/upload-face', formData, { silent: true });
+    await EdelModules.api.post('/api/auth/upload-face', formData, {
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent: true
+    });
 
     // Update local user data
     user.faceVerified = true;

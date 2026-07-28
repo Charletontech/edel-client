@@ -599,7 +599,26 @@ if (verificationToken) {
   verifyEmailToken(verificationToken);
 }
 
-const tabParam = new URLSearchParams(window.location.search).get("tab");
+const urlParams = new URLSearchParams(window.location.search);
+const refParam = urlParams.get("ref") || urlParams.get("referral") || urlParams.get("referralCode");
+if (refParam) {
+  sessionStorage.setItem("edel_ref_code", refParam);
+  const handleRefView = () => {
+    switchAuthView("signup");
+    const banner = document.getElementById("signup-referral-banner");
+    const codeBadge = document.getElementById("referral-code-badge");
+    if (banner) banner.classList.remove("hidden");
+    if (codeBadge) codeBadge.textContent = refParam.toUpperCase();
+    Edel.initIcons();
+  };
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', handleRefView);
+  } else {
+    handleRefView();
+  }
+}
+
+const tabParam = urlParams.get("tab");
 if (tabParam === "signup") {
   window.addEventListener('load', () => switchAuthView("signup"));
 } else if (tabParam === "login") {
@@ -612,12 +631,8 @@ window.addEventListener("edel:account-choice-required", (event) => {
 
 window.addEventListener("edel:verification-required", (event) => {
   const detail = event.detail || {};
-  // For signup, show face capture first; for login just go to email verification
-  if (detail.type === 'signup' || (!detail.type && detail.email)) {
-    showFaceCaptureView(detail.email || '');
-  } else {
-    showVerificationView(detail.email || "", detail.message || "Please verify your email to continue.", detail.type);
-  }
+  // Always go directly to email verification (face capture is now a post-login action only)
+  showVerificationView(detail.email || "", detail.message || "Please verify your email to continue.", detail.type);
 });
 
 resendVerificationBtn?.addEventListener("click", async () => {

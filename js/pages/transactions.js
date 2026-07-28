@@ -252,7 +252,7 @@ function renderProviderView() {
             </div>
             <div>
               <h4 class="font-bold text-brand-navy text-sm sm:text-base">${tx.description || 'Platform Access Fee'}</h4>
-              <p class="text-xs text-slate-500 mt-0.5">${new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • Paid via Paystack</p>
+              <p class="text-xs text-slate-500 mt-0.5">${new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • Paid via Atlas</p>
             </div>
           </div>
           <div class="text-right">
@@ -270,7 +270,7 @@ function renderProviderView() {
       <div>
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-bold text-brand-navy">Platform Billing History</h3>
-          <span class="text-xs font-semibold text-slate-400 bg-slate-200 px-2.5 py-1 rounded-md">Powered by Paystack</span>
+          <span class="text-xs font-semibold text-slate-400 bg-slate-200 px-2.5 py-1 rounded-md">Powered by Atlas</span>
         </div>
         <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
           ${txHtml}
@@ -283,41 +283,68 @@ function renderProviderView() {
 
 async function payAccessFee() {
   try {
-    const initRes = await EdelModules.api.post('/api/billing/paystack/initialize', {}, {
+    const initRes = await EdelModules.api.post('/api/atlas/checkout/access-fee', {}, {
       headers: EdelModules.auth.getAuthHeaders()
     });
 
-    const handler = PaystackPop.setup({
-      key: billingState.status.paystackPublicKey || "pk_test_placeholder",
-      email: EdelModules.auth.getUser().email,
-      amount: billingState.status.accessFeeAmount * 100,
-      ref: initRes.reference,
-      onClose: function(){
-        Ui.toast("info", "Payment Cancelled", "You closed the payment window.");
-        loadBillingData();
-      },
-      callback: function(response){
-        // Run async logic inside the standard function
-        EdelModules.api.get(`/api/billing/paystack/verify/${response.reference}`, {
-          headers: EdelModules.auth.getAuthHeaders()
-        })
-        .then(() => {
-          Ui.toast("success", "Payment Successful", "Thank you! Your access fee has been paid.");
-          // Update local user state
-          const user = EdelModules.auth.getUser();
-          user.hasPaidAccessFee = true;
-          EdelModules.auth.setUser(user);
-          loadBillingData();
-        })
-        .catch((error) => {
-          Ui.toast("error", "Verification Failed", error.message || "Could not verify payment.");
-          loadBillingData();
-        });
-      }
-    });
-    handler.openIframe();
+    if (!initRes.checkoutUrl || !initRes.sourceReference) {
+      throw new Error("Could not initialize Atlas checkout.");
+    }
+
+    localStorage.setItem("edel_pending_atlas_source_reference", initRes.sourceReference);
+    window.location.href = initRes.checkoutUrl;
   } catch (error) {
     Ui.toast("error", "Payment Error", error.message || "Could not initialize payment.");
+  }
+}
+
+async function verifyPendingAtlasCheckout(sourceReference, { silent = false } = {}) {
+  if (!sourceReference) return false;
+
+  try {
+    await EdelModules.api.get(`/api/atlas/checkout/access-fee/verify/${encodeURIComponent(sourceReference)}`, {
+      headers: EdelModules.auth.getAuthHeaders(),
+      silent
+    });
+
+    localStorage.removeItem("edel_pending_atlas_source_reference");
+
+    const user = EdelModules.auth.getUser();
+    if (user) {
+      user.hasPaidAccessFee = true;
+      EdelModules.auth.setUser(user);
+    }
+
+    if (!silent) {
+      Ui.toast("success", "Payment Successful", "Thank you! Your access fee has been paid.");
+    }
+
+    await loadBillingData();
+    return true;
+  } catch (error) {
+    if (!silent) {
+      Ui.toast("info", "Payment Pending", error.message || "We could not confirm this payment yet.");
+    }
+    await loadBillingData();
+    return false;
+  }
+}
+
+async function reconcileAtlasCheckoutFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const sourceReference =
+    params.get("sourceReference") ||
+    params.get("source_reference") ||
+    params.get("reference") ||
+    localStorage.getItem("edel_pending_atlas_source_reference");
+
+  if (!sourceReference) return;
+
+  await verifyPendingAtlasCheckout(sourceReference, { silent: !window.location.search });
+
+  if (window.location.search) {
+    const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+    window.history.replaceState({}, document.title, cleanUrl);
   }
 }
 
@@ -452,11 +479,12 @@ function setView(viewType) {
 
 // Expose globally for onclick handlers
 window.payAccessFee = payAccessFee;
+window.verifyPendingAtlasCheckout = verifyPendingAtlasCheckout;
 window.openReceipt = openReceipt;
 window.closeReceipt = closeReceipt;
 window.setView = setView;
 
 window.addEventListener("load", () => {
   populateUserProfile();
-  loadBillingData();
+  loadBillingData().then(() => reconcileAtlasCheckoutFromUrl());
 });

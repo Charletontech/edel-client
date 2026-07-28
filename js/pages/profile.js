@@ -28,9 +28,13 @@ function updateVerifiedBadge(user = EdelModules.auth.getUser()) {
   if (!profileElements.badge) return;
 
   const sessionRole = getSessionRole(user);
-  const shouldShowBadge = !!user?.hasPaidAccessFee && sessionRole === "provider";
+  const isProviderVerified = !!user?.hasPaidAccessFee && sessionRole === "provider";
+  const isCustomerVerified = (!!user?.faceVerified || !!user?.facePhoto) && (sessionRole === "customer" || user?.role === "customer" || user?.role === "both");
 
-  profileElements.badge.classList.toggle("hidden", !shouldShowBadge);
+  profileElements.badge.classList.toggle("hidden", !isProviderVerified);
+  if (profileElements.rookieBadge) {
+    profileElements.rookieBadge.classList.toggle("hidden", !isCustomerVerified);
+  }
 }
 
 const profileElements = {
@@ -39,6 +43,7 @@ const profileElements = {
   rating: document.getElementById("profile-rating"),
   avatar: document.getElementById("profile-avatar"),
   badge: document.getElementById("profile-badge-container"),
+  rookieBadge: document.getElementById("profile-rookie-badge-container"),
   completedJobsMetric: document.getElementById("metric-completed-jobs"),
   completedJobsCount: document.getElementById("jobs-completed-count"),
   providerSections: document.getElementById("provider-sections"),
@@ -143,6 +148,122 @@ function syncProfileInputs(user) {
   }
 }
 
+function hydrateReferralSection(user) {
+  const ungeneratedView = document.getElementById("referral-ungenerated-view");
+  const generatedView = document.getElementById("referral-generated-view");
+  const linkInput = document.getElementById("referral-link-input");
+  const countEl = document.getElementById("referrals-count");
+
+  if (!ungeneratedView || !generatedView) return;
+
+  if (user?.referralCode) {
+    ungeneratedView.classList.add("hidden");
+    generatedView.classList.remove("hidden");
+
+    const origin = window.location.origin;
+    const fullLink = user.referralLink || `${origin}/auth/?ref=${encodeURIComponent(user.referralCode)}`;
+
+    if (linkInput) linkInput.value = fullLink;
+    if (countEl) countEl.innerText = user.referralCount || 0;
+  } else {
+    ungeneratedView.classList.remove("hidden");
+    generatedView.classList.add("hidden");
+  }
+}
+
+window.generateReferralLink = async function () {
+  const btn = document.getElementById("btn-generate-referral");
+  const originalHtml = btn ? btn.innerHTML : "";
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-brand-accent"></i> Generating...`;
+    Edel.initIcons();
+  }
+
+  try {
+    const res = await EdelModules.api.post(
+      "/api/generate-referral",
+      {},
+      {
+        headers: EdelModules.auth.getAuthHeaders(),
+        silent: true,
+      }
+    );
+
+    const currentUser = EdelModules.auth.getUser() || {};
+    const updatedUser = {
+      ...currentUser,
+      referralCode: res.referralCode,
+      referralLink: res.referralLink,
+      referralCount: res.referralCount || 0,
+    };
+    EdelModules.auth.setUser(updatedUser);
+
+    hydrateReferralSection(updatedUser);
+    Ui.toast("success", "Referral Link Created", "Your referral link is ready to share!");
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+      Edel.initIcons();
+    }
+    Ui.toast("error", "Generation Failed", err.message || "Failed to generate referral link");
+  }
+};
+
+window.copyReferralLink = function () {
+  const input = document.getElementById("referral-link-input");
+  const btnText = document.getElementById("copy-btn-text");
+
+  if (!input || !input.value) return;
+
+  navigator.clipboard.writeText(input.value)
+    .then(() => {
+      if (btnText) btnText.textContent = "Copied!";
+      Ui.toast("success", "Copied to Clipboard", "Referral link copied.");
+      setTimeout(() => {
+        if (btnText) btnText.textContent = "Copy";
+      }, 2500);
+    })
+    .catch(() => {
+      input.select();
+      document.execCommand("copy");
+      if (btnText) btnText.textContent = "Copied!";
+      Ui.toast("success", "Copied to Clipboard", "Referral link copied.");
+      setTimeout(() => {
+        if (btnText) btnText.textContent = "Copy";
+      }, 2500);
+    });
+};
+
+window.shareReferral = function (platform) {
+  const input = document.getElementById("referral-link-input");
+  const link = input?.value || window.location.href;
+  const shareText = encodeURIComponent(`Join me on E-del! Use my referral link to register: ${link}`);
+
+  if (platform === "whatsapp") {
+    window.open(`https://api.whatsapp.com/send?text=${shareText}`, "_blank");
+  } else if (platform === "twitter") {
+    window.open(`https://twitter.com/intent/tweet?text=${shareText}`, "_blank");
+  }
+};
+
+function getRatingHtml(ratingVal, role) {
+  const defaultVal = 50;
+  const val = ratingVal !== undefined && ratingVal !== null ? Math.round(Number(ratingVal)) : defaultVal;
+  let icon = "minus";
+  let iconClass = "text-slate-400";
+  if (val >= 80) {
+    icon = "trending-up";
+    iconClass = "text-green-500";
+  } else if (val < 50) {
+    icon = "trending-down";
+    iconClass = "text-red-500";
+  }
+  return `${val}% <i data-lucide="${icon}" class="w-4 h-4 ${iconClass}"></i>`;
+}
+
 function hydrateProfile(user) {
   if (!user) return;
 
@@ -183,14 +304,7 @@ function hydrateProfile(user) {
     : customerRoleTagClass;
 
   // Rating logic
-  const rating = user.rating || (sessionRole === "provider" ? 50 : 100);
-  const ratingTrend = rating >= (sessionRole === "provider" ? 50 : 100)
-      ? "trending-up"
-      : "trending-down";
-  const trendColor =
-    ratingTrend === "trending-up" ? "text-green-500" : "text-red-500";
-
-  profileElements.rating.innerHTML = `${rating}% <i data-lucide="${ratingTrend}" class="w-4 h-4 ${trendColor}"></i>`;
+  profileElements.rating.innerHTML = getRatingHtml(user.rating, sessionRole);
 
   if (isProviderRole) {
     profileElements.completedJobsCount.innerText = user.jobsCompleted || 0;
@@ -212,6 +326,7 @@ function hydrateProfile(user) {
   if (smsToggle) smsToggle.checked = !!user.smsUpdates;
 
   syncProfileInputs(user);
+  hydrateReferralSection(user);
 
   const switchButton = document.getElementById("btn-switch-account");
   if (switchButton) {
@@ -548,8 +663,7 @@ function setView(viewType) {
         profileRoleTag.className = customerRoleTagClass;
       }
       if (profileRating) {
-        profileRating.innerHTML =
-          '100% <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>';
+        profileRating.innerHTML = getRatingHtml(updatedUser.rating, "customer");
       }
       if (profileAvatar) {
         profileAvatar.src = EdelModules.api.buildUrl(
@@ -570,8 +684,7 @@ function setView(viewType) {
         profileRoleTag.className = providerRoleTagClass;
       }
       if (profileRating) {
-        const rating = updatedUser.rating || 50;
-        profileRating.innerHTML = `${rating}% <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>`;
+        profileRating.innerHTML = getRatingHtml(updatedUser.rating, "provider");
       }
       if (profileAvatar) {
         profileAvatar.src = EdelModules.api.buildUrl(
@@ -631,8 +744,7 @@ function setView(viewType) {
       profileRoleTag.className = customerRoleTagClass;
     }
     if (profileRating) {
-      profileRating.innerHTML =
-        '100% <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>';
+      profileRating.innerHTML = getRatingHtml(currentUser.rating, "customer");
     }
     if (profileAvatar) {
       profileAvatar.src = EdelModules.api.buildUrl(
@@ -654,8 +766,7 @@ function setView(viewType) {
       profileRoleTag.className = providerRoleTagClass;
     }
     if (profileRating) {
-      const rating = currentUser.rating || 50;
-      profileRating.innerHTML = `${rating}% <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>`;
+      profileRating.innerHTML = getRatingHtml(currentUser.rating, "provider");
     }
     if (profileAvatar) {
       profileAvatar.src = EdelModules.api.buildUrl(
@@ -794,7 +905,7 @@ function updateStatusUI(status) {
   );
 
   iconContainer.className =
-    "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-300";
+    "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-300 shadow-[0_2px_4px_rgba(100,116,139,0.25)]";
 
   switch (status) {
     case "available":
@@ -1179,35 +1290,9 @@ function openManualLocationModal() {
 }
 
 async function updateMyLocation() {
-  Ui.toast('info', 'Checking Location', '🔄 Checking your current location...', { timer: 2000 });
-
-  const result = await EdelModules.location.getLocation();
-
-  if (result.success && result.location) {
-    const loc = result.location;
-
-    // If result came from IP, confirm with user first
-    if (loc.source === 'ip') {
-      const confirmed = await Ui.alert(
-        'question',
-        'Location Approximated',
-        `📍 We detected your area as: ${loc.city}. Is this correct?`,
-        true,
-        true,
-      );
-      if (!confirmed || !confirmed.isConfirmed) {
-        openManualLocationModal();
-        return;
-      }
-    }
-
-    await saveProfileLocation(loc.city, loc.lat, loc.lng);
-  } else {
-    // GPS/IP failed/denied/blocked — prompt manual location modal
-    openManualLocationModal();
-  }
+  // Directly prompt manual location modal (skipping GPS auto-detect per user request)
+  openManualLocationModal();
 }
-
 function initProfileManualLocation() {
   const manualInput = document.getElementById('profile-manual-location-input');
   const manualStatus = document.getElementById('profile-manual-location-status');
