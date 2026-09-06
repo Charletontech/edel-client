@@ -78,10 +78,10 @@ function renderProviderView() {
             </div>
             
             <h2 class="text-3xl lg:text-4xl font-extrabold text-brand-navy tracking-tight mb-3">
-              Lifetime <span class="text-green-500 font-medium text-2xl lg:text-3xl">Unlocked</span>
+              30-Day Access <span class="text-green-500 font-medium text-2xl lg:text-3xl">Unlocked</span>
             </h2>
             <p class="text-sm text-slate-500 max-w-md leading-relaxed mb-6">
-              You have successfully paid the one-time platform access fee. Your account is now permanently upgraded to accept unlimited service requests.
+              You have successfully paid the monthly platform access fee. Your account is now upgraded to accept unlimited service requests for the next 30 days.
             </p>
 
             <!-- Feature list -->
@@ -105,7 +105,7 @@ function renderProviderView() {
                 <i data-lucide="check-circle-2" class="w-6 h-6"></i>
               </div>
               <h3 class="text-lg font-bold text-brand-navy mb-1">Pass Active</h3>
-              <p class="text-xs text-slate-500 mb-6 leading-relaxed">No further payments required. You have full, unrestricted access to the E-del marketplace.</p>
+              <p class="text-xs text-slate-500 mb-6 leading-relaxed">Your monthly subscription is active. You have full, unrestricted access to the E-del marketplace.</p>
             </div>
             <div class="w-full bg-green-50 text-green-700 font-bold py-3.5 px-4 rounded-xl border border-green-200 flex items-center justify-center gap-2 text-sm relative z-10">
               <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
@@ -128,7 +128,7 @@ function renderProviderView() {
               <span class="text-sm font-bold uppercase tracking-wider">Access Locked</span>
             </div>
             <h2 class="text-3xl lg:text-4xl font-extrabold tracking-tight mb-2">Payment Required</h2>
-            <p class="text-sm text-slate-400 max-w-sm leading-relaxed">You have completed ${status.jobsCompleted} free orders. Please pay the one-time fee to unlock unlimited orders.</p>
+            <p class="text-sm text-slate-400 max-w-sm leading-relaxed">You have completed ${status.jobsCompleted} free orders. Please pay the monthly subscription fee to unlock unlimited orders.</p>
           </div>
           <div class="flex w-full md:w-auto">
             <button onclick="payAccessFee()" class="w-full bg-brand-accent text-brand-navy hover:bg-white font-bold py-4 px-8 rounded-2xl shadow-glow transition-all active:scale-95 flex items-center justify-center gap-3">
@@ -211,7 +211,7 @@ function renderProviderView() {
                 <i data-lucide="zap" class="w-6 h-6"></i>
               </div>
               <h3 class="text-lg font-bold text-brand-navy mb-1">Skip the Wait</h3>
-              <p class="text-xs text-slate-500 mb-6 leading-relaxed">Unlock unlimited orders immediately and secure your lifetime provider access today.</p>
+              <p class="text-xs text-slate-500 mb-6 leading-relaxed">Unlock unlimited orders immediately and secure your 30-day provider access today.</p>
             </div>
             <button onclick="payAccessFee()" class="w-full bg-brand-navy text-white hover:bg-brand-accent hover:text-brand-navy font-bold py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm group/btn">
               Pay ₦${status.accessFeeAmount.toLocaleString()} Early
@@ -237,12 +237,21 @@ function renderProviderView() {
     `;
   } else {
     txHtml = transactions.map(tx => {
+      const isPending = tx.status === 'pending';
       const isSuccess = tx.status === 'success';
       const icon = isSuccess ? 'unlock' : (tx.status === 'failed' ? 'x-circle' : 'clock');
       const color = isSuccess ? 'text-brand-navy bg-brand-accent/10 border-brand-accent/20' : (tx.status === 'failed' ? 'text-red-600 bg-red-50 border-red-100' : 'text-orange-600 bg-orange-50 border-orange-100');
-      const statusBadge = isSuccess 
+      let statusBadge = isSuccess 
         ? `<span class="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-md mt-1 inline-flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Successful</span>`
         : `<span class="text-[10px] font-bold uppercase tracking-wider mt-1 inline-block ${tx.status === 'failed' ? 'text-red-600' : 'text-orange-600'}">${tx.status}</span>`;
+      
+      if (isPending) {
+        statusBadge += `
+          <button onclick="event.stopPropagation(); verifyPendingAtlasCheckout('${tx.reference}')" class="ml-2 text-[10px] font-bold bg-brand-navy text-white hover:bg-brand-accent hover:text-brand-navy px-2 py-0.5 rounded-md transition-colors inline-flex items-center gap-1 shadow-sm">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Verify
+          </button>
+        `;
+      }
 
       return `
         <div class="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors group" onclick="openReceipt('${tx.id}')">

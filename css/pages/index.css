@@ -1,3 +1,12 @@
+/* Homepage Typography Override (Vitalswap Style) */
+body, .font-sans {
+  font-family: "Poppins", system-ui, -apple-system, sans-serif !important;
+}
+
+code, pre, .font-mono {
+  font-family: ui-monospace, Menlo, monospace !important;
+}
+
 /* Custom Animations & Utilities */
 .gradient-text {
   background: linear-gradient(135deg, var(--brand-accent) 0%, #d97706 100%);
@@ -62,7 +71,7 @@
 
 /* Cyber Typography */
 .font-mono-data {
-  font-family: "Space Mono", monospace;
+  font-family: ui-monospace, Menlo, monospace !important;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }

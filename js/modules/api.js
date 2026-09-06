@@ -80,6 +80,16 @@ window.EdelModules.api = {
       }
 
       if (!response.ok) {
+        if (response.status === 401 && !window.location.pathname.includes("/auth/")) {
+          // Token is likely expired or invalid. Auto logout to clear stale state.
+          if (window.EdelModules?.auth?.logout) {
+            window.EdelModules.auth.logout();
+          } else {
+            localStorage.removeItem("edel_user");
+            window.location.href = "/auth/";
+          }
+        }
+
         const message = this.getErrorMessage(data);
         
         // Auto-toast error unless silent option is true

@@ -1,3 +1,27 @@
+
+let currentTypeFilter = 'all';
+
+window.Discovery = {
+  setTypeFilter(type) {
+    currentTypeFilter = type;
+    
+    // Update active styles
+    const btnAll = document.getElementById('type-filter-all');
+    const btnProd = document.getElementById('type-filter-product');
+    const btnServ = document.getElementById('type-filter-service');
+    
+    [btnAll, btnProd, btnServ].forEach(b => {
+      b.className = 'flex-1 py-1.5 px-3 rounded-lg text-sm font-bold text-slate-500 hover:text-brand-navy transition-all';
+    });
+    
+    const activeBtn = document.getElementById('type-filter-' + type);
+    if(activeBtn) {
+      activeBtn.className = 'flex-1 py-1.5 px-3 rounded-lg text-sm font-bold bg-white text-brand-navy shadow-sm transition-all';
+    }
+    
+    loadDiscoveryFeed();
+  }
+};
 let _settingsLoaded = false;
 let _enableCategoriesViewForProviders = false;
 Edel.initIcons();
@@ -1180,7 +1204,7 @@ async function startFaceDetectionLoop(video) {
     return;
   }
 
-  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
+  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 });
 
   _faceDetectionInterval = setInterval(async () => {
     if (!video || video.readyState < 2) return;

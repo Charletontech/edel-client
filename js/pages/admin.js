@@ -803,6 +803,7 @@ const Admin = (() => {
               <thead class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
                 <tr>
                   <th class="px-6 py-4 font-bold">Category</th>
+                  <th class="px-6 py-4 font-bold">Type</th>
                   <th class="px-6 py-4 font-bold">Icon</th>
                   <th class="px-6 py-4 font-bold">Status</th>
                   <th class="px-6 py-4 font-bold text-right">Actions</th>
@@ -810,10 +811,11 @@ const Admin = (() => {
               </thead>
               <tbody class="divide-y divide-slate-100">
                 ${categories.length === 0 ? `
-                  <tr><td colspan="4" class="px-6 py-8 text-center text-slate-400">No categories found.</td></tr>
+                  <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No categories found.</td></tr>
                 ` : categories.map(cat => `
                   <tr class="hover:bg-slate-50/50 transition-colors">
                     <td class="px-6 py-4 font-bold text-brand-navy capitalize">${escapeHtml(cat.name)}</td>
+                    <td class="px-6 py-4 text-sm text-slate-500">${escapeHtml(cat.type || 'Service')}</td>
                     <td class="px-6 py-4">
                       <div class="flex items-center gap-2">
                         <div class="w-8 h-8 bg-brand-light rounded-lg flex items-center justify-center">
@@ -831,7 +833,8 @@ const Admin = (() => {
                       <button onclick="Admin.openCategoryModal(${cat.id})" class="text-brand-navy hover:text-brand-blue p-2">
                         <i data-lucide="edit-2" class="w-4 h-4"></i>
                       </button>
-                      <button onclick="Admin.deleteCategory(${cat.id})" class="text-red-500 hover:text-red-600 p-2">
+                      <button onclick="Admin.deleteCategory,
+    loadBusinesses(${cat.id})" class="text-red-500 hover:text-red-600 p-2">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                       </button>
                     </td>
@@ -865,6 +868,14 @@ const Admin = (() => {
         </div>
         
         <div>
+          <label class="block text-sm font-bold text-brand-navy mb-2">Category Type</label>
+          <select id="cat-type-input" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-accent focus:bg-white transition-all text-sm">
+            <option value="Product" ${category && category.type === 'Product' ? 'selected' : ''}>Product</option>
+            <option value="Service" ${!category || category.type === 'Service' ? 'selected' : ''}>Service</option>
+          </select>
+        </div>
+        
+        <div>
           <label class="block text-sm font-bold text-brand-navy mb-2">Select Icon</label>
           <input type="hidden" id="cat-icon-input" value="${defaultIcon}">
           <div class="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-48 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
@@ -891,15 +902,16 @@ const Admin = (() => {
 
   async function saveCategory(id) {
     const name = document.getElementById("cat-name-input").value;
+    const type = document.getElementById("cat-type-input").value;
     const iconName = document.getElementById("cat-icon-input").value;
     const isActive = document.getElementById("cat-active-input").checked;
 
     try {
       if (id) {
-        await EdelModules.api.put(`/api/admin/categories/${id}`, { name, iconName, isActive }, getAuthOptions());
+        await EdelModules.api.put(`/api/admin/categories/${id}`, { name, iconName, isActive, type }, getAuthOptions());
         Ui.toast("success", "Category Updated", "The category has been updated successfully.");
       } else {
-        await EdelModules.api.post("/api/admin/categories", { name, iconName, isActive }, getAuthOptions());
+        await EdelModules.api.post("/api/admin/categories", { name, iconName, isActive, type }, getAuthOptions());
         Ui.toast("success", "Category Created", "New category has been added.");
       }
       closeModal();

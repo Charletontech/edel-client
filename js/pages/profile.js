@@ -1,3 +1,438 @@
+
+function getAuthOptions() {
+  return {
+    headers: EdelModules.auth.getAuthHeaders()
+  };
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatCurrency(amount) {
+  const num = Number(amount) || 0;
+  return '₦' + num.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function previewNewImage(input) {
+  const file = input.files && input.files[0];
+  const previewImg = document.getElementById("preview-image");
+  const previewPlaceholder = document.getElementById("preview-placeholder");
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      if (previewImg) {
+        previewImg.src = e.target.result;
+        previewImg.classList.remove("hidden");
+      }
+      if (previewPlaceholder) {
+        previewPlaceholder.classList.add("hidden");
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+window.previewNewImage = previewNewImage;
+window.escapeHtml = escapeHtml;
+window.formatCurrency = formatCurrency;
+
+// --- Businesses & Items Logic ---
+const ProfileBusinesses = {
+  businesses: [],
+  categories: [],
+  
+  async loadCategories() {
+    try {
+      const cats = await EdelModules.api.get("/api/services/categories", {
+        headers: EdelModules.auth.getAuthHeaders()
+      });
+      this.categories = Array.isArray(cats) ? cats : (cats?.data || []);
+      window.allAppCategories = this.categories;
+    } catch (e) {
+      console.error("Failed to load categories", e);
+    }
+  },
+  
+  async updateCategoryDropdown() {
+    const typeRadio = document.querySelector('input[name="bus-type"]:checked');
+    const type = typeRadio ? typeRadio.value : 'Service';
+    const select = document.getElementById('bus-category-input');
+    if (!select) return;
+    
+    if (!this.categories || this.categories.length === 0) {
+      await this.loadCategories();
+    }
+
+    select.innerHTML = '<option value="" disabled selected>Select a category...</option>';
+    
+    const catsToUse = (this.categories && this.categories.length > 0) ? this.categories : (window.allAppCategories || []);
+    
+    const filteredCats = catsToUse.filter(c => {
+      if (!c.type) return true;
+      return c.type.toLowerCase() === type.toLowerCase();
+    });
+
+    const finalCats = filteredCats.length > 0 ? filteredCats : catsToUse;
+
+    finalCats.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.textContent = c.name.charAt(0).toUpperCase() + c.name.slice(1);
+      select.appendChild(opt);
+    });
+  },
+  
+  async loadBusinesses() {
+    try {
+      const data = await EdelModules.api.get("/api/businesses", getAuthOptions());
+      this.businesses = Array.isArray(data) ? data : [];
+      this.render();
+    } catch (error) {
+      console.error("Error loading businesses:", error);
+    }
+  },
+  
+  async saveBusiness() {
+    const nameInput = document.getElementById('bus-name-input');
+    const name = nameInput ? nameInput.value.trim() : '';
+    const typeRadio = document.querySelector('input[name="bus-type"]:checked');
+    const type = typeRadio ? typeRadio.value : 'Service';
+    const categorySelect = document.getElementById('bus-category-input');
+    const category = categorySelect ? categorySelect.value : '';
+    
+    if(!name || !category) {
+      return Ui.toast("error", "Validation Error", "Please provide a business name and select a category.");
+    }
+    
+    const btn = document.getElementById('btn-save-business');
+    const ogHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Creating...';
+      btn.disabled = true;
+    }
+    
+    try {
+      await EdelModules.api.post("/api/businesses", { name, businessType: type, category }, getAuthOptions());
+      Ui.toast("success", "Business Created", `"${name}" has been created! You can now add items under it.`);
+      closeModals();
+      if (nameInput) nameInput.value = '';
+      await this.loadBusinesses();
+    } catch (err) {
+      Ui.toast("error", "Error", err.message || "Failed to create business");
+    } finally {
+      if (btn) {
+        btn.innerHTML = ogHtml;
+        btn.disabled = false;
+      }
+      Edel.initIcons();
+    }
+  },
+  
+  confirmDeleteBusiness(id, name) {
+    if(confirm(`WARNING: Are you sure you want to delete "${name || 'this business'}"?\n\nALL products and services associated with this business will be PERMANENTLY deleted. This action cannot be undone.`)) {
+      this.deleteBusiness(id);
+    }
+  },
+  
+  async deleteBusiness(id) {
+    try {
+      await EdelModules.api.delete(`/api/businesses/${id}`, getAuthOptions());
+      Ui.toast("success", "Business Deleted", "The business and its associated items have been removed.");
+      await this.loadBusinesses();
+    } catch (e) {
+      Ui.toast("error", "Delete Failed", e.message || "Could not delete business");
+    }
+  },
+  
+  openAddItem(businessId) {
+    const bus = this.businesses.find(b => String(b.id) === String(businessId));
+    const busType = bus?.businessType || 'Service';
+    const busName = bus?.name || 'Business';
+
+    const itemBusinessIdInput = document.getElementById('item-business-id-input');
+    const serviceIdInput = document.getElementById('service-id-input');
+    const titleInput = document.getElementById('new-title');
+    const priceInput = document.getElementById('new-price');
+    const descInput = document.getElementById('new-desc');
+    const imageInput = document.getElementById('new-image');
+    const previewImg = document.getElementById('preview-image');
+    const previewPlaceholder = document.getElementById('preview-placeholder');
+    const modalTitle = document.getElementById('modal-add-service-title');
+    const saveBtn = document.getElementById('btn-save-service');
+
+    if (itemBusinessIdInput) itemBusinessIdInput.value = businessId;
+    if (serviceIdInput) serviceIdInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (priceInput) priceInput.value = '';
+    if (descInput) descInput.value = '';
+    if (imageInput) imageInput.value = '';
+    if (previewImg) {
+      previewImg.src = '';
+      previewImg.classList.add('hidden');
+    }
+    if (previewPlaceholder) previewPlaceholder.classList.remove('hidden');
+
+    if (modalTitle) {
+      modalTitle.textContent = `Add ${busType} to "${busName}"`;
+    }
+    if (saveBtn) {
+      saveBtn.innerHTML = `Add ${busType} <i data-lucide="check" class="w-5 h-5"></i>`;
+      saveBtn.setAttribute('onclick', 'saveNewService()');
+    }
+
+    openModal('modal-add-service');
+    Edel.initIcons();
+  },
+
+  openEditItem(businessId, itemId) {
+    const bus = this.businesses.find(b => String(b.id) === String(businessId));
+    const item = bus?.items?.find(i => String(i.id) === String(itemId));
+    if (!bus || !item) {
+      return Ui.toast("error", "Error", "Could not find item details to edit.");
+    }
+
+    const itemBusinessIdInput = document.getElementById('item-business-id-input');
+    const serviceIdInput = document.getElementById('service-id-input');
+    const titleInput = document.getElementById('new-title');
+    const priceInput = document.getElementById('new-price');
+    const descInput = document.getElementById('new-desc');
+    const imageInput = document.getElementById('new-image');
+    const previewImg = document.getElementById('preview-image');
+    const previewPlaceholder = document.getElementById('preview-placeholder');
+    const modalTitle = document.getElementById('modal-add-service-title');
+    const saveBtn = document.getElementById('btn-save-service');
+
+    if (itemBusinessIdInput) itemBusinessIdInput.value = businessId;
+    if (serviceIdInput) serviceIdInput.value = itemId;
+    if (titleInput) titleInput.value = item.title || '';
+    if (priceInput) priceInput.value = item.basePrice || '';
+    if (descInput) descInput.value = item.description || '';
+    if (imageInput) imageInput.value = '';
+
+    if (item.businessPhoto && previewImg && previewPlaceholder) {
+      previewImg.src = EdelModules.api.buildUrl(item.businessPhoto);
+      previewImg.classList.remove('hidden');
+      previewPlaceholder.classList.add('hidden');
+    } else if (previewImg && previewPlaceholder) {
+      previewImg.src = '';
+      previewImg.classList.add('hidden');
+      previewPlaceholder.classList.remove('hidden');
+    }
+
+    if (modalTitle) {
+      modalTitle.textContent = `Edit ${bus.businessType}: "${item.title}"`;
+    }
+    if (saveBtn) {
+      saveBtn.innerHTML = `Save Changes <i data-lucide="check" class="w-5 h-5"></i>`;
+      saveBtn.setAttribute('onclick', 'saveNewService()');
+    }
+
+    openModal('modal-add-service');
+    Edel.initIcons();
+  },
+  
+  render() {
+    const container = document.getElementById('businesses-container');
+    const limitText = document.getElementById('business-limit-text');
+    const btnAdd = document.getElementById('btn-add-business');
+    if (!container) return;
+    
+    const count = this.businesses.length;
+    if (count >= 3) {
+      if (btnAdd) btnAdd.style.display = 'none';
+      if (limitText) limitText.innerHTML = '<span class="text-amber-600 font-bold flex items-center gap-1"><i data-lucide="info" class="w-3.5 h-3.5"></i> Maximum of 3 businesses reached</span>';
+    } else {
+      if (btnAdd) btnAdd.style.display = 'flex';
+      if (limitText) limitText.innerHTML = `You can manage up to 3 businesses <span class="font-bold text-brand-navy">(${3 - count} slot${3 - count === 1 ? '' : 's'} available)</span>`;
+    }
+    
+    if (count === 0) {
+      container.innerHTML = `
+        <div class="text-center py-12 px-6 bg-slate-50/60 rounded-3xl border-2 border-dashed border-slate-200">
+          <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 mx-auto mb-4 text-brand-navy">
+            <i data-lucide="briefcase" class="w-8 h-8 text-brand-accent"></i>
+          </div>
+          <h4 class="font-extrabold text-brand-navy text-lg mb-1.5">No Businesses Created Yet</h4>
+          <p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto mb-5 leading-relaxed">
+            Create your business profile to start uploading products or services for discovery by customers.
+          </p>
+          <button onclick="openModal('modal-add-business')" class="inline-flex items-center gap-2 px-6 py-3 bg-brand-navy hover:bg-brand-blue text-brand-accent rounded-2xl font-extrabold text-sm shadow-md shadow-brand-navy/10 transition-all active:scale-95 cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i> Create Your First Business
+          </button>
+        </div>
+      `;
+      Edel.initIcons();
+      return;
+    }
+    
+    let html = '';
+    this.businesses.forEach(bus => {
+      const items = bus.items || [];
+      const isProduct = bus.businessType === 'Product';
+      const badgeColor = isProduct 
+        ? 'bg-blue-50 text-blue-700 border border-blue-200/60' 
+        : 'bg-purple-50 text-purple-700 border border-purple-200/60';
+      const iconBg = isProduct
+        ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
+        : 'bg-brand-navy text-brand-accent shadow-sm shadow-brand-navy/20';
+      const iconType = isProduct ? 'box' : 'sparkles';
+      
+      html += `
+        <div class="bg-white rounded-3xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+          <!-- Business Card Header -->
+          <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
+            <div class="flex gap-3.5 sm:gap-4 items-center">
+              <div class="w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center shrink-0">
+                <i data-lucide="${iconType}" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="font-extrabold text-brand-navy text-lg tracking-tight">${escapeHtml(bus.name)}</h4>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${badgeColor} uppercase tracking-wider">
+                    ${bus.businessType}
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="inline-flex items-center gap-1 text-xs text-slate-500 font-semibold bg-white px-2.5 py-0.5 rounded-lg border border-slate-200/60 capitalize">
+                    <i data-lucide="tag" class="w-3 h-3 text-brand-accent"></i> ${escapeHtml(bus.category)}
+                  </span>
+                  <span class="text-xs text-slate-400 font-medium">• ${items.length} ${items.length === 1 ? (isProduct ? 'product' : 'service') : (isProduct ? 'products' : 'services')}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-2 self-end sm:self-center">
+              <button 
+                onclick="ProfileBusinesses.openAddItem('${bus.id}')" 
+                class="px-4 py-2 bg-brand-navy hover:bg-brand-blue text-brand-accent rounded-xl font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer"
+              >
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add ${bus.businessType}
+              </button>
+              <button 
+                onclick="ProfileBusinesses.confirmDeleteBusiness('${bus.id}', '${escapeHtml(bus.name)}')" 
+                class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl border border-transparent hover:border-red-100 transition-all cursor-pointer" 
+                title="Delete Business"
+              >
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Items List / Grid -->
+          <div class="p-5 sm:p-6">
+            ${items.length === 0 ? `
+              <div class="py-8 px-4 rounded-2xl bg-slate-50/70 border border-dashed border-slate-200 text-center">
+                <div class="w-10 h-10 rounded-xl bg-white shadow-xs border border-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2.5">
+                  <i data-lucide="${isProduct ? 'package-plus' : 'sparkles'}" class="w-5 h-5"></i>
+                </div>
+                <p class="text-xs font-bold text-brand-navy mb-1">No ${isProduct ? 'products' : 'services'} added yet</p>
+                <p class="text-[11px] text-slate-400 max-w-xs mx-auto mb-3.5">Add items under this business so customers can discover and request them.</p>
+                <button onclick="ProfileBusinesses.openAddItem('${bus.id}')" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-navy hover:bg-brand-blue text-brand-accent rounded-xl text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add First ${bus.businessType}
+                </button>
+              </div>
+            ` : `
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                ${items.map(item => `
+                  <div class="flex flex-col p-3.5 bg-slate-50/60 rounded-2xl border border-slate-100 hover:border-brand-accent/40 hover:bg-white hover:shadow-md transition-all duration-200 group">
+                    <div class="relative w-full h-36 rounded-xl overflow-hidden bg-slate-200 mb-3 shrink-0">
+                      <img 
+                        src="${EdelModules.api.buildUrl(item.businessPhoto)}" 
+                        alt="${escapeHtml(item.title)}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                        onerror="this.src='/assets/images/placeholder.png'" 
+                      />
+                      <span class="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-brand-navy/90 backdrop-blur-sm text-brand-accent font-extrabold text-xs shadow-sm">
+                        ${formatCurrency(item.basePrice)}
+                      </span>
+                    </div>
+                    <!-- 3-Dot Menu Button floating on top-right of photo -->
+                    <div class="absolute top-2 right-2 item-menu-container z-20">
+                      <button 
+                        type="button" 
+                        onclick="toggleItemMenu(this, event)" 
+                        class="w-7 h-7 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-white/80 text-slate-700 hover:text-brand-navy hover:bg-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95" 
+                        title="Options"
+                      >
+                        <i data-lucide="more-vertical" class="w-4 h-4 pointer-events-none"></i>
+                      </button>
+                      
+                      <!-- 3-Dot Dropdown Menu -->
+                      <div class="item-dropdown-menu absolute right-0 top-full mt-1 w-36 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 hidden z-30">
+                        <button 
+                          type="button" 
+                          onclick="ProfileBusinesses.openEditItem('${bus.id}', '${item.id}'); closeAllItemMenus();" 
+                          class="w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-brand-navy hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
+                        >
+                          <i data-lucide="edit-3" class="w-3.5 h-3.5 text-blue-600"></i> Edit ${isProduct ? 'Product' : 'Service'}
+                        </button>
+                        <button 
+                          type="button" 
+                          onclick="deleteService('${item.id}'); closeAllItemMenus();" 
+                          class="w-full text-left px-3.5 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer transition-colors border-t border-slate-100"
+                        >
+                          <i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-500"></i> Delete
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <h5 class="font-bold text-brand-navy text-sm leading-snug truncate" title="${escapeHtml(item.title)}">
+                          ${escapeHtml(item.title)}
+                        </h5>
+                        <p class="text-xs text-slate-500 font-medium line-clamp-2 mt-1 leading-relaxed">
+                          ${escapeHtml(item.description || 'No description provided')}
+                        </p>
+                      </div>
+                      <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-200/60">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          ${isProduct ? 'Product' : 'Service'}
+                        </span>
+                        <div class="flex items-center gap-1">
+                          <button 
+                            type="button" 
+                            onclick="ProfileBusinesses.openEditItem('${bus.id}', '${item.id}')" 
+                            class="text-slate-400 hover:text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg transition-colors cursor-pointer" 
+                            title="Edit ${isProduct ? 'product' : 'service'}"
+                          >
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                          </button>
+                          <button 
+                            type="button" 
+                            onclick="deleteService('${item.id}')" 
+                            class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer" 
+                            title="Delete ${isProduct ? 'product' : 'service'}"
+                          >
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+    Edel.initIcons();
+  }
+};
+
+window.ProfileBusinesses = ProfileBusinesses;
+ProfileBusinesses.loadCategories();
+ProfileBusinesses.loadBusinesses();
+
 Edel.initIcons();
 Edel.applySafeArea();
 
@@ -29,7 +464,7 @@ function updateVerifiedBadge(user = EdelModules.auth.getUser()) {
 
   const sessionRole = getSessionRole(user);
   const isProviderVerified = !!user?.hasPaidAccessFee && sessionRole === "provider";
-  const isCustomerVerified = (!!user?.faceVerified || !!user?.facePhoto) && (sessionRole === "customer" || user?.role === "customer" || user?.role === "both");
+  const isCustomerVerified = (!!user?.faceVerified || !!user?.facePhoto) && sessionRole === "customer";
 
   profileElements.badge.classList.toggle("hidden", !isProviderVerified);
   if (profileElements.rookieBadge) {
@@ -816,10 +1251,10 @@ async function upgradeAccount(targetRole, payload = {}) {
 }
 
 async function submitProviderUpgrade() {
-  const serviceCategory = document.getElementById("upgrade-category").value;
-  const serviceTitle = document.getElementById("upgrade-title").value;
-  const basePrice = document.getElementById("upgrade-price").value;
-  const serviceDescription = document.getElementById("upgrade-desc").value;
+  const serviceCategory = document.getElementById("upgrade-category")?.value;
+  const serviceTitle = document.getElementById("upgrade-title")?.value;
+  const basePrice = document.getElementById("upgrade-price")?.value;
+  const serviceDescription = document.getElementById("upgrade-desc")?.value;
   const photoInput = document.getElementById("upgrade-business-photo");
 
   if (!serviceCategory || !serviceTitle || !basePrice || !serviceDescription) {
@@ -827,7 +1262,7 @@ async function submitProviderUpgrade() {
     return;
   }
 
-  if (!photoInput.files[0]) {
+  if (!photoInput?.files?.[0]) {
     Ui.toast("warning", "Photo Required", "Please upload a business photo for your service");
     return;
   }
@@ -884,9 +1319,8 @@ async function updateProviderStatus(selectElement) {
     Ui.toast("success", "Status Updated", `You are now ${newStatus}`);
   } catch (error) {
     Ui.toast("error", "Update Failed", error.message);
-    // Revert select if failed
     const currentUser = EdelModules.auth.getUser();
-    selectElement.value = currentUser.availabilityStatus || "available";
+    selectElement.value = currentUser?.availabilityStatus || "available";
   }
 }
 
@@ -895,7 +1329,7 @@ function updateStatusUI(status) {
   const description = document.getElementById("status-description");
   const selectElement = document.getElementById("provider-status");
 
-  if (!iconContainer || !description) return;
+  if (!iconContainer || !description || !selectElement) return;
 
   selectElement.classList.remove(
     "status-available",
@@ -960,81 +1394,115 @@ document.getElementById('upgrade-business-photo')?.addEventListener('change', (e
 });
 
 async function saveNewService() {
-  const category = document.getElementById("new-category").value;
-  const title = document.getElementById("new-title").value;
-  const basePrice = document.getElementById("new-price").value;
-  const description = document.getElementById("new-desc").value;
-  const photoInput = document.getElementById("new-business-photo");
+  const serviceId = document.getElementById("service-id-input")?.value;
+  const businessId = document.getElementById("item-business-id-input")?.value;
+  const title = document.getElementById("new-title")?.value?.trim();
+  const basePrice = document.getElementById("new-price")?.value?.trim();
+  const description = document.getElementById("new-desc")?.value?.trim();
+  const imageInput = document.getElementById("new-image");
+  const imageFile = imageInput?.files ? imageInput.files[0] : null;
 
-  if (!category || !title || !basePrice || !description) {
-    Ui.toast("warning", "Missing Info", "Please fill all fields");
-    return;
+  if (!title || !basePrice || !description) {
+    return Ui.toast("error", "Validation Error", "Please fill in item title, price, and description");
   }
 
-  if (!photoInput.files[0]) {
-    Ui.toast("warning", "Photo Required", "Please upload a business photo for your service");
-    return;
+  if (!businessId) {
+    return Ui.toast("error", "Error", "A business is required to add this item");
+  }
+
+  if (!serviceId && !imageFile) {
+    return Ui.toast("error", "Photo Required", "Please upload a photo for your item");
   }
 
   const formData = new FormData();
-  formData.append("category", category);
+  formData.append("businessId", businessId);
   formData.append("title", title);
-  formData.append("basePrice", Number(basePrice));
+  formData.append("basePrice", basePrice);
   formData.append("description", description);
-  formData.append("businessPhoto", photoInput.files[0]);
+  if (imageFile) {
+    formData.append("businessPhoto", imageFile);
+  }
+
+  const btn = document.getElementById("btn-save-service");
+  const ogHtml = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Saving...';
+    btn.disabled = true;
+  }
 
   try {
-    Ui.toast("info", "Adding Service", "Uploading your service details...");
-    await EdelModules.api.post(
-      "/api/services",
-      formData,
-      {
-        headers: EdelModules.auth.getAuthHeaders(),
-        silent: true,
-      },
-    );
+    if (serviceId) {
+      await EdelModules.api.put(`/api/services/${serviceId}`, formData, {
+        headers: EdelModules.auth.getAuthHeaders()
+      });
+      Ui.toast("success", "Item Updated", "Your item has been updated successfully.");
+    } else {
+      await EdelModules.api.post("/api/services", formData, {
+        headers: EdelModules.auth.getAuthHeaders()
+      });
+      Ui.toast("success", "Item Added", "New item listed under your business!");
+    }
 
-    Ui.toast("success", "Service Added", "Your new service is now live!");
     closeModals();
-    refreshDashboard();
-
-    // Clear form
-    document.getElementById("new-category").value = "";
-    document.getElementById("new-title").value = "";
-    document.getElementById("new-price").value = "";
-    document.getElementById("new-desc").value = "";
-    if (photoInput) photoInput.value = "";
-    const photoLabel = document.getElementById("photo-upload-label");
-    if (photoLabel) photoLabel.innerText = "Upload Business Photo";
+    await ProfileBusinesses.loadBusinesses();
   } catch (error) {
-    Ui.toast("error", "Failed to Add Service", error.message);
+    Ui.toast("error", "Save Failed", error.message || "Failed to save item");
+  } finally {
+    if (btn) {
+      btn.innerHTML = ogHtml;
+      btn.disabled = false;
+    }
+    Edel.initIcons();
   }
 }
 
 async function deleteService(id) {
-  const confirmed = await new Promise((resolve) => {
-    // Using a simple confirm for now, or CoolAlert if preferred
-    if (confirm("Are you sure you want to delete this service?")) {
-      resolve(true);
-    } else {
-      resolve(false);
-    }
-  });
-
-  if (!confirmed) return;
+  if (!confirm("Are you sure you want to delete this item?")) return;
 
   try {
-    await EdelModules.api.delete(`/api/services/${id}`, {
-      headers: EdelModules.auth.getAuthHeaders(),
-      silent: true,
+    await EdelModules.api.delete('/api/services/' + id, {
+      headers: EdelModules.auth.getAuthHeaders()
     });
 
-    Ui.toast("success", "Service Deleted", "The service has been removed.");
-    refreshDashboard();
+    Ui.toast("success", "Item Deleted", "The item has been removed.");
+    await ProfileBusinesses.loadBusinesses();
   } catch (error) {
-    Ui.toast("error", "Delete Failed", error.message);
+    Ui.toast("error", "Delete Failed", error.message || "Could not delete item");
   }
 }
+
+
+// 3-Dot Item Menu Dropdown Helpers
+window.toggleItemMenu = function(button, event) {
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  const container = button.closest('.item-menu-container');
+  const menu = container ? container.querySelector('.item-dropdown-menu') : null;
+  if (!menu) return;
+  
+  const isHidden = menu.classList.contains('hidden');
+  
+  // Close all other item menus first
+  window.closeAllItemMenus();
+  
+  if (isHidden) {
+    menu.classList.remove('hidden');
+  }
+};
+
+window.closeAllItemMenus = function() {
+  document.querySelectorAll('.item-dropdown-menu').forEach(m => {
+    m.classList.add('hidden');
+  });
+};
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.item-menu-container')) {
+    window.closeAllItemMenus();
+  }
+});
 
 // Service Menu Mobile Helper
 window.toggleServiceMenu = function(button) {
@@ -1057,8 +1525,7 @@ document.addEventListener('click', (e) => {
 
 function editService(id) {
   const user = EdelModules.auth.getUser();
-  const service = user.services.find((s) => s.id === id);
-
+  const service = user?.services?.find((s) => s.id === id);
   if (!service) return;
 
   // Fill "Add Service" modal with data and change its behavior
@@ -1168,26 +1635,15 @@ function viewServiceDetails(id) {
       `;
     }
   }
-
-  // Setup Edit Button in Details
-  const editBtn = document.getElementById("btn-edit-from-detail");
-  if (isDisabled) {
-    editBtn.classList.add("hidden");
-  } else {
-    editBtn.classList.remove("hidden");
-    editBtn.onclick = () => {
-      closeModals();
-      setTimeout(() => editService(id), 350);
-    };
-  }
-
-  openModal("modal-service-details");
-  Edel.initIcons();
 }
 
 function openModal(modalId) {
   const overlay = document.getElementById("modal-overlay");
   const modal = document.getElementById(modalId);
+
+  if (modalId === 'modal-add-business') {
+    ProfileBusinesses.updateCategoryDropdown();
+  }
 
   if (currentOpenModal && currentOpenModal !== modal) {
     currentOpenModal.classList.add("hidden");
@@ -1228,13 +1684,14 @@ function closeModals() {
   }, 300);
 }
 
-document.getElementById("modal-overlay").addEventListener("click", function (e) {
+document.getElementById("modal-overlay")?.addEventListener("click", function (e) {
   if (e.target === this) {
     closeModals();
   }
 });
 
 window.updateProviderStatus = updateProviderStatus;
+window.updateStatusUI = updateStatusUI;
 window.saveNewService = saveNewService;
 window.deleteService = deleteService;
 window.editService = editService;
